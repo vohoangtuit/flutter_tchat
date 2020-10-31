@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "521036740132",
+    "firebase_url": "https://tchat-526d5.firebaseio.com",
+    "project_id": "tchat-526d5",
+    "storage_bucket": "tchat-526d5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521036740132:android:45fc3428a90f252d0f0ab1",
+        "android_client_info": {
+          "package_name": "vht.tchat.com"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521036740132-g4fcor3rp271m9klno77g6422hngn15e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vht.tchat.com",
+            "certificate_hash": "428044f15da915e88f61a4ec92055bb38f3fd691"
+          }
+        },
+        {
+          "client_id": "521036740132-87cl1ln0qkl5543pj0ltv9h9vvf7m84o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAkaxAt6nNiDiWYUjT6d6XkrIstnA7HGaQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521036740132-87cl1ln0qkl5543pj0ltv9h9vvf7m84o.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "521036740132-mprn6n3v1qsbvr8p73tcbt62v33hpuur.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "vht.tchat.com"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
