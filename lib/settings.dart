@@ -9,7 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'const.dart';
+import 'utils/const.dart';
 
 class ChatSettings extends StatelessWidget {
   @override

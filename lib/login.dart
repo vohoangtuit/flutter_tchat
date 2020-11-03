@@ -7,9 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/loading.dart';
 
-import 'const.dart';
+import 'utils/const.dart';
 import 'home.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -45,7 +47,7 @@ class LoginScreenState extends State<LoginScreen> {
 
     isLoggedIn = await googleSignIn.isSignedIn();
     if (isLoggedIn) {
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>
@@ -101,19 +103,29 @@ class LoginScreenState extends State<LoginScreen> {
         await prefs.setString('id', currentUser.uid);
         await prefs.setString('nickname', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
+
+        await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
+        await SharedPre.saveString(SharedPre.sharedPreID,currentUser.uid);
+        await SharedPre.saveString(SharedPre.sharedPreNickname,currentUser.displayName);
+        await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,currentUser.photoURL);
       } else {
         // Write data to local
         await prefs.setString('id', documents[0].data()['id']);
         await prefs.setString('nickname', documents[0].data()['nickname']);
         await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
         await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
+
+        await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
+        await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()['id']);
+        await SharedPre.saveString(SharedPre.sharedPreNickname,documents[0].data()['nickname']);
+        await SharedPre.saveString(SharedPre.sharedPreAboutMe,documents[0].data()['aboutMe']);
       }
       Fluttertoast.showToast(msg: "Sign in success");
       this.setState(() {
         isLoading = false;
       });
 
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) =>
@@ -129,13 +141,8 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            widget.title,
-            style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-          ),
-          centerTitle: true,
-        ),
+        appBar: appBarWithTitle(
+        context,'Login Account'),
         body: Stack(
           children: <Widget>[
             Center(

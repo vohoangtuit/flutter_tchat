@@ -9,32 +9,63 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tchat_app/const.dart';
+import 'package:tchat_app/widget/basewidget.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/utils/const.dart';
 import 'package:tchat_app/widget/full_photo.dart';
 import 'package:tchat_app/widget/loading.dart';
+import 'package:tchat_app/widget/text_style.dart';
 
 class Chat extends StatelessWidget {
   final String peerId;
   final String peerAvatar;
+  final String nickname;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar})
+  Chat({Key key, @required this.peerId, @required this.peerAvatar,this.nickname})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'CHAT',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+        centerTitle: false,
+        title: Text(nickname,style: mediumTextWhite(),),
+        actions: <Widget>[
+          GestureDetector(
+            onTap: (){
+              //authMethods.signOut();
+             // SharedPre.clearData();
+             // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Authenticate()));
+            },
+            child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 10),
+                //child: IconButton( icon: new Image.asset('images/icons/camera_white.png',width: 28,height: 28,),
+                 // onPressed: () => callVideo()),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 0.0,top: 2.0,right: 0.0,bottom: 0.0),
+                child: Row(
+                  children: [
+                    IconButton(icon: new Image.asset('images/icons/phone_white.png',width: 28,height: 22,),onPressed: ()=> audioVideo()),
+                     IconButton(icon: new Image.asset('images/icons/camera_white.png',width: 28,height: 28,),onPressed: ()=> callVideo()),
+                  ],
+                ),
+              ),
+          ),
+          )
+        ],
       ),
       body: ChatScreen(
         peerId: peerId,
         peerAvatar: peerAvatar,
       ),
     );
+  }
+  callVideo(){
+    print('call video');
+
+  }
+  audioVideo(){
+    print('audio call');
+
   }
 }
 
@@ -716,4 +747,5 @@ class ChatScreenState extends State<ChatScreen> {
             ),
     );
   }
+
 }

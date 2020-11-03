@@ -11,10 +11,12 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/settings.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/loading.dart';
+import 'package:tchat_app/widget/text_style.dart';
 
 import 'chat.dart';
-import 'const.dart';
+import 'utils/const.dart';
 import 'main.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -226,6 +228,7 @@ class HomeScreenState extends State<HomeScreen> {
     await FirebaseAuth.instance.signOut();
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
+    await SharedPre.clearData();
 
     this.setState(() {
       isLoading = false;
@@ -241,8 +244,8 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'MAIN',
-          style: TextStyle(color: primaryColor, fontWeight: FontWeight.bold),
+          'TChat',
+          style: mediumTextWhite()
         ),
         centerTitle: true,
         actions: <Widget>[
@@ -378,6 +381,7 @@ class HomeScreenState extends State<HomeScreen> {
                     builder: (context) => Chat(
                           peerId: document.id,
                           peerAvatar: document.data()['photoUrl'],
+                          nickname: document.data()['nickname']
                         )));
           },
           color: greyColor2,

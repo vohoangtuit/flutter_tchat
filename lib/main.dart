@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:tchat_app/splash.dart';
 
-import 'const.dart';
+import 'utils/const.dart';
 import 'login.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,9 +16,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chat Demo',
       theme: ThemeData(
-        primaryColor: themeColor,
+        primarySwatch: Colors.blue,
       ),
-      home: LoginScreen(title: 'VHT TChat'),
+   //   home: LoginScreen(title: 'VHT TChat'),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }
