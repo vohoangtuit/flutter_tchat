@@ -11,7 +11,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/loading.dart';
 
-import 'utils/const.dart';
+import '../utils/const.dart';
 import 'home.dart';
 
 class LoginScreen extends StatefulWidget {

@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:tchat_app/splash.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/screens/splash.dart';
 
-import 'utils/const.dart';
+import '../utils/const.dart';
 import 'login.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

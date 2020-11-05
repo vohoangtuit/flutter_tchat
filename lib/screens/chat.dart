@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,14 +9,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tchat_app/widget/basewidget.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/utils/const.dart';
+import 'package:tchat_app/screens/video_call.dart';
+import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/full_photo.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-class Chat extends StatelessWidget {
+class Chat extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
   final String nickname;
@@ -24,11 +26,17 @@ class Chat extends StatelessWidget {
       : super(key: key);
 
   @override
+  _ChatState createState() => _ChatState();
+}
+
+class _ChatState extends State<Chat> {
+  ClientRole role = ClientRole.Broadcaster;
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(nickname,style: mediumTextWhite(),),
+        title: Text(widget.nickname,style: mediumTextWhite(),),
         actions: <Widget>[
           GestureDetector(
             onTap: (){
@@ -54,18 +62,28 @@ class Chat extends StatelessWidget {
         ],
       ),
       body: ChatScreen(
-        peerId: peerId,
-        peerAvatar: peerAvatar,
+        peerId: widget.peerId,
+        peerAvatar: widget.peerAvatar,
       ),
     );
   }
-  callVideo(){
+
+  callVideo() async{
     print('call video');
+    await _handleCameraAndMic();
+    await Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoCall(role: role,)));
 
   }
+
   audioVideo(){
     print('audio call');
 
+  }
+  Future<void> _handleCameraAndMic() async {
+    print("permission");
+    await PermissionHandler().requestPermissions(
+      [PermissionGroup.camera, PermissionGroup.microphone],
+    );
   }
 }
 
@@ -268,8 +286,7 @@ class ChatScreenState extends State<ChatScreen> {
                           child: CachedNetworkImage(
                             placeholder: (context, url) => Container(
                               child: CircularProgressIndicator(
-                                valueColor:
-                                    AlwaysStoppedAnimation<Color>(themeColor),
+                              // valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                               ),
                               width: 200.0,
                               height: 200.0,
@@ -342,8 +359,7 @@ class ChatScreenState extends State<ChatScreen> {
                           placeholder: (context, url) => Container(
                             child: CircularProgressIndicator(
                               strokeWidth: 1.0,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(themeColor),
+                              //valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                             ),
                             width: 35.0,
                             height: 35.0,
@@ -380,8 +396,7 @@ class ChatScreenState extends State<ChatScreen> {
                                 child: CachedNetworkImage(
                                   placeholder: (context, url) => Container(
                                     child: CircularProgressIndicator(
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          themeColor),
+                                     /// valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                                     ),
                                     width: 200.0,
                                     height: 200.0,
@@ -717,7 +732,10 @@ class ChatScreenState extends State<ChatScreen> {
       child: groupChatId == ''
           ? Center(
               child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(themeColor)))
+                  //valueColor: AlwaysStoppedAnimation<Color>(themeColor)
+              )
+      )
+
           : StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection('messages')
@@ -730,8 +748,9 @@ class ChatScreenState extends State<ChatScreen> {
                 if (!snapshot.hasData) {
                   return Center(
                       child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(themeColor)));
+                        //  valueColor: AlwaysStoppedAnimation<Color>(themeColor)
+                      )
+                  );
                 } else {
                   listMessage.addAll(snapshot.data.documents);
                   return ListView.builder(
