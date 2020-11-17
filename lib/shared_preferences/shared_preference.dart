@@ -5,7 +5,7 @@ class SharedPre {
   static String sharedPreUserEmail="USER_EMAIL";
 
   static String sharedPreID ="id";
-  static String sharedPreNickname ="nickname";
+  static String sharedPreFullName ="fullName";
   static String sharedPrePhotoUrl ="photoUrl";
   static String sharedPreAboutMe ="aboutMe";
 
@@ -26,6 +26,10 @@ class SharedPre {
   static Future<String> getStringKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.getString(key);
+  }
+  static Future<bool> clearKey(String key) async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.remove(key);
   }
 
   static Future<void> clearData() async{

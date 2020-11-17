@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/loading.dart';
@@ -91,7 +92,7 @@ class LoginScreenState extends State<LoginScreen> {
             .collection('users')
             .doc(firebaseUser.uid)
             .set({
-          'nickname': firebaseUser.displayName,
+          'fullName': firebaseUser.displayName,
           'photoUrl': firebaseUser.photoURL,
           'id': firebaseUser.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
@@ -101,23 +102,23 @@ class LoginScreenState extends State<LoginScreen> {
         // Write data to local
         currentUser = firebaseUser;
         await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', currentUser.displayName);
+        await prefs.setString('fullName', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
 
         await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
         await SharedPre.saveString(SharedPre.sharedPreID,currentUser.uid);
-        await SharedPre.saveString(SharedPre.sharedPreNickname,currentUser.displayName);
+        await SharedPre.saveString(SharedPre.sharedPreFullName,currentUser.displayName);
         await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,currentUser.photoURL);
       } else {
         // Write data to local
         await prefs.setString('id', documents[0].data()['id']);
-        await prefs.setString('nickname', documents[0].data()['nickname']);
+        await prefs.setString('fullName', documents[0].data()['fullName']);
         await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
         await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
 
         await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
         await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()['id']);
-        await SharedPre.saveString(SharedPre.sharedPreNickname,documents[0].data()['nickname']);
+        await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()['fullName']);
         await SharedPre.saveString(SharedPre.sharedPreAboutMe,documents[0].data()['aboutMe']);
       }
       Fluttertoast.showToast(msg: "Sign in success");
@@ -129,7 +130,8 @@ class LoginScreenState extends State<LoginScreen> {
           context,
           MaterialPageRoute(
               builder: (context) =>
-                  HomeScreen(currentUserId: firebaseUser.uid)));
+                  //HomeScreen(currentUserId: firebaseUser.uid)));
+                  MainScreen()));
     } else {
       Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {

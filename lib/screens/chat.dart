@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
@@ -6,12 +7,15 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_socket_io/flutter_socket_io.dart';
+import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/screens/video_call.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/full_photo.dart';
 import 'package:tchat_app/widget/loading.dart';
@@ -20,9 +24,9 @@ import 'package:tchat_app/widget/text_style.dart';
 class Chat extends StatefulWidget {
   final String peerId;
   final String peerAvatar;
-  final String nickname;
+  final String fullName;
 
-  Chat({Key key, @required this.peerId, @required this.peerAvatar,this.nickname})
+  Chat({Key key, @required this.peerId, @required this.peerAvatar,this.fullName})
       : super(key: key);
 
   @override
@@ -31,12 +35,13 @@ class Chat extends StatefulWidget {
 
 class _ChatState extends State<Chat> {
   ClientRole role = ClientRole.Broadcaster;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(widget.nickname,style: mediumTextWhite(),),
+        title: Text(widget.fullName,style: mediumTextWhite(),),
         actions: <Widget>[
           GestureDetector(
             onTap: (){
@@ -67,6 +72,7 @@ class _ChatState extends State<Chat> {
       ),
     );
   }
+
 
   callVideo() async{
     print('call video');
@@ -116,6 +122,10 @@ class ChatScreenState extends State<ChatScreen> {
   bool isLoading;
   bool isShowSticker;
   String imageUrl;
+  SocketIO socketIO;
+
+  String fullName="";
+  bool typing =false;
 
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
@@ -143,7 +153,7 @@ class ChatScreenState extends State<ChatScreen> {
 
   @override
   void initState() {
-    super.initState();
+
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
 
@@ -152,10 +162,83 @@ class ChatScreenState extends State<ChatScreen> {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-
+    initSocket();
     readLocal();
+    textEditingController.addListener(() {
+      if(textEditingController.text.isNotEmpty){
+       // print("text change : ${textEditingController.text}");
+        socketIO.sendMessage("typing", json.encode({'username': fullName}));
+      }else{
+      //  print("stop typing");
+        socketIO.sendMessage("stop_typing", json.encode({'username': fullName}));
+      }
+    });
+    super.initState();
   }
+  @override
+  void dispose(){
+    super.dispose();
+    socketIO.disconnect();
+    socketIO.sendMessage("user_left", json.encode({'username': fullName}));
+    textEditingController.dispose();
+  }
+  initSocket()async{
+    socketIO = SocketIOManager().createSocketIO('http://192.168.29.121:8080', '/',
+  //  socketIO = SocketIOManager().createSocketIO('https://chat2007.herokuapp.com', '/',
+    );
 
+    //Call init before doing anything with socket
+    socketIO.init();
+
+  await SharedPre.getStringKey(SharedPre.sharedPreFullName).then((value) => {
+    fullName =value
+    });
+    print("FullName $fullName");
+
+    // todo: send event to server socket
+    socketIO.sendMessage("add_user", json.encode({'username': fullName}));
+
+    // todo: listener events from server socket
+    socketIO.subscribe('user_joined', userJoin);
+    socketIO.subscribe('user_left', userLeft);
+    socketIO.subscribe('typing', userTyping);
+    socketIO.subscribe('stop_typing', stopTyping);
+    //     //Connect to the socket
+    socketIO.connect();
+  }
+  void userJoin(dynamic data){
+    print(data);
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map = json.decode(data);
+    print("user_joined -------------------- $map");
+  }
+  void userLeft(dynamic data){
+    print(data);
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map = json.decode(data);
+    print("userLeft -------------------- $map");
+
+  }
+  void userTyping(dynamic data){
+    print(data);
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map = json.decode(data);
+    print("typing -------------------- $map");
+    setState(() {
+      typing=true;
+    });
+
+  }
+  void stopTyping(dynamic data){
+    print(data);
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map = json.decode(data);
+    print("stopTyping -------------------- $map");
+    setState(() {
+      typing=false;
+    });
+
+  }
   void onFocusChange() {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
@@ -528,7 +611,8 @@ class ChatScreenState extends State<ChatScreen> {
 
               // Sticker
               (isShowSticker ? buildSticker() : Container()),
-
+              buildTyping(),
+            //Text(typing?'Typing...':'',style: smallTextBlack()),
               // Input content
               buildInput(),
             ],
@@ -691,6 +775,7 @@ class ChatScreenState extends State<ChatScreen> {
           Flexible(
             child: Container(
               child: TextField(
+
                 onSubmitted: (value) {
                   onSendMessage(textEditingController.text, 0);
                 },
@@ -764,6 +849,19 @@ class ChatScreenState extends State<ChatScreen> {
                 }
               },
             ),
+    );
+  }
+  Widget buildTyping(){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(5.0),
+          child: Text(
+              typing?'Typing...':'',style: textBlueSmall(),
+          ),
+        ),
+      ],
     );
   }
 

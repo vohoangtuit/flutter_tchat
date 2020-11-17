@@ -353,7 +353,7 @@ class HomeScreenState extends State<HomeScreen> {
                     children: <Widget>[
                       Container(
                         child: Text(
-                          'Nickname: ${document.data()['nickname']}',
+                          'Full Name: ${document.data()['fullName']}',
                           style: TextStyle(color: primaryColor),
                         ),
                         alignment: Alignment.centerLeft,
@@ -381,7 +381,7 @@ class HomeScreenState extends State<HomeScreen> {
                     builder: (context) => Chat(
                           peerId: document.id,
                           peerAvatar: document.data()['photoUrl'],
-                          nickname: document.data()['nickname']
+                          fullName: document.data()['fullName']
                         )));
           },
           color: greyColor2,

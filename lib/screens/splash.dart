@@ -5,6 +5,7 @@ import 'package:tchat_app/widget/text_style.dart';
 
 import 'home.dart';
 import 'login.dart';
+import 'main_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
@@ -39,9 +40,10 @@ class _SplashScreenState extends State<SplashScreen> {
     String id = await SharedPre.getStringKey(SharedPre.sharedPreID);
     await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
       Future.delayed(Duration(seconds: 3),()async{
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
+       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
        if(value!=null){
          if(value){
+         //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
          }else{
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));

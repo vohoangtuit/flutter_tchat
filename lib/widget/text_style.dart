@@ -2,6 +2,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+TextStyle textBlueSmall(){
+  return TextStyle(color: Colors.blue, fontSize: 12);
+}
 TextStyle textBlueDefault(){
   return TextStyle(color: Colors.blue, fontSize: 14);
 }
@@ -60,4 +63,8 @@ TextStyle normalTextStyleButton(Color color) {
 }
 TextStyle textMessage() {
   return TextStyle(color: Colors.white, fontSize: 16);
+}
+
+TextStyle textTabBar() {
+  return TextStyle(color: Colors.grey, fontSize: 14);
 }
