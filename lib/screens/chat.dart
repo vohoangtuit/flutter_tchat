@@ -183,8 +183,8 @@ class ChatScreenState extends State<ChatScreen> {
     textEditingController.dispose();
   }
   initSocket()async{
-    socketIO = SocketIOManager().createSocketIO('http://192.168.29.121:8080', '/',
-  //  socketIO = SocketIOManager().createSocketIO('https://chat2007.herokuapp.com', '/',
+   // socketIO = SocketIOManager().createSocketIO(Const().SocketChat, '/',
+    socketIO = SocketIOManager().createSocketIO('https://chat2007.herokuapp.com', '/',
     );
 
     //Call init before doing anything with socket
