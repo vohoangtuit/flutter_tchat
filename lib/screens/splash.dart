@@ -43,8 +43,8 @@ class _SplashScreenState extends State<SplashScreen> {
        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
        if(value!=null){
          if(value){
-         //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+         //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
          }else{
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
          }

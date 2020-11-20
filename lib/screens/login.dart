@@ -131,7 +131,7 @@ class LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(
               builder: (context) =>
                   //HomeScreen(currentUserId: firebaseUser.uid)));
-                  MainScreen()));
+                 MainScreen()));
     } else {
       Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {

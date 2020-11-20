@@ -183,8 +183,8 @@ class ChatScreenState extends State<ChatScreen> {
     textEditingController.dispose();
   }
   initSocket()async{
-   // socketIO = SocketIOManager().createSocketIO(Const().SocketChat, '/',
-    socketIO = SocketIOManager().createSocketIO('https://chat2007.herokuapp.com', '/',
+    socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/",
+   // socketIO = SocketIOManager().createSocketIO('https://chatsocket2008.herokuapp.com', '/',
     );
 
     //Call init before doing anything with socket
@@ -197,12 +197,14 @@ class ChatScreenState extends State<ChatScreen> {
 
     // todo: send event to server socket
     socketIO.sendMessage("add_user", json.encode({'username': fullName}));
+    socketIO.sendMessage("send_message", json.encode({'send_message': fullName}));
 
     // todo: listener events from server socket
     socketIO.subscribe('user_joined', userJoin);
     socketIO.subscribe('user_left', userLeft);
     socketIO.subscribe('typing', userTyping);
     socketIO.subscribe('stop_typing', stopTyping);
+    socketIO.subscribe('receive_message', receiveMessage);
     //     //Connect to the socket
     socketIO.connect();
   }
@@ -239,6 +241,17 @@ class ChatScreenState extends State<ChatScreen> {
     });
 
   }
+  void receiveMessage(dynamic data){
+    print("receiveMessage "+data);
+    Map<String,dynamic> map = new Map<String,dynamic>();
+    map = json.decode(data);
+    print("receive_message -------------------- $map");
+    setState(() {
+      typing=false;
+    });
+
+  }
+
   void onFocusChange() {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
