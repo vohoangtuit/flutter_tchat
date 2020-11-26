@@ -3,7 +3,6 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-import 'home_screen.dart';
 import 'login_screen.dart';
 import 'main_screen.dart';
 
@@ -43,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
        // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
        if(value!=null){
          if(value){
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen()));
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(false)));
          //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
          }else{
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));

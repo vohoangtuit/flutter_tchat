@@ -46,11 +46,14 @@ dependencies:
   flutter_socket_io: ^0.6.0
   adhara_socket_io: ^0.4.2+1
   socket_io_client: ^0.9.11
+  floor: ^0.17.0
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  floor_generator: ^0.17.0
+  build_runner: ^1.10.6
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

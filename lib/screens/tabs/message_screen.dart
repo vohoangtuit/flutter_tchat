@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/database/database.dart';
+import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 
@@ -11,105 +13,123 @@ class MessageScreen extends StatefulWidget {
   _MessageScreenState createState() => _MessageScreenState();
 }
 
-class _MessageScreenState extends BaseStatefulState<MessageScreen> with AutomaticKeepAliveClientMixin<MessageScreen>{
-  @override
+class _MessageScreenState extends BaseStatefulState<MessageScreen> {
+  //with AutomaticKeepAliveClientMixin<MessageScreen>
+  //@override
   // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+//  bool get wantKeepAlive => true;
   dynamic data;
+
+  List<MessageModel> listMessage = List();
+
   @override
   Widget build(BuildContext context) {
     return Container(
-     // child: lassMGS(),
+      child: listView(),
     );
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     init();
-
   }
-  Widget lassMGS(){
-   return StreamBuilder<DocumentSnapshot>(
-        stream: fireBaseStore
-            .collection(FIREBASE_MESSAGES)
-            .doc(idMe).snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.hasData) {
-            //snapshot -> AsyncSnapshot of DocumentSnapshot
-            //snapshot.data -> DocumentSnapshot
-            //snapshot.data.data -> Map of fields that you need :)
 
-            print('snapshot '+snapshot.data.data().toString());
-          //  print('snapshot '+snapshot.data.c);
-      //      print('snapshot '+snapshot.data.data().d);
-            print('snapshot 1'+snapshot.toString());
-            print('snapshot 2'+snapshot.data.toString());
-            print('snapshot 3'+snapshot.data.data().values.toString());
-            Map<String, dynamic> documentFields = snapshot.data.data();
-            print('documentFields '+documentFields.toString());
-            //print('documentFields '+documentFields['content']);
-            //TODO Okay, now you can use documentFields (json) as needed
-            return Text('sdsd');
-          }
-        }
+  Widget listView() {
+    return ListView.builder(
+      shrinkWrap: true,
+      padding: EdgeInsets.all(10.0),
+      itemBuilder: (context, index) =>
+          buildItemLastMessage(context, listMessage[index]),
+      itemCount: listMessage.length == 0 ? 0 : listMessage.length,
     );
   }
-  void init()async{
-    String id='';
-    await SharedPre.getStringKey(SharedPre.sharedPreID).then((value)  {
-      id=value;
-    });
-    final DocumentReference document =   fireBaseStore.collection('messages')
-        .doc(id);
-    await document.get().then<dynamic>(( DocumentSnapshot snapshot) async{
+
+  Widget buildItemLastMessage(BuildContext context, MessageModel message) {
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            getPhoto(message).isEmpty?Icon(
+              Icons.account_circle,
+              size: 50.0,
+              color: greyColor,
+            ):Image.network(getPhoto(message),width: 50,height: 50),
+            Column(
+              children: [
+                Text(getName(message)),
+                Text(message.content),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String getName(MessageModel mgs) {
+    String name = '';
+    if (mgs.idSender.contains(userModel.id)) {
+      name = mgs.nameReceiver!=null?mgs.nameReceiver:'';
+      return name;
+    } else {
+      return name;
+    }
+  }
+  String getContent(MessageModel mgs) {
+    if(mgs.type==0){
+      return mgs.content;
+    }else if(mgs.type==1){
+      return '[Photo]';
+    }
+    return '[Sticker]';
+  }
+  String getPhoto(MessageModel mgs){
+    if (mgs.idSender.contains(userModel.id)) {
+      return mgs.photoReceiver;
+    }
+    return '';
+  }
+
+  void init() async {
+    // configData();
+    tChatAppDatabase =
+        await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
+    //  setState(() {
+    userDao = tChatAppDatabase.userDao;
+    messageDao = tChatAppDatabase.messageDao;
+
+    List<MessageModel> list = List();
+    await messageDao.getAllMessage().then((value) {
       setState(() {
-        data =snapshot.data;
+        list.addAll(value);
+      });
+      // print("list "+list.toString());
+    });
+    print("list " + list.toString());
+    if (userDao == null) {
+      print('userDao null');
+    }
+    if (userModel == null) {
+      print('MSG Screen  userModel null');
+      await userDao.getSingleUser().then((value) {
+        setState(() {
+          userModel = value;
+        });
+      });
+    }
+    // print('MSG Screen  '+userModel.toString());
+    await messageDao.getLastMessage().then((value) {
+      setState(() {
+        listMessage.addAll(value);
+        if (listMessage.length > 0) {
+          for (MessageModel mgs in listMessage) {
+            print('mgs ' + mgs.toString());
+          }
+        }
       });
     });
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("map -------------------- $map");
-    StreamBuilder<DocumentSnapshot>(
-      stream: Firestore.instance.collection("messages").document(id).snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return LinearProgressIndicator();
-        print("snapshot -------------------- ${json.decode(snapshot.data.toString())}");
-       // return _buildList(context, snapshot.data.documents);
-      },
-    );
   }
-  void getListLastMessage() async{
-    String id='';
-   await SharedPre.getStringKey(SharedPre.sharedPreID).then((value)  {
-      id=value;
-    });
-
-    print('idMe $id');//8AC6oXq9WAcGm4pZgKjMtqV09d53
-
-
-    Stream<DocumentSnapshot> provideDocumentFieldStream() {
-      return   fireBaseStore.collection('messages')
-          .doc(id)
-          .snapshots();
-    }
-    StreamBuilder<DocumentSnapshot>(
-        stream: provideDocumentFieldStream(),
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.hasData) {
-            //snapshot -> AsyncSnapshot of DocumentSnapshot
-            //snapshot.data -> DocumentSnapshot
-            //snapshot.data.data -> Map of fields that you need :)
-
-            Map<String, dynamic> documentFields = snapshot.data.data();
-            print('documentFields '+documentFields.toString());
-            print('documentFields '+documentFields['content']);
-            //TODO Okay, now you can use documentFields (json) as needed
-            return Text(documentFields['content']);
-          }
-        }
-    );
-  }
-
-
 }

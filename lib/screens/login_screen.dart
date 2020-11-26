@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -25,7 +26,7 @@ class LoginScreen extends StatefulWidget {
   LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginScreenState extends State<LoginScreen> {
+class LoginScreenState extends BaseStatefulState<LoginScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
@@ -52,7 +53,7 @@ class LoginScreenState extends State<LoginScreen> {
         context,
         MaterialPageRoute(
             builder: (context) =>
-                MainScreen()),
+                MainScreen(false)),
       );
     }
 
@@ -87,9 +88,10 @@ class LoginScreenState extends State<LoginScreen> {
           .get();
       final List<DocumentSnapshot> documents = result.docs;
 
+      UserModel user;
       if (documents.length == 0) {
         // Update data to server if new user
-        UserModel user = UserModel(firebaseUser.uid, '', firebaseUser.displayName, '',firebaseUser.email, firebaseUser.photoURL, 0, '',DateTime.now().millisecondsSinceEpoch.toString());
+          user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',email:firebaseUser.email, photoURL:firebaseUser.photoURL, statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true);
         FirebaseFirestore.instance
             .collection(FIREBASE_USERS)
             .doc(firebaseUser.uid)
@@ -103,11 +105,14 @@ class LoginScreenState extends State<LoginScreen> {
       } else {
         // Write data to local
         await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
-        await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()['id']);
-        await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()['fullName']);
-        await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,documents[0].data()['photoURL']);
+        await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()[USER_ID]);
+        await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_FULLNAME]);
+        await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_PHOTO_URL]);
+        await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,documents[0].data()[USER_EMAIL]);
+        user = UserModel(id:documents[0].data()[USER_ID], userName:'', fullName:documents[0].data()[USER_FULLNAME], birthday:'',email:documents[0].data()[USER_EMAIL], photoURL:documents[0].data()[USER_PHOTO_URL], statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true);
 
       }
+      await userDao.InsertUser(user);
       Fluttertoast.showToast(msg: "Sign in success");
       this.setState(() {
         isLoading = false;
@@ -118,7 +123,7 @@ class LoginScreenState extends State<LoginScreen> {
           MaterialPageRoute(
               builder: (context) =>
                   //HomeScreen(currentUserId: firebaseUser.uid)));
-                 MainScreen()));
+                 MainScreen(true)));
     } else {
       Fluttertoast.showToast(msg: "Sign in fail");
       this.setState(() {

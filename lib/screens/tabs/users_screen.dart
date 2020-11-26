@@ -12,13 +12,13 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/setting_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-import '../chat_screen.dart';
 import '../main.dart';
 class UsersScreen extends StatefulWidget {
 
@@ -57,7 +57,7 @@ class UsersScreenState extends BaseStatefulState<UsersScreen> {
                           ),
                         );
                       } else {
-                        if(idMe==null){
+                        if( userModel.id==null){
                           return Text("hello");
                         }else{
                           return ListView.builder (
@@ -88,7 +88,7 @@ class UsersScreenState extends BaseStatefulState<UsersScreen> {
   }
 
   Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (document.data()[USER_ID] == idMe) {
+    if (document.data()[USER_ID] ==  userModel.id) {
       return Container();
     } else {
       return Container(
@@ -149,13 +149,11 @@ class UsersScreenState extends BaseStatefulState<UsersScreen> {
             ],
           ),
           onPressed: () {
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                       document.id,
-                       document.data()[USER_PHOTO_URL],
-                        document.data()[USER_FULLNAME]
+                    builder: (context) => ChatScreen(document.id, document.data()[USER_PHOTO_URL], document.data()[USER_FULLNAME]
                     )));
           },
           color: greyColor2,

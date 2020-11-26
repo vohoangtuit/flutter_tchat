@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/screens/splash_screen.dart';
+import 'package:tchat_app/screens/splash_screen.dart';
 
 import '../utils/const.dart';
 import 'login_screen.dart';

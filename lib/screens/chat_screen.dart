@@ -26,10 +26,10 @@ import 'package:tchat_app/widget/text_style.dart';
 import 'items/ItemChatMessage.dart';
 
 class ChatScreen extends StatefulWidget {
-   String toId;
-   String photoUrl;
-   String fullName;
-  ChatScreen(this.toId, this.photoUrl, this.fullName);
+   String idReceiver;
+   String photoReceiver;
+   String nameReceiver;
+  ChatScreen(this.idReceiver, this.photoReceiver, this.nameReceiver);
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -40,8 +40,8 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   int _limit = 20;
   final int _limitIncrement = 20;
   File imageFile;
-  bool isLoading;
-  bool isShowSticker;
+  bool isLoading=false;
+  bool isShowSticker=false;
   String imageUrl;
   SocketIO socketIO;
   bool typing =false;
@@ -56,14 +56,9 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(widget.fullName,style: mediumTextWhite(),),
+        title: Text(widget.nameReceiver,style: mediumTextWhite(),),
         actions: <Widget>[
           GestureDetector(
-            onTap: (){
-              //authMethods.signOut();
-              // SharedPre.clearData();
-              // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>Authenticate()));
-            },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 10),
               //child: IconButton( icon: new Image.asset('images/icons/camera_white.png',width: 28,height: 28,),
@@ -89,7 +84,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
                   // List of messages
                   buildListMessage(),
                   // Sticker
-                  (isShowSticker ? buildSticker() : Container()),
+                 (isShowSticker ? buildSticker() : Container()),
                   buildTyping(),
 
                   // Input content
@@ -110,6 +105,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   @override
   void initState() {
     super.initState();
+    print("initState "+widget.idReceiver+' '+widget.photoReceiver+' '+widget.nameReceiver);
     initData();
   }
   callVideo() async{
@@ -152,13 +148,13 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   initData() async{
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
-    groupChatId = idMe+'-'+widget.toId;
+    groupChatId = userModel.id+'-'+widget.idReceiver;
 
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
 
-    print("photoUrl ${widget.photoUrl}");
+    print("photoUrl ${widget.photoReceiver}");
     //initSocket();
 
     textEditingController.addListener(() {
@@ -190,7 +186,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   }
   initSocket()async{
     await SharedPre.getStringKey(SharedPre.sharedPreFullName).then((value) => {
-      widget.fullName =value
+      widget.nameReceiver =value
     });
 
     //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
@@ -314,9 +310,9 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     // type: 0 = text, 1 = image, 2 = sticker
     if (content.trim() != '') {
       textEditingController.clear();
-       Message messages =Message(idFrom:idMe, idTo:widget.toId, timestamp:DateTime.now().millisecondsSinceEpoch.toString(), content:content, type:type, status:0);
-       var from =fireBaseStore.collection(FIREBASE_MESSAGES).doc(idMe).collection(widget.toId).doc();// end doc can use timestamp
-       var to =fireBaseStore.collection(FIREBASE_MESSAGES).doc(widget.toId).collection(idMe).doc();// end doc can use timestamp
+       MessageModel messages =MessageModel(idSender: userModel.id,nameSender:userModel.fullName,photoSender: userModel.photoURL , idReceiver:widget.idReceiver,nameReceiver: widget.nameReceiver,photoReceiver: widget.photoReceiver, timestamp:DateTime.now().millisecondsSinceEpoch.toString(), content:content, type:type, status:0);
+       var from =fireBaseStore.collection(FIREBASE_MESSAGES).doc( userModel.id).collection(widget.idReceiver).doc();// end doc can use timestamp
+       var to =fireBaseStore.collection(FIREBASE_MESSAGES).doc(widget.idReceiver).collection( userModel.id).doc();// end doc can use timestamp
        WriteBatch writeBatch =fireBaseStore.batch();
        writeBatch.set(from, messages.toJson());
        writeBatch.set(to, messages.toJson());
@@ -330,6 +326,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+      messageDao.insertMessage(messages);
     } else {
       Fluttertoast.showToast(
           msg: 'Nothing to send',
@@ -539,9 +536,9 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   }
 
   Widget buildListMessage() {
-    print("id: $idMe - toId: ${widget.toId}");
+    print("id: ${userModel.id} - toId: ${widget.idReceiver}");
     return Flexible(
-      child: idMe == ''
+      child:  userModel.id == ''
           ? Center(
               child: CircularProgressIndicator(
                   //valueColor: AlwaysStoppedAnimation<Color>(themeColor)
@@ -550,8 +547,8 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
           : StreamBuilder(
               stream: fireBaseStore
                   .collection(FIREBASE_MESSAGES)
-                  .doc(idMe)
-                  .collection(widget.toId)
+                  .doc( userModel.id)
+                  .collection(widget.idReceiver)
                   .orderBy('timestamp', descending: true)
                   .limit(_limit)
                   .snapshots(),
@@ -568,7 +565,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
                     itemBuilder: (context, index) =>
-                    ItemChatMessage(context,idMe,index,snapshot.data.documents[index],listMessage,widget.photoUrl),
+                    ItemChatMessage(context, userModel.id,index,snapshot.data.documents[index],listMessage,widget.photoReceiver),
                     itemCount: snapshot.data.documents.length,
                     reverse: true,
                     controller: listScrollController,

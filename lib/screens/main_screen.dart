@@ -16,6 +16,9 @@ import 'package:tchat_app/screens/tabs/users_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 class MainScreen extends StatefulWidget {
+   bool synData;
+
+  MainScreen( this.synData);
   @override
   _MainScreenState createState() => _MainScreenState();
 }
@@ -63,6 +66,45 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
     super.initState();
     controller = TabController(length: 5, vsync: this);
     controller.addListener(_handleTabSelection);
+    if(widget.synData){
+
+    }
+  }
+  void handleSyncData(){
+
+    // StreamBuilder(
+    //   stream: fireBaseStore
+    //       .collection(FIREBASE_MESSAGES)
+    //       .doc( userModel.id)
+    //       .snapshots(),
+    //   builder: (context, snapshot) {
+    //     if (!snapshot.hasData) {
+    //       print("cannot get data");
+    //     } else {
+    //       listMessage.addAll(snapshot.data.documents);
+    //       return ListView.builder(
+    //         padding: EdgeInsets.all(10.0),
+    //         itemBuilder: (context, index) =>
+    //             ItemChatMessage(context, userModel.id,index,snapshot.data.documents[index],listMessage,widget.photoUrl),
+    //         itemCount: snapshot.data.documents.length,
+    //         reverse: true,
+    //         controller: listScrollController,
+    //       );
+    //     }
+    //   },
+    // ),
+    // fireBaseStore.collection(FIREBASE_MESSAGES).doc(userModel.id).snapshots().listen((event) {
+    //   if(event)
+    // });
+    // fireBaseStore
+    //     .collection(FIREBASE_MESSAGES)
+    //     .doc( userModel.id)
+    //     .collection("widget.toId")
+    //     .orderBy('timestamp', descending: true)
+    //     .limit(10)
+    //     .snapshots().listen((event) {
+    //
+    // });
   }
 
   @override
@@ -218,7 +260,7 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
     firebaseMessaging.getToken().then((token) {
       print('token: $token');
       fireBaseStore.collection(FIREBASE_USERS)
-          .doc(idMe)
+          .doc( userModel.id)
           .update({USER_PUST_TOKEN: token});
     }).catchError((err) {
       Fluttertoast.showToast(msg: err.message.toString());
