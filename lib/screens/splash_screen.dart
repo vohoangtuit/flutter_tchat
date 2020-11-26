@@ -3,8 +3,8 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-import 'home.dart';
-import 'login.dart';
+import 'home_screen.dart';
+import 'login_screen.dart';
 import 'main_screen.dart';
 
 

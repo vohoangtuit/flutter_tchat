@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/screens/splash.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/screens/splash_screen.dart';
 
 import '../utils/const.dart';
-import 'login.dart';
+import 'login_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();

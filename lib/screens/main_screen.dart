@@ -1,32 +1,42 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/tabs/contacts_screen.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
 import 'package:tchat_app/screens/tabs/message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
 import 'package:tchat_app/screens/tabs/time_line_screen.dart';
 import 'package:tchat_app/screens/tabs/users_screen.dart';
 import 'package:tchat_app/utils/const.dart';
-
+import 'package:tchat_app/base/bases_statefulwidget.dart';
 class MainScreen extends StatefulWidget {
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateMixin{
+class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin{
   TabController controller;
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('TChat Application'),
+        title: Text('TChat '),
         centerTitle: false,
       ),
       body: WillPopScope(
         child: TabBarView(
           physics: NeverScrollableScrollPhysics(),// todo: disable swip
-         // children: <Widget>[MessageScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+         // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+          children: <Widget>[MessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+       //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
           // set the controller
           controller: controller,
         ),
@@ -51,7 +61,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
-    controller = TabController(length: 4, vsync: this);
+    controller = TabController(length: 5, vsync: this);
     controller.addListener(_handleTabSelection);
   }
 
@@ -75,17 +85,22 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 3,),
-        Icon(Icons.group, color: controller.index == 1 ? Colors.blue : Colors.grey),
+        Icon(Icons.account_box_outlined, color: controller.index == 1 ? Colors.blue : Colors.grey),
+        Text("Contacts"),
+      ],)),
+      Tab(child: Column(children: [
+        SizedBox(height: 3,),
+        Icon(Icons.group, color: controller.index == 2 ? Colors.blue : Colors.grey),
         Text("Group"),
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 3,),
-        Icon(Icons.timelapse_outlined, color: controller.index == 2 ? Colors.blue : Colors.grey),
+        Icon(Icons.timelapse_outlined, color: controller.index == 3 ? Colors.blue : Colors.grey),
         Text("TimeLine"),
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 3,),
-        Icon(Icons.category, color: controller.index == 3 ? Colors.blue : Colors.grey),
+        Icon(Icons.category, color: controller.index == 4 ? Colors.blue : Colors.grey),
         Text("More"),
       ],)),
     ];
@@ -183,4 +198,68 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
         break;
     }
   }
+
+  void registerNotification() {
+    firebaseMessaging.requestNotificationPermissions();
+
+    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+      print('onMessage: $message');
+      Platform.isAndroid
+          ? showNotification(message['notification'])
+          : showNotification(message['aps']['alert']);
+      return;
+    }, onResume: (Map<String, dynamic> message) {
+      print('onResume: $message');
+      return;
+    }, onLaunch: (Map<String, dynamic> message) {
+      print('onLaunch: $message');
+      return;
+    });
+    firebaseMessaging.getToken().then((token) {
+      print('token: $token');
+      fireBaseStore.collection(FIREBASE_USERS)
+          .doc(idMe)
+          .update({USER_PUST_TOKEN: token});
+    }).catchError((err) {
+      Fluttertoast.showToast(msg: err.message.toString());
+    });
+  }
+
+  void configLocalNotification() {
+    var initializationSettingsAndroid =
+    new AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = new IOSInitializationSettings();
+    var initializationSettings = new InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+  void showNotification(message) async {
+    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+      Platform.isAndroid
+          ? 'com.dfa.flutterchatdemo'
+          : 'com.duytq.flutterchatdemo',
+      'Flutter chat demo',
+      'your channel description',
+      playSound: true,
+      enableVibration: true,
+      importance: Importance.Max,
+      priority: Priority.High,
+    );
+    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
+    var platformChannelSpecifics = new NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+    print(message);
+//    print(message['body'].toString());
+//    print(json.encode(message));
+
+    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
+        message['body'].toString(), platformChannelSpecifics,
+        payload: json.encode(message));
+
+//    await flutterLocalNotificationsPlugin.show(
+//        0, 'plain title', 'plain body', platformChannelSpecifics,
+//        payload: 'item x');
+  }
+
 }

@@ -7,13 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/loading.dart';
 
 import '../utils/const.dart';
-import 'home.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
@@ -27,7 +28,7 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends State<LoginScreen> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  SharedPreferences prefs;
+
 
   bool isLoading = false;
   bool isLoggedIn = false;
@@ -44,15 +45,14 @@ class LoginScreenState extends State<LoginScreen> {
       isLoading = true;
     });
 
-    prefs = await SharedPreferences.getInstance();
-
     isLoggedIn = await googleSignIn.isSignedIn();
     if (isLoggedIn) {
+      String id = await SharedPre.getStringKey(SharedPre.sharedPreID);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>
-                HomeScreen(currentUserId: prefs.getString('id'))),
+                MainScreen()),
       );
     }
 
@@ -62,7 +62,7 @@ class LoginScreenState extends State<LoginScreen> {
   }
 
   Future<Null> handleSignIn() async {
-    prefs = await SharedPreferences.getInstance();
+
 
     this.setState(() {
       isLoading = true;
@@ -82,44 +82,31 @@ class LoginScreenState extends State<LoginScreen> {
     if (firebaseUser != null) {
       // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
-          .collection('users')
-          .where('id', isEqualTo: firebaseUser.uid)
+          .collection(FIREBASE_USERS)
+          .where(FIREBASE_ID, isEqualTo: firebaseUser.uid)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
+
       if (documents.length == 0) {
         // Update data to server if new user
+        UserModel user = UserModel(firebaseUser.uid, '', firebaseUser.displayName, '',firebaseUser.email, firebaseUser.photoURL, 0, '',DateTime.now().millisecondsSinceEpoch.toString());
         FirebaseFirestore.instance
-            .collection('users')
+            .collection(FIREBASE_USERS)
             .doc(firebaseUser.uid)
-            .set({
-          'fullName': firebaseUser.displayName,
-          'photoUrl': firebaseUser.photoURL,
-          'id': firebaseUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null
-        });
-
+            .set(user.toJson());
         // Write data to local
         currentUser = firebaseUser;
-        await prefs.setString('id', currentUser.uid);
-        await prefs.setString('fullName', currentUser.displayName);
-        await prefs.setString('photoUrl', currentUser.photoURL);
-
         await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
         await SharedPre.saveString(SharedPre.sharedPreID,currentUser.uid);
         await SharedPre.saveString(SharedPre.sharedPreFullName,currentUser.displayName);
         await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,currentUser.photoURL);
       } else {
         // Write data to local
-        await prefs.setString('id', documents[0].data()['id']);
-        await prefs.setString('fullName', documents[0].data()['fullName']);
-        await prefs.setString('photoUrl', documents[0].data()['photoUrl']);
-        await prefs.setString('aboutMe', documents[0].data()['aboutMe']);
-
         await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
         await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()['id']);
         await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()['fullName']);
-        await SharedPre.saveString(SharedPre.sharedPreAboutMe,documents[0].data()['aboutMe']);
+        await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,documents[0].data()['photoURL']);
+
       }
       Fluttertoast.showToast(msg: "Sign in success");
       this.setState(() {

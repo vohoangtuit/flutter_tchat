@@ -5,7 +5,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
 
 import '../main.dart';
-import '../settings.dart';
+import '../setting_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override

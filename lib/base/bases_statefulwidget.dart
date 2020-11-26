@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/progressbar.dart';
 
 import 'dialog.dart';
@@ -9,6 +12,11 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   var  restApi;
   ProgressBar progressBar;
   bool onStart =false;
+  FirebaseFirestore fireBaseStore;
+  FirebaseFirestore userRef;
+  FirebaseFirestore msgRef;
+
+  String idMe='';
   @override
   Widget build(BuildContext context) {
 
@@ -24,9 +32,25 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   @override
   void initState() {
     super.initState();
-    progressBar= new ProgressBar();
-    baseStatefulState=this;
-    //restApi =  RestClient(baseStatefulState:baseStatefulState);
+
+    if(!onStart){
+      baseStatefulState=this;
+      fireBaseStore = FirebaseFirestore.instance;
+     // userRef = fireBaseStore.collection(FIREBASE_USERS) as FirebaseFirestore;
+     // msgRef = fireBaseStore.collection(FIREBASE_MESSAGES) as FirebaseFirestore;
+      progressBar = ProgressBar();
+      onStart =true;
+    }
+    if(idMe.isEmpty){
+      _getProfile();
+    }
+  }
+  void _getProfile() async{
+    await SharedPre.getStringKey(SharedPre.sharedPreID).then((value)  {
+      setState(() {
+        idMe =value;
+      });
+    });
   }
   @override
   void dispose() {
