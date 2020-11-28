@@ -26,6 +26,15 @@ TextStyle normalTextBlack() {
 TextStyle mediumTextBlack() {
   return TextStyle(color: Colors.black, fontSize: 16);
 }
+TextStyle smallTextGray() {
+  return TextStyle(color: Colors.grey, fontSize: 12);
+}
+TextStyle normalTextGray() {
+  return TextStyle(color: Colors.grey, fontSize: 14);
+}
+TextStyle mediumTextGray() {
+  return TextStyle(color: Colors.grey, fontSize: 16);
+}
 TextStyle textWhiteButtonDefault(){
   return TextStyle(color: Colors.white, fontSize: 16);
 }

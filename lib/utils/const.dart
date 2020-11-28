@@ -21,11 +21,4 @@ final String SOCKET_USER_JOINED ='user_joined';
 final String SOCKET_USER_LEFT ='user_left';
 
 //---------todo Firebase------------
-final String FIREBASE_ID ='id';
-final String FIREBASE_USERS ='users';
-final String FIREBASE_MESSAGES ='messages';
-final String FIREBASE_GROUP ='groups';
 
-class Const{
-
-}

@@ -1,5 +1,6 @@
 
 //---------todo UserModel------------
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:floor/floor.dart';
 final String USER_MODEL ='UserModel';
 final String USER_ID ='id';
@@ -30,19 +31,7 @@ class UserModel {
   String pushToken='';
   bool isLogin;
 
-  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin}) {
-    // this.idDB = idDB;
-    // this.id = id;
-    // this.userName = userName;
-    // this.fullName = fullName;
-    // this.birthday = birthday;
-    // this.email = email;
-    // this.photoURL = photoURL;
-    // this.statusAccount = statusAccount;
-    // this.phoneNumber = phoneNumber;
-    // this.createdAt = createdAt;
-    // this.isLogin = isLogin;
-  }
+  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin});
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data[USER_ID] = this.id;
@@ -58,7 +47,10 @@ class UserModel {
     data[USER_ISlOGIN] = this.isLogin;
     return data;
   }
-
+  // UserModel.toUserFromDocument(DocumentSnapshot doc){
+  //   UserModel u =UserModel(id: doc.data()[USER_ID]);
+  //   return u;
+  // }
   @override
   String toString() {
     return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, email: $email, photoURL: $photoURL, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin}';

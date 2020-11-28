@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -23,13 +24,15 @@ import 'package:tchat_app/widget/full_photo.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-import 'items/ItemChatMessage.dart';
+import 'items/item_chat.dart';
 
 class ChatScreen extends StatefulWidget {
-   String idReceiver;
-   String photoReceiver;
-   String nameReceiver;
+  String idReceiver;
+  String photoReceiver;
+  String nameReceiver;
+
   ChatScreen(this.idReceiver, this.photoReceiver, this.nameReceiver);
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -40,23 +43,26 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   int _limit = 20;
   final int _limitIncrement = 20;
   File imageFile;
-  bool isLoading=false;
-  bool isShowSticker=false;
+  bool isLoading = false;
+  bool isShowSticker = false;
   String imageUrl;
   SocketIO socketIO;
-  bool typing =false;
+  bool typing = false;
 
-  String groupChatId="";
+  String groupChatId = "";
 
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
+  Stream chatStream;
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(widget.nameReceiver,style: mediumTextWhite(),),
+        title: Text(widget.nameReceiver, style: mediumTextWhite()),
         actions: <Widget>[
           GestureDetector(
             child: Container(
@@ -64,11 +70,24 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
               //child: IconButton( icon: new Image.asset('images/icons/camera_white.png',width: 28,height: 28,),
               // onPressed: () => callVideo()),
               child: Padding(
-                padding: const EdgeInsets.only(left: 0.0,top: 2.0,right: 0.0,bottom: 0.0),
+                padding: const EdgeInsets.only(
+                    left: 0.0, top: 2.0, right: 0.0, bottom: 0.0),
                 child: Row(
                   children: [
-                    IconButton(icon: new Image.asset('images/icons/phone_white.png',width: 28,height: 22,),onPressed: ()=> audioVideo()),
-                    IconButton(icon: new Image.asset('images/icons/camera_white.png',width: 28,height: 28,),onPressed: ()=> callVideo()),
+                    IconButton(
+                        icon: new Image.asset(
+                          'images/icons/phone_white.png',
+                          width: 28,
+                          height: 22,
+                        ),
+                        onPressed: () => audioVideo()),
+                    IconButton(
+                        icon: new Image.asset(
+                          'images/icons/camera_white.png',
+                          width: 28,
+                          height: 28,
+                        ),
+                        onPressed: () => callVideo()),
                   ],
                 ),
               ),
@@ -76,55 +95,65 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
           )
         ],
       ),
-      body: WillPopScope(
-          child: Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  // List of messages
-                  buildListMessage(),
-                  // Sticker
-                 (isShowSticker ? buildSticker() : Container()),
-                  buildTyping(),
+      body: Container(
+        child: Stack(
+          children: <Widget>[
+            Column(
+              children: <Widget>[
+                // List of messages
+               // buildListMessage(),
+              listChat(),
+// Sticker
+                  (isShowSticker ? buildSticker() : Container()),
+                //buildTyping(),
 
-                  // Input content
-                  buildInput(),
-                ],
-              ),
+                // Input content
+                buildInput(),
+              ],
+            ),
+            // listChat(),
+            // buildListMessage(),
 
-              // Loading
-              buildLoading()
-            ],
-          ),
-          onWillPop: onBackPress,
+            // Loading
+            buildLoading()
+          ],
+        ),
       ),
     );
-
   }
 
   @override
   void initState() {
     super.initState();
-    print("initState "+widget.idReceiver+' '+widget.photoReceiver+' '+widget.nameReceiver);
+    //  print('chat screen initState()');
     initData();
   }
-  callVideo() async{
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  callVideo() async {
     print('call video');
     await _handleCameraAndMic();
-    await Navigator.push(context, MaterialPageRoute(builder: (context)=>VideoCall(role: role,)));
-
-  }
-
-  audioVideo(){
+    await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => VideoCall(
+                  role: role,
+                )));}
+  audioVideo() {
     print('audio call');
-
   }
+
   Future<void> _handleCameraAndMic() async {
     print("permission");
     await PermissionHandler().requestPermissions(
       [PermissionGroup.camera, PermissionGroup.microphone],
     );
   }
+
   _scrollListener() {
     if (listScrollController.offset >=
             listScrollController.position.maxScrollExtent &&
@@ -145,115 +174,73 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     }
   }
 
-  initData() async{
+  initData() async {
+    showLoading();
+    await Future.delayed(const Duration(seconds: 2), () {
+    });
+    hideLoading();
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
-    groupChatId = userModel.id+'-'+widget.idReceiver;
-
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-
-    print("photoUrl ${widget.photoReceiver}");
+    groupChatId = userModel.id + '-' + widget.idReceiver;
+    getMessage();
     //initSocket();
-
     textEditingController.addListener(() {
-      if(textEditingController.text.isNotEmpty){
-        if(typing)
-          return;
-        typing =true;
+      if (textEditingController.text.isNotEmpty) {
+        if (typing) return;
+        typing = true;
         //socketIO.sendMessage(Const().SOCKET_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
-      }else{
-        if(!typing)
-          return;
-        typing =false;
-       // socketIO.sendMessage(Const().SOCKET_STOP_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
+      } else {
+        if (!typing) return;
+        typing = false;
+        // socketIO.sendMessage(Const().SOCKET_STOP_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
       }
     });
+    listenerData();
   }
+
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
-    socketIO.sendMessage(// todo send message to server socket
-      'unsubscribe',
-      json.encode({
-        'groupChatId': groupChatId, // todo re update
-      }),
-    );
-    socketIO.disconnect();
+    // socketIO.sendMessage(// todo send message to server socket
+    //     //   'unsubscribe',
+    //     //   json.encode({
+    //     //     'groupChatId': groupChatId, // todo re update
+    //     //   }),
+    //     // );
+    //     // socketIO.disconnect();
 
     textEditingController.dispose();
   }
-  initSocket()async{
-    await SharedPre.getStringKey(SharedPre.sharedPreFullName).then((value) => {
-      widget.nameReceiver =value
+  void listenerData(){
+    var userQuery=  FirebaseFirestore.instance
+        .collection(FIREBASE_MESSAGES)
+        .doc(userModel.id)
+        .collection(widget.idReceiver)
+        .limit(1)
+        .orderBy('timestamp', descending: true);
+
+    userQuery.snapshots().listen((data) {
+      data.docs.forEach((change) {
+        print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
+      });
     });
 
-    //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
-    socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",
-        query: 'idChat=''',socketStatusCallback: _socketStatus);
-
-    socketIO.init();
-    socketIO.sendMessage(// todo send message to server socket
-      'subscribe',
-      json.encode({
-        'groupChatId': groupChatId,
-      }),
-    );
-
-    // todo: listener events from server socket
-    socketIO.subscribe(SOCKET_TYPING, userTyping);
-    socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
-
-    socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
-    socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
-
-    //     //Connect to the socket
-    socketIO.connect();
-
   }
-  _socketStatus(dynamic data) {
-    print("Socket status: " + data);
-  }
-  void userTyping(dynamic data){
-    print(data);
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("typing -------------------- $map");
-    setState(() {
-      typing=true;
+
+  void getMessage() {
+    firebaseDatabaseMethods
+        .getMessageChat(userModel.id, widget.idReceiver)
+        .then((data) {
+      //
+      print('data '+data.toString());
+      setState(() {
+        chatStream =data;
+       // if(data.)
+      });
     });
-  }
-  void stopTyping(dynamic data){
-    print(data);
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("stopTyping -------------------- $map");
-    setState(() {
-      typing=false;
-    });
-  }
-  void userJoined(dynamic data){
-    print(data);
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("userJoined -------------------- $map");
-  }
-  void userLeft(dynamic data){
-    print(data);
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("userLeft -------------------- $map");
-  }
-  void receiveMessage(dynamic data){
-    print("receiveMessage "+data);
-    Map<String,dynamic> map = new Map<String,dynamic>();
-    map = json.decode(data);
-    print("receive_message -------------------- $map");
-    setState(() {
-      typing=false;
-    });
-
   }
 
   void onFocusChange() {
@@ -264,6 +251,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       });
     }
   }
+
   Future getImage() async {
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
@@ -306,27 +294,48 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     });
   }
 
-  void onSendMessage(String content, int type) {
+  void onSendMessage(String content, int type) async {
     // type: 0 = text, 1 = image, 2 = sticker
     if (content.trim() != '') {
       textEditingController.clear();
-       MessageModel messages =MessageModel(idSender: userModel.id,nameSender:userModel.fullName,photoSender: userModel.photoURL , idReceiver:widget.idReceiver,nameReceiver: widget.nameReceiver,photoReceiver: widget.photoReceiver, timestamp:DateTime.now().millisecondsSinceEpoch.toString(), content:content, type:type, status:0);
-       var from =fireBaseStore.collection(FIREBASE_MESSAGES).doc( userModel.id).collection(widget.idReceiver).doc();// end doc can use timestamp
-       var to =fireBaseStore.collection(FIREBASE_MESSAGES).doc(widget.idReceiver).collection( userModel.id).doc();// end doc can use timestamp
-       WriteBatch writeBatch =fireBaseStore.batch();
-       writeBatch.set(from, messages.toJson());
-       writeBatch.set(to, messages.toJson());
-    writeBatch.commit().then((value) => ()=>{
-      print('Create message ')
-
-    }).catchError((onError){
-      print(('create message error $onError'));
-    });
-
+      MessageModel messages = MessageModel(
+          idSender: userModel.id,
+          nameSender: userModel.fullName,
+          photoSender: userModel.photoURL,
+          idReceiver: widget.idReceiver,
+          nameReceiver: widget.nameReceiver,
+          photoReceiver: widget.photoReceiver,
+          timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: content,
+          type: type,
+          status: 0);
+      var from = fireBaseStore
+          .collection(FIREBASE_MESSAGES)
+          .doc(userModel.id)
+          .collection(widget.idReceiver)
+          .doc(); // end doc can use timestamp
+      var to = fireBaseStore
+          .collection(FIREBASE_MESSAGES)
+          .doc(widget.idReceiver)
+          .collection(userModel.id)
+          .doc(); // end doc can use timestamp
+      WriteBatch writeBatch = fireBaseStore.batch();
+      writeBatch.set(from, messages.toJson());
+      writeBatch.set(to, messages.toJson());
+      writeBatch
+          .commit()
+          .then((value) => () => {print('Create message succree ')})
+          .catchError((onError) {
+        print(('create message error $onError'));
+      });
+      //  print('message insert '+messages.toString());
+      await messageDao.insertMessage(messages);
+      setState(() {
+        newMessage = true;
+      });
 
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-      messageDao.insertMessage(messages);
     } else {
       Fluttertoast.showToast(
           msg: 'Nothing to send',
@@ -346,8 +355,6 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
     return Future.value(false);
   }
-
-
 
   Widget buildSticker() {
     return Container(
@@ -468,64 +475,66 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
   Widget buildInput() {
     return Container(
-      child: Row(
-        children: <Widget>[
-          // Button send image
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.image),
-                onPressed: getImage,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(Icons.face),
-                onPressed: getSticker,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
-
-          // Edit text
-          Flexible(
-            child: Container(
-              child: TextField(
-
-                onSubmitted: (value) {
-                  onSendMessage(textEditingController.text, 0);
-                },
-                style: TextStyle(color: primaryColor, fontSize: 15.0),
-                controller: textEditingController,
-                decoration: InputDecoration.collapsed(
-                  hintText: 'Type your message...',
-                  hintStyle: TextStyle(color: greyColor),
+      alignment: Alignment.bottomCenter,
+      child: Container(
+        child: Row(
+          children: <Widget>[
+            // Button send image
+            Material(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 1.0),
+                child: IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: getImage,
+                  color: primaryColor,
                 ),
-                focusNode: focusNode,
               ),
+              color: Colors.white,
             ),
-          ),
+            Material(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 1.0),
+                child: IconButton(
+                  icon: Icon(Icons.face),
+                  onPressed: getSticker,
+                  color: primaryColor,
+                ),
+              ),
+              color: Colors.white,
+            ),
 
-          // Button send message
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 8.0),
-              child: IconButton(
-                icon: Icon(Icons.send),
-                onPressed: () => onSendMessage(textEditingController.text, 0),
-                color: primaryColor,
+            // Edit text
+            Flexible(
+              child: Container(
+                child: TextField(
+                  onSubmitted: (value) {
+                    onSendMessage(textEditingController.text, 0);
+                  },
+                  style: TextStyle(color: primaryColor, fontSize: 15.0),
+                  controller: textEditingController,
+                  decoration: InputDecoration.collapsed(
+                    hintText: 'Type your message...',
+                    hintStyle: TextStyle(color: greyColor),
+                  ),
+                  focusNode: focusNode,
+                ),
               ),
             ),
-            color: Colors.white,
-          ),
-        ],
+
+            // Button send message
+            Material(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 8.0),
+                child: IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () => onSendMessage(textEditingController.text, 0),
+                  color: primaryColor,
+                ),
+              ),
+              color: Colors.white,
+            ),
+          ],
+        ),
       ),
       width: double.infinity,
       height: 50.0,
@@ -536,18 +545,12 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   }
 
   Widget buildListMessage() {
-    print("id: ${userModel.id} - toId: ${widget.idReceiver}");
-    return Flexible(
-      child:  userModel.id == ''
-          ? Center(
-              child: CircularProgressIndicator(
-                  //valueColor: AlwaysStoppedAnimation<Color>(themeColor)
-              ))
 
-          : StreamBuilder(
+    return Flexible(
+      child: StreamBuilder(
               stream: fireBaseStore
                   .collection(FIREBASE_MESSAGES)
-                  .doc( userModel.id)
+                  .doc(userModel.id)
                   .collection(widget.idReceiver)
                   .orderBy('timestamp', descending: true)
                   .limit(_limit)
@@ -557,15 +560,19 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
                   print("cannot get data");
                   return Center(
                       child: CircularProgressIndicator(
-                        //  valueColor: AlwaysStoppedAnimation<Color>(themeColor)
-                      )
-                  );
+                          //  valueColor: AlwaysStoppedAnimation<Color>(themeColor)
+                          ));
                 } else {
                   listMessage.addAll(snapshot.data.documents);
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) =>
-                    ItemChatMessage(context, userModel.id,index,snapshot.data.documents[index],listMessage,widget.photoReceiver),
+                    itemBuilder: (context, index) => ItemChatMessage(
+                        context,
+                        userModel.id,
+                        index,
+                        snapshot.data.documents[index],
+                        listMessage,
+                        widget.photoReceiver),
                     itemCount: snapshot.data.documents.length,
                     reverse: true,
                     controller: listScrollController,
@@ -575,18 +582,149 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
             ),
     );
   }
-  Widget buildTyping(){
+
+   listChat() {
+
+    return Flexible(
+      child: StreamBuilder(
+        stream: chatStream,
+        builder: (context, snapshot) {
+          if(snapshot.hasData){
+            listMessage.addAll(snapshot.data.documents);
+            return ListView.builder(
+              padding: EdgeInsets.all(10.0),
+              itemBuilder: (context, index) => ItemChatMessage(
+                  context,
+                  userModel.id,
+                  index,
+                  snapshot.data.documents[index],
+                  listMessage,
+                  widget.photoReceiver),
+              itemCount: snapshot.data.documents.length,
+              reverse: true,
+              controller: listScrollController,
+            );
+          }else{
+            return Center(
+              child: Container(
+                child: Text(''),
+              ),
+            );
+          }
+
+    }),
+    );
+  }
+
+
+  Widget buildTyping() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(5.0),
           child: Text(
-              typing?'Typing...':'',style: TextStyle(color: Colors.lightBlue,fontSize: 11),
+            typing ? 'Typing...' : '',
+            style: TextStyle(color: Colors.lightBlue, fontSize: 11),
           ),
         ),
       ],
     );
   }
 
+  initSocket() async {
+    await SharedPre.getStringKey(SharedPre.sharedPreFullName)
+        .then((value) => {widget.nameReceiver = value});
+
+    //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
+    socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",
+        query: 'idChat=' '', socketStatusCallback: _socketStatus);
+
+    socketIO.init();
+    socketIO.sendMessage(
+      // todo send message to server socket
+      'subscribe',
+      json.encode({
+        'groupChatId': groupChatId,
+      }),
+    );
+
+    // todo: listener events from server socket
+    socketIO.subscribe(SOCKET_TYPING, userTyping);
+    socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
+
+    socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
+    socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
+
+    //     //Connect to the socket
+    socketIO.connect();
+  }
+
+  _socketStatus(dynamic data) {
+    print("Socket status: " + data);
+  }
+
+  void userTyping(dynamic data) {
+    print(data);
+    Map<String, dynamic> map = new Map<String, dynamic>();
+    map = json.decode(data);
+    print("typing -------------------- $map");
+    setState(() {
+      typing = true;
+    });
+  }
+
+  void stopTyping(dynamic data) {
+    print(data);
+    Map<String, dynamic> map = new Map<String, dynamic>();
+    map = json.decode(data);
+    print("stopTyping -------------------- $map");
+    setState(() {
+      typing = false;
+    });
+  }
+
+  void userJoined(dynamic data) {
+    print(data);
+    Map<String, dynamic> map = new Map<String, dynamic>();
+    map = json.decode(data);
+    print("userJoined -------------------- $map");
+  }
+
+  void userLeft(dynamic data) {
+    print(data);
+    Map<String, dynamic> map = new Map<String, dynamic>();
+    map = json.decode(data);
+    print("userLeft -------------------- $map");
+  }
+
+  void receiveMessage(dynamic data) {
+    print("receiveMessage " + data);
+    Map<String, dynamic> map = new Map<String, dynamic>();
+    map = json.decode(data);
+    print("receive_message -------------------- $map");
+    setState(() {
+      typing = false;
+    });
+  }
+
+  @override
+  void onDetached() {
+    // TODO: implement onDetached
+  }
+
+  @override
+  void onInactive() {
+    // TODO: implement onInactive
+  }
+
+  @override
+  void onPaused() {
+    // TODO: implement onPaused
+  }
+
+  @override
+  void onResumed() {
+    // TODO: implement onResumed
+  }
 }

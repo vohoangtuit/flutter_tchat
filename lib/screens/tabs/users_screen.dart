@@ -11,8 +11,10 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
+import 'package:tchat_app/screens/items/item_users.dart';
 import 'package:tchat_app/screens/setting_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -20,150 +22,105 @@ import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
 import '../main.dart';
-class UsersScreen extends StatefulWidget {
 
+class UsersScreen extends StatefulWidget {
   @override
   State createState() => UsersScreenState();
 }
 
-class UsersScreenState extends BaseStatefulState<UsersScreen> {
+class UsersScreenState extends BaseStatefulState<UsersScreen>
+    with AutomaticKeepAliveClientMixin<UsersScreen> {
   bool isLoading = false;
+  List<UserModel> listUser = List();
+  Stream streamUsers;
 
   @override
   void initState() {
     super.initState();
-
+    getData();
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Flexible(
-        child: Column(
-          children: [
-            Stack(
-              children: <Widget>[
-                // List
-                Container(
-                  child: StreamBuilder(
-                    stream:
-                    fireBaseStore.collection(FIREBASE_USERS).snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(themeColor),
-                          ),
-                        );
-                      } else {
-                        if( userModel.id==null){
-                          return Text("hello");
-                        }else{
-                          return ListView.builder (
-                              shrinkWrap: true,
-                              padding: EdgeInsets.all(10.0),
-                              itemBuilder: (context, index) =>
-                                  buildItem(context, snapshot.data.documents[index]),
-                              itemCount: snapshot.data.documents.length,
-                          );
-                        }
-
-                      //
-                      }
-                    },
-                  ),
-                ),
-
-                // Loading
-                Positioned(
-                  child: isLoading ? const Loading() : Container(),
-                )
-              ],
-            ),
-          ],
-        ),
-      ),
+    return Container(
+      //
+      child: userList(),
     );
   }
 
-  Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (document.data()[USER_ID] ==  userModel.id) {
-      return Container();
-    } else {
-      return Container(
-        child: FlatButton(
-          child: Row(
-            children: <Widget>[
-              Material(
-                child: document.data()[USER_PHOTO_URL] != null
-                    ? CachedNetworkImage(
-                  placeholder: (context, url) => Container(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 1.0,
-                      valueColor:
-                      AlwaysStoppedAnimation<Color>(themeColor),
-                    ),
-                    width: 50.0,
-                    height: 50.0,
-                    padding: EdgeInsets.all(15.0),
-                  ),
-                  imageUrl: document.data()[USER_PHOTO_URL],
-                  width: 50.0,
-                  height: 50.0,
-                  fit: BoxFit.cover,
-                )
-                    : Icon(
-                  Icons.account_circle,
-                  size: 50.0,
-                  color: greyColor,
-                ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
-              ),
-              Flexible(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          'Full Name: ${document.data()[USER_FULLNAME]}',
-                          style: TextStyle(color: primaryColor),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                      ),
-                      Container(
-                        child: Text(
-                          'Email: ${document.data()[USER_EMAIL] ?? '.....'}',
-                          style: TextStyle(color: primaryColor),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 20.0),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
+  getData() async {
+    await Future.delayed(const Duration(seconds: 2), () {
+      showLoading();
+    });
+    firebaseDatabaseMethods.getAllUser().then((data) {
+      setState(() {
+        streamUsers = data;
+      });
+      hideLoading();
+    });
 
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatScreen(document.id, document.data()[USER_PHOTO_URL], document.data()[USER_FULLNAME]
-                    )));
-          },
-          color: greyColor2,
-          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        ),
-        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-      );
-    }
+    // todo: detect data to other use
+    // final QuerySnapshot result = await firebaseDatabaseMethods.getAllUser();
+    // final List<DocumentSnapshot> documents = result.docs;
+    // if (documents.isNotEmpty) {
+    //   for (DocumentSnapshot doc in documents) {
+    //     UserModel userModel = UserModel(
+    //       id: doc.data()[USER_ID],
+    //       userName: doc.data()[USER_USERNAME],
+    //       fullName: doc.data()[USER_FULLNAME],
+    //       birthday: doc.data()[USER_BIRTHDAY],
+    //       email: doc.data()[USER_EMAIL],
+    //       photoURL: doc.data()[USER_PHOTO_URL],
+    //       statusAccount: doc.data()[USER_STATUS_ACCOUNT],
+    //       phoneNumber: doc.data()[USER_PHONE],
+    //       createdAt: doc.data()[USER_CREATED_AT],
+    //       pushToken: doc.data()[USER_ISlOGIN],
+    //     );
+    //   }
+    //   listUser.add(userModel);
+    // }
+    // print("listUse "+listUser.toString());
+  }
+
+  Widget userList() {
+    return StreamBuilder(
+      stream: streamUsers,
+      builder: (context, snapshot) {
+        return snapshot.hasData
+            ? ListView.builder(
+                shrinkWrap: true,
+                padding: EdgeInsets.all(10.0),
+                itemCount: snapshot.data.documents.length,
+                // snapshot.data.documents.length
+                itemBuilder: (context, index) => ItemUser(
+                    context, snapshot.data.documents[index], userModel),
+              )
+            : Container();
+      },
+    );
+  }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
+
+  @override
+  void onDetached() {
+    print('user screen onDetached()');
+  }
+
+  @override
+  void onInactive() {
+    print('user screen onInactive()');
+  }
+
+  @override
+  void onPaused() {
+    print('user screen onPaused()');
+  }
+
+  @override
+  void onResumed() {
+    print('user screen onResumed()');
   }
 }
-

@@ -11,7 +11,7 @@ import 'package:tchat_app/models/user_model.dart';
 // todo: run comment to create database: flutter packages pub run build_runner build
 part 'database.g.dart'; // the generated code will be there
 //
-@Database(version: 2, entities: [UserModel,MessageModel])
+@Database(version: 1, entities: [UserModel,MessageModel])
 abstract class TChatAppDatabase extends FloorDatabase {
   UserDao get userDao;
   MessageDao get messageDao;

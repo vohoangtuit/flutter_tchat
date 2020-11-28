@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
-import 'package:tchat_app/screens/tabs/contacts_screen.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
-import 'package:tchat_app/screens/tabs/message_screen.dart';
+import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
 import 'package:tchat_app/screens/tabs/time_line_screen.dart';
 import 'package:tchat_app/screens/tabs/users_screen.dart';
@@ -17,7 +16,6 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 class MainScreen extends StatefulWidget {
    bool synData;
-
   MainScreen( this.synData);
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -29,46 +27,55 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('TChat '),
-        centerTitle: false,
-      ),
-      body: WillPopScope(
-        child: TabBarView(
-          physics: NeverScrollableScrollPhysics(),// todo: disable swip
-         // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          children: <Widget>[MessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-       //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          // set the controller
-          controller: controller,
+   // print('main screen ${userModel.fullName}');
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('TChat '),
+          centerTitle: false,
         ),
-        onWillPop: onBackPress,
-      ),
-      bottomNavigationBar: Material(
-        // set the color of the bottom navigation bar
-        color: Colors.white,
-        // set the tab bar as the child of bottom navigation bar
-        child: TabBar(
-          indicatorColor: Colors.transparent,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          labelStyle: TextStyle(color:Colors.blue,fontSize: 11.0),//,fontFamily: 'Family Name'
-          unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:11.0),//,fontFamily: 'Family Name'
-          tabs:listTab(),
-          controller: controller,
+        body: WillPopScope(
+          child: TabBarView(
+            physics: NeverScrollableScrollPhysics(),// todo: disable swip
+            // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+            children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+            //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+            // set the controller
+            controller: controller,
+          ),
+          onWillPop: onBackPress,
         ),
-      ),
-    );
+        bottomNavigationBar: Material(
+          // set the color of the bottom navigation bar
+          color: Colors.white,
+          // set the tab bar as the child of bottom navigation bar
+          child: TabBar(
+            indicatorColor: Colors.transparent,
+            labelColor: Colors.blue,
+            unselectedLabelColor: Colors.grey,
+            labelStyle: TextStyle(color:Colors.blue,fontSize: 11.0),//,fontFamily: 'Family Name'
+            unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:11.0),//,fontFamily: 'Family Name'
+            tabs:listTab(),
+            controller: controller,
+          ),
+        ),
+      );
   }
   @override
   void initState() {
     super.initState();
+  //  print('main screen initState()');
     controller = TabController(length: 5, vsync: this);
     controller.addListener(_handleTabSelection);
     if(widget.synData){
 
     }
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  //  print("didChangeDependencies  Main "+onStart.toString());
+
+    // print
   }
   void handleSyncData(){
 
@@ -302,6 +309,26 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 //    await flutterLocalNotificationsPlugin.show(
 //        0, 'plain title', 'plain body', platformChannelSpecifics,
 //        payload: 'item x');
+  }
+
+  @override
+  void onDetached() {
+   print('Main screen onDetached()');
+  }
+
+  @override
+  void onInactive() {
+    print('Main screen onInactive()');
+  }
+
+  @override
+  void onPaused() {
+    print('Main screen onPaused()');
+  }
+
+  @override
+  void onResumed() {
+    print('Main screen onResumed()');
   }
 
 }

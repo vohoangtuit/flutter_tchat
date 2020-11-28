@@ -10,7 +10,7 @@ abstract class MessageDao {
   @Query('SELECT * FROM MessageModel WHERE id = :id LIMIT 1')
   Future<MessageModel> getMessageById(String id);
 
-  @Query('SELECT * FROM MessageModel GROUP BY idTo ORDER BY timestamp DESC LIMIT 1')//  DESC ASC
+  @Query('SELECT * FROM MessageModel GROUP BY idReceiver ORDER BY timestamp DESC')//  DESC ASC
   Future<List<MessageModel>> getLastMessage();
 
   @Query('SELECT * FROM MessageModel LIMIT 1')

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
 
@@ -12,28 +13,49 @@ class MoreScreen extends StatefulWidget {
   _MoreScreenState createState() => _MoreScreenState();
 }
 
-class _MoreScreenState extends State<MoreScreen> with AutomaticKeepAliveClientMixin<MoreScreen>{
+class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepAliveClientMixin<MoreScreen>{
   final GoogleSignIn googleSignIn = GoogleSignIn();
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            NormalButton(title: 'Setting',onPressed: (){
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => ChatSettings()));
-            },),
-            SizedBox(height: 10,),
-            NormalButton(title: 'LogOut',onPressed: (){
-              handleSignOut();
-            },),
-          ],
+    if(userModel==null){
+      print("_MoreScreenState null user");
+      return Container();
+    }else{
+      print("_MoreScreenState ${userModel.fullName}");
+      return SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+
+            children: [
+              SizedBox(height: 20,),
+              Text('FullName: ${userModel.fullName}'),
+              SizedBox(height: 10,),
+              Text('id: ${userModel.id}'),
+              NormalButton(title: 'Setting',onPressed: (){
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => ChatSettings()));
+              },),
+              SizedBox(height: 10,),
+              NormalButton(title: 'LogOut',onPressed: (){
+                handleSignOut();
+              },),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    }
+
+  }
+  @override
+  void initState() {
+    super.initState();
+
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
   Future<Null> handleSignOut() async {
     this.setState(() {
@@ -57,4 +79,24 @@ class _MoreScreenState extends State<MoreScreen> with AutomaticKeepAliveClientMi
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
+
+  @override
+  void onDetached() {
+    // TODO: implement onDetached
+  }
+
+  @override
+  void onInactive() {
+    // TODO: implement onInactive
+  }
+
+  @override
+  void onPaused() {
+    // TODO: implement onPaused
+  }
+
+  @override
+  void onResumed() {
+    // TODO: implement onResumed
+  }
 }
