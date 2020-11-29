@@ -5,7 +5,7 @@ class GroupScreen extends StatefulWidget {
   _GroupScreenState createState() => _GroupScreenState();
 }
 
-class _GroupScreenState extends BaseStatefulState<GroupScreen> with AutomaticKeepAliveClientMixin<GroupScreen>{//
+class _GroupScreenState extends State<GroupScreen> with WidgetsBindingObserver{//AutomaticKeepAliveClientMixin<GroupScreen>,
   @override
   Widget build(BuildContext context) {
     return Container();
@@ -20,23 +20,29 @@ class _GroupScreenState extends BaseStatefulState<GroupScreen> with AutomaticKee
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
-  @override
-  void onDetached() {
-    print('Group screen onDetached()');
-  }
+  @override//                     AppLifecycleState state
+  void didChangeAppLifecycleState(AppLifecycleState state) {//didChangeAppLifecycleState
+    state = state;
+    print(state);
+    print(":::::::");                                         //didChangeAppLifecycleState
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print('GroupScreen resumed()');
 
-  @override
-  void onInactive() {
-    print('Group screen onInactive()');
-  }
+        break;
+      case AppLifecycleState.inactive:
+        print('GroupScreen inactive()');
 
-  @override
-  void onPaused() {
-    print('Group screen onPaused()');
-  }
+        break;
+      case AppLifecycleState.paused:
+        print('GroupScreen paused()');
 
-  @override
-  void onResumed() {
-    print('Group screen onResumed()');
+        break;
+      case AppLifecycleState.detached:
+        print('GroupScreen paused()');
+
+        break;
+
+    }
   }
 }

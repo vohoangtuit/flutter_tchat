@@ -56,28 +56,31 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> with
     }
 
   }
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    switch (state) {
-      case AppLifecycleState.resumed:
-        print('base resumed()');
-        onResumed();
-        break;
-      case AppLifecycleState.inactive:
-        print('base inactive()');
-        onPaused();
-        break;
-      case AppLifecycleState.paused:
-        print('base paused()');
-        onInactive();
-        break;
-      case AppLifecycleState.detached:
-        print('base paused()');
-        onDetached();
-        break;
-
-    }
-  }
+//  @override//                     AppLifecycleState state
+//  void didChangeAppLifecycleState(AppLifecycleState state) {//didChangeAppLifecycleState
+//    state = state;
+//    print(state);
+//    print(":::::::");                                         //didChangeAppLifecycleState
+//    switch (state) {
+//      case AppLifecycleState.resumed:
+//        print('base resumed()');
+//        //onResumed();
+//        break;
+//      case AppLifecycleState.inactive:
+//        print('base inactive()');
+//       // onPaused();
+//        break;
+//      case AppLifecycleState.paused:
+//        print('base paused()');
+//       // onInactive();
+//        break;
+//      case AppLifecycleState.detached:
+//        print('base paused()');
+//      //  onDetached();
+//        break;
+//
+//    }
+//  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -106,10 +109,10 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> with
        });
     });
   }
-  void onResumed();
-  void onPaused();
-  void onInactive();
-  void onDetached();
+//  void onResumed();
+//  void onPaused();
+//  void onInactive();
+//  void onDetached();
   void showLoading() {
     if(progressBar!=null){
       progressBar.show(context);

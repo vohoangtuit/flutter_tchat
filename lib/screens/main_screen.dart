@@ -21,7 +21,7 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin{
+class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin , WidgetsBindingObserver{
   TabController controller;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
@@ -310,25 +310,30 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 //        0, 'plain title', 'plain body', platformChannelSpecifics,
 //        payload: 'item x');
   }
+  @override//                     AppLifecycleState state
+  void didChangeAppLifecycleState(AppLifecycleState state) {//didChangeAppLifecycleState
+    state = state;
+    print(state);
+    print(":::::::");                                         //didChangeAppLifecycleState
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print('Main resumed()');
 
-  @override
-  void onDetached() {
-   print('Main screen onDetached()');
-  }
+        break;
+      case AppLifecycleState.inactive:
+        print('Main inactive()');
 
-  @override
-  void onInactive() {
-    print('Main screen onInactive()');
-  }
+        break;
+      case AppLifecycleState.paused:
+        print('Main paused()');
 
-  @override
-  void onPaused() {
-    print('Main screen onPaused()');
-  }
+        break;
+      case AppLifecycleState.detached:
+        print('Main paused()');
 
-  @override
-  void onResumed() {
-    print('Main screen onResumed()');
+        break;
+
+    }
   }
 
 }

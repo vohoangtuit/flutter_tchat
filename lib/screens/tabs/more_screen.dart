@@ -7,6 +7,7 @@ import 'package:tchat_app/widget/button.dart';
 
 import '../main.dart';
 import '../setting_screen.dart';
+import 'last_message_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override
@@ -19,10 +20,10 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     if(userModel==null){
-      print("_MoreScreenState null user");
+     // print("_MoreScreenState null user");
       return Container();
     }else{
-      print("_MoreScreenState ${userModel.fullName}");
+     // print("_MoreScreenState ${userModel.fullName}");
       return SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -40,6 +41,11 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
               SizedBox(height: 10,),
               NormalButton(title: 'LogOut',onPressed: (){
                 handleSignOut();
+              },),
+              SizedBox(height: 10,),
+              NormalButton(title: 'Clear Data Chat',onPressed: (){
+               messageDao.deleteAllMessage();
+               LastMessageScreen(loadData: true);
               },),
             ],
           ),
@@ -80,23 +86,4 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
-  @override
-  void onDetached() {
-    // TODO: implement onDetached
-  }
-
-  @override
-  void onInactive() {
-    // TODO: implement onInactive
-  }
-
-  @override
-  void onPaused() {
-    // TODO: implement onPaused
-  }
-
-  @override
-  void onResumed() {
-    // TODO: implement onResumed
-  }
 }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "521036740132-l7j0h3rdv9ov7fnqjp1iq05b9rvrp4uo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "vht.tchat.com",
+            "certificate_hash": "aa8a9378d82c940e9f5324a2070a36d736d0b9a5"
+          }
+        },
+        {
           "client_id": "521036740132-g4fcor3rp271m9klno77g6422hngn15e.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

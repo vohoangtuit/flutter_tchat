@@ -12,11 +12,13 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
 class LastMessageScreen extends StatefulWidget {
+   bool loadData ;
+  LastMessageScreen({this.loadData});
   @override
   _LastMessageScreenState createState() => _LastMessageScreenState();
 }
 
-class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen> {
+class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen> , WidgetsBindingObserver{
   //
   @override
 //  TODO: implement wantKeepAlive
@@ -24,7 +26,7 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   dynamic data;
 
   List<MessageModel> listMessage = List();
-  bool loadData =false;
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,24 +80,33 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
       });
     });
   }
+  @override//
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+//    state = state;
+//    print(state);
+//    print(":::::::");
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print('Message resumed()' +widget.loadData.toString());
+        if(widget.loadData){
+          widget.loadData =false;
+        }
+        init();
+        break;
+      case AppLifecycleState.inactive:
+        print('Message inactive()');
 
-  @override
-  void onDetached() {
-    print('message screen onDetached');
+        break;
+      case AppLifecycleState.paused:
+        print('Message paused()');
+
+        break;
+      case AppLifecycleState.detached:
+        print('Message paused()');
+
+        break;
+
+    }
   }
 
-  @override
-  void onInactive() {
-    print('message screen onInactive');
-  }
-
-  @override
-  void onPaused() {
-    print('message screen onPaused');
-  }
-
-  @override
-  void onResumed() {
-    print('message screen onResumed');
-  }
 }

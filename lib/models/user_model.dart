@@ -2,6 +2,7 @@
 //---------todo UserModel------------
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:floor/floor.dart';
+import 'package:flutter/cupertino.dart';
 final String USER_MODEL ='UserModel';
 final String USER_ID ='id';
 final String USER_USERNAME ='userName';
@@ -16,7 +17,7 @@ final String USER_PUST_TOKEN ='pushToken';
 final String USER_ISlOGIN ='isLogin';
 
 @entity
-class UserModel {
+class UserModel extends ChangeNotifier{
   @PrimaryKey(autoGenerate: true)
   int idDB;
   String id='';

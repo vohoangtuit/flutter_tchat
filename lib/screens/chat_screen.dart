@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/message._model.dart';
+import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -223,10 +224,25 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
         .orderBy('timestamp', descending: true);
 
     userQuery.snapshots().listen((data) {
+      print("data size: "+data.size.toString());
+      MessageModel message = MessageModel();
       data.docs.forEach((change) {
         print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
+        message.idSender =change.data()[MESSAGE_ID_SENDER];
+        message.nameSender =change.data()[MESSAGE_NAME_SENDER];
+        message.photoSender =change.data()[MESSAGE_PHOTO_SENDER];
+        message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
+        message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
+        message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
+        message.timestamp =change.data()[MESSAGE_TIMESTAMP];
+        message.content =change.data()[MESSAGE_CONTENT];
+        message.type =change.data()[MESSAGE_TYPE];
+        message.status =change.data()[MESSAGE_STATUS];
       });
+      messageDao.insertMessage(message);
+      LastMessageScreen(loadData: true);
     });
+
 
   }
 
@@ -333,6 +349,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       setState(() {
         newMessage = true;
       });
+      LastMessageScreen(loadData: true);
 
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
@@ -708,23 +725,4 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     });
   }
 
-  @override
-  void onDetached() {
-    // TODO: implement onDetached
-  }
-
-  @override
-  void onInactive() {
-    // TODO: implement onInactive
-  }
-
-  @override
-  void onPaused() {
-    // TODO: implement onPaused
-  }
-
-  @override
-  void onResumed() {
-    // TODO: implement onResumed
-  }
 }

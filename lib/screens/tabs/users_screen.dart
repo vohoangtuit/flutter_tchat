@@ -104,23 +104,4 @@ class UsersScreenState extends BaseStatefulState<UsersScreen>
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
-  @override
-  void onDetached() {
-    print('user screen onDetached()');
-  }
-
-  @override
-  void onInactive() {
-    print('user screen onInactive()');
-  }
-
-  @override
-  void onPaused() {
-    print('user screen onPaused()');
-  }
-
-  @override
-  void onResumed() {
-    print('user screen onResumed()');
-  }
 }

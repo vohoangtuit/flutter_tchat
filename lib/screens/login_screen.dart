@@ -18,7 +18,7 @@ import 'package:tchat_app/widget/loading.dart';
 import '../utils/const.dart';
 import 'home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget with WidgetsBindingObserver {
   LoginScreen({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -161,24 +161,30 @@ class LoginScreenState extends BaseStatefulState<LoginScreen> {
           ],
         ));
   }
+//  @override//                     AppLifecycleState state
+//  void didChangeAppLifecycleState(AppLifecycleState state) {//didChangeAppLifecycleState
+//    state = state;
+//    print(state);
+//    print(":::::::");                                         //didChangeAppLifecycleState
+//    switch (state) {
+//      case AppLifecycleState.resumed:
+//        print('Login resumed()');
+//
+//        break;
+//      case AppLifecycleState.inactive:
+//        print('Login inactive()');
+//
+//        break;
+//      case AppLifecycleState.paused:
+//        print('Login paused()');
+//
+//        break;
+//      case AppLifecycleState.detached:
+//        print('Login paused()');
+//
+//        break;
+//
+//    }
+//  }
 
-  @override
-  void onDetached() {
-    // TODO: implement onDetached
-  }
-
-  @override
-  void onInactive() {
-    // TODO: implement onInactive
-  }
-
-  @override
-  void onPaused() {
-    // TODO: implement onPaused
-  }
-
-  @override
-  void onResumed() {
-    // TODO: implement onResumed
-  }
 }
