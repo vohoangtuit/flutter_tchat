@@ -33,27 +33,27 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
           title: Text('TChat '),
           centerTitle: false,
         ),
-        body: WillPopScope(
-          child: TabBarView(
-            physics: NeverScrollableScrollPhysics(),// todo: disable swip
-            // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-            children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-            //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-            // set the controller
-            controller: controller,
-          ),
-          onWillPop: onBackPress,
+        body: TabBarView(
+          physics: NeverScrollableScrollPhysics(),// todo: disable swip
+          // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+          children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+          //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+          // set the controller
+          controller: controller,
         ),
         bottomNavigationBar: Material(
           // set the color of the bottom navigation bar
           color: Colors.white,
           // set the tab bar as the child of bottom navigation bar
-          child: TabBar(
-            indicatorColor: Colors.transparent,
+          child:
+          TabBar(
+           // indicatorColor: Colors.transparent,
+            indicatorColor: Colors.blue,
             labelColor: Colors.blue,
             unselectedLabelColor: Colors.grey,
-            labelStyle: TextStyle(color:Colors.blue,fontSize: 11.0),//,fontFamily: 'Family Name'
-            unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:11.0),//,fontFamily: 'Family Name'
+            labelPadding: EdgeInsets.only(left: 0.0,top: 5.0,right: 0.0,bottom: 0.0),
+            labelStyle: TextStyle(color:Colors.blue,fontSize: 10.5),//,fontFamily: 'Family Name'
+            unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:10.5),//,fontFamily: 'Family Name'
             tabs:listTab(),
             controller: controller,
           ),
@@ -63,6 +63,7 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
   //  print('main screen initState()');
     controller = TabController(length: 5, vsync: this);
     controller.addListener(_handleTabSelection);
@@ -116,6 +117,7 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     // Dispose of the Tab Controller
     controller.dispose();
     super.dispose();
@@ -130,123 +132,31 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
       Tab(child: Column(children: [
         SizedBox(height: 3,),
         Icon(Icons.message, color: controller.index == 0 ? Colors.blue : Colors.grey),
-        Text("Message"),
+        Text("Messages"),
       ],)),
       Tab(child: Column(children: [
-        SizedBox(height: 3,),
+        SizedBox(height: 5,),
         Icon(Icons.account_box_outlined, color: controller.index == 1 ? Colors.blue : Colors.grey),
         Text("Contacts"),
       ],)),
       Tab(child: Column(children: [
-        SizedBox(height: 3,),
+        SizedBox(height: 5,),
         Icon(Icons.group, color: controller.index == 2 ? Colors.blue : Colors.grey),
         Text("Group"),
       ],)),
       Tab(child: Column(children: [
-        SizedBox(height: 3,),
+        SizedBox(height: 5,),
         Icon(Icons.timelapse_outlined, color: controller.index == 3 ? Colors.blue : Colors.grey),
         Text("TimeLine"),
       ],)),
       Tab(child: Column(children: [
-        SizedBox(height: 3,),
-        Icon(Icons.category, color: controller.index == 4 ? Colors.blue : Colors.grey),
-        Text("More"),
-      ],)),
+          SizedBox(height: 5,),
+          Icon(Icons.category, color: controller.index == 4 ? Colors.blue : Colors.grey),
+          Text("More"),
+        ],)),
     ];
   }
-  Future<bool> onBackPress() {
-    openDialog();
-    return Future.value(false);
-  }
-  Future<Null> openDialog() async {
-    switch (await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            contentPadding:
-            EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
-            children: <Widget>[
-              Container(
-                color: themeColor,
-                margin: EdgeInsets.all(0.0),
-                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
-                height: 100.0,
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.exit_to_app,
-                        size: 30.0,
-                        color: Colors.white,
-                      ),
-                      margin: EdgeInsets.only(bottom: 10.0),
-                    ),
-                    Text(
-                      'Exit app',
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Are you sure to exit app?',
-                      style: TextStyle(color: Colors.white70, fontSize: 14.0),
-                    ),
-                  ],
-                ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, 0);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.cancel,
-                        color: primaryColor,
-                      ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'CANCEL',
-                      style: TextStyle(
-                          color: primaryColor, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, 1);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.check_circle,
-                        color: primaryColor,
-                      ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'YES',
-                      style: TextStyle(
-                          color: primaryColor, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          );
-        })) {
-      case 0:
-        break;
-      case 1:
-        exit(0);
-        break;
-    }
-  }
+
 
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();
@@ -310,15 +220,14 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 //        0, 'plain title', 'plain body', platformChannelSpecifics,
 //        payload: 'item x');
   }
-  @override//                     AppLifecycleState state
-  void didChangeAppLifecycleState(AppLifecycleState state) {//didChangeAppLifecycleState
-    state = state;
-    print(state);
-    print(":::::::");                                         //didChangeAppLifecycleState
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // state = state;
+    // print(state);
+    // print(":::::::");
     switch (state) {
       case AppLifecycleState.resumed:
         print('Main resumed()');
-
         break;
       case AppLifecycleState.inactive:
         print('Main inactive()');

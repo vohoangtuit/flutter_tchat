@@ -16,6 +16,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
+import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
@@ -126,13 +127,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    //  print('chat screen initState()');
     initData();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
   }
 
   callVideo() async {
@@ -154,7 +149,6 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       [PermissionGroup.camera, PermissionGroup.microphone],
     );
   }
-
   _scrollListener() {
     if (listScrollController.offset >=
             listScrollController.position.maxScrollExtent &&
@@ -204,6 +198,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
   @override
   void dispose() {
+    textEditingController.dispose();
     super.dispose();
     // socketIO.sendMessage(// todo send message to server socket
     //     //   'unsubscribe',
@@ -213,9 +208,9 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     //     // );
     //     // socketIO.disconnect();
 
-    textEditingController.dispose();
+
   }
-  void listenerData(){
+  void listenerData() async{
     var userQuery=  FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
         .doc(userModel.id)
@@ -225,24 +220,29 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
     userQuery.snapshots().listen((data) {
       print("data size: "+data.size.toString());
-      MessageModel message = MessageModel();
+      //print("data doc: "+data.docs.toString());
+      LastMessageModel message = LastMessageModel();
       data.docs.forEach((change) {
-        print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
-        message.idSender =change.data()[MESSAGE_ID_SENDER];
-        message.nameSender =change.data()[MESSAGE_NAME_SENDER];
-        message.photoSender =change.data()[MESSAGE_PHOTO_SENDER];
-        message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
-        message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
-        message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
+      //  print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
+        if(userModel.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
+        //  print('message is me');
+          message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
+          message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
+          message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
+        }else{
+         //print('message not me');
+          message.idReceiver =change.data()[MESSAGE_ID_SENDER];
+          message.nameReceiver =change.data()[MESSAGE_NAME_SENDER];
+          message.photoReceiver =change.data()[MESSAGE_PHOTO_SENDER];
+        }
         message.timestamp =change.data()[MESSAGE_TIMESTAMP];
         message.content =change.data()[MESSAGE_CONTENT];
         message.type =change.data()[MESSAGE_TYPE];
         message.status =change.data()[MESSAGE_STATUS];
       });
-      messageDao.insertMessage(message);
+      updateLastMessageByID(message);
       LastMessageScreen(loadData: true);
     });
-
 
   }
 
@@ -251,7 +251,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
         .getMessageChat(userModel.id, widget.idReceiver)
         .then((data) {
       //
-      print('data '+data.toString());
+   //   print('data '+data.toString());
       setState(() {
         chatStream =data;
        // if(data.)
@@ -346,10 +346,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       });
       //  print('message insert '+messages.toString());
       await messageDao.insertMessage(messages);
-      setState(() {
-        newMessage = true;
-      });
-      LastMessageScreen(loadData: true);
+       LastMessageScreen(loadData: true);
 
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);

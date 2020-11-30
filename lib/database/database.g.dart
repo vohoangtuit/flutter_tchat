@@ -64,6 +64,8 @@ class _$TChatAppDatabase extends TChatAppDatabase {
 
   MessageDao _messageDaoInstance;
 
+  LastMessageDao _lastMessageDaoInstance;
+
   Future<sqflite.Database> open(String path, List<Migration> migrations,
       [Callback callback]) async {
     final databaseOptions = sqflite.OpenDatabaseOptions(
@@ -85,6 +87,8 @@ class _$TChatAppDatabase extends TChatAppDatabase {
             'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `email` TEXT, `photoURL` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `pushToken` TEXT, `isLogin` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `LastMessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -100,6 +104,12 @@ class _$TChatAppDatabase extends TChatAppDatabase {
   @override
   MessageDao get messageDao {
     return _messageDaoInstance ??= _$MessageDao(database, changeListener);
+  }
+
+  @override
+  LastMessageDao get lastMessageDao {
+    return _lastMessageDaoInstance ??=
+        _$LastMessageDao(database, changeListener);
   }
 }
 
@@ -309,6 +319,124 @@ class _$MessageDao extends MessageDao {
   @override
   Future<void> insertMessage(MessageModel message) async {
     await _messageModelInsertionAdapter.insert(
+        message, OnConflictStrategy.abort);
+  }
+}
+
+class _$LastMessageDao extends LastMessageDao {
+  _$LastMessageDao(this.database, this.changeListener)
+      : _queryAdapter = QueryAdapter(database),
+        _lastMessageModelInsertionAdapter = InsertionAdapter(
+            database,
+            'LastMessageModel',
+            (LastMessageModel item) => <String, dynamic>{
+                  'idDB': item.idDB,
+                  'idReceiver': item.idReceiver,
+                  'nameReceiver': item.nameReceiver,
+                  'photoReceiver': item.photoReceiver,
+                  'timestamp': item.timestamp,
+                  'content': item.content,
+                  'type': item.type,
+                  'status': item.status
+                }),
+        _lastMessageModelUpdateAdapter = UpdateAdapter(
+            database,
+            'LastMessageModel',
+            ['idDB'],
+            (LastMessageModel item) => <String, dynamic>{
+                  'idDB': item.idDB,
+                  'idReceiver': item.idReceiver,
+                  'nameReceiver': item.nameReceiver,
+                  'photoReceiver': item.photoReceiver,
+                  'timestamp': item.timestamp,
+                  'content': item.content,
+                  'type': item.type,
+                  'status': item.status
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<LastMessageModel> _lastMessageModelInsertionAdapter;
+
+  final UpdateAdapter<LastMessageModel> _lastMessageModelUpdateAdapter;
+
+  @override
+  Future<List<LastMessageModel>> getAllLastMessage() async {
+    return _queryAdapter.queryList('SELECT * FROM LastMessageModel',
+        mapper: (Map<String, dynamic> row) => LastMessageModel(
+            idDB: row['idDB'] as int,
+            idReceiver: row['idReceiver'] as String,
+            nameReceiver: row['nameReceiver'] as String,
+            photoReceiver: row['photoReceiver'] as String,
+            content: row['content'] as String,
+            type: row['type'] as int,
+            timestamp: row['timestamp'] as String,
+            status: row['status'] as int));
+  }
+
+  @override
+  Future<LastMessageModel> getLastMessageById(String idReceiver) async {
+    return _queryAdapter.query(
+        'SELECT * FROM LastMessageModel WHERE idReceiver = ? LIMIT 1',
+        arguments: <dynamic>[idReceiver],
+        mapper: (Map<String, dynamic> row) => LastMessageModel(
+            idDB: row['idDB'] as int,
+            idReceiver: row['idReceiver'] as String,
+            nameReceiver: row['nameReceiver'] as String,
+            photoReceiver: row['photoReceiver'] as String,
+            content: row['content'] as String,
+            type: row['type'] as int,
+            timestamp: row['timestamp'] as String,
+            status: row['status'] as int));
+  }
+
+  @override
+  Future<List<LastMessageModel>> getSingleLastMessage() async {
+    return _queryAdapter.queryList(
+        'SELECT * FROM LastMessageModel GROUP BY idReceiver ORDER BY timestamp DESC',
+        mapper: (Map<String, dynamic> row) => LastMessageModel(
+            idDB: row['idDB'] as int,
+            idReceiver: row['idReceiver'] as String,
+            nameReceiver: row['nameReceiver'] as String,
+            photoReceiver: row['photoReceiver'] as String,
+            content: row['content'] as String,
+            type: row['type'] as int,
+            timestamp: row['timestamp'] as String,
+            status: row['status'] as int));
+  }
+
+  @override
+  Future<LastMessageModel> getSingleMessage() async {
+    return _queryAdapter.query('SELECT * FROM LastMessageModel LIMIT 1',
+        mapper: (Map<String, dynamic> row) => LastMessageModel(
+            idDB: row['idDB'] as int,
+            idReceiver: row['idReceiver'] as String,
+            nameReceiver: row['nameReceiver'] as String,
+            photoReceiver: row['photoReceiver'] as String,
+            content: row['content'] as String,
+            type: row['type'] as int,
+            timestamp: row['timestamp'] as String,
+            status: row['status'] as int));
+  }
+
+  @override
+  Future<void> deleteAllMessage() async {
+    await _queryAdapter.queryNoReturn('DELETE * FROM LastMessageModel');
+  }
+
+  @override
+  Future<void> insertMessage(LastMessageModel message) async {
+    await _lastMessageModelInsertionAdapter.insert(
+        message, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> updateLastMessageById(LastMessageModel message) async {
+    await _lastMessageModelUpdateAdapter.update(
         message, OnConflictStrategy.abort);
   }
 }

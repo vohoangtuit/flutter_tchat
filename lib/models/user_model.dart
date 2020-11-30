@@ -17,7 +17,7 @@ final String USER_PUST_TOKEN ='pushToken';
 final String USER_ISlOGIN ='isLogin';
 
 @entity
-class UserModel extends ChangeNotifier{
+class UserModel {
   @PrimaryKey(autoGenerate: true)
   int idDB;
   String id='';
@@ -31,6 +31,7 @@ class UserModel extends ChangeNotifier{
   String createdAt='';
   String pushToken='';
   bool isLogin;
+
 
   UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin});
   Map<String, dynamic> toJson() {

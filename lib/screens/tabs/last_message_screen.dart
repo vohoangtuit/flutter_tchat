@@ -2,8 +2,12 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/bloc/account_bloc.dart';
+import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
 import 'package:tchat_app/database/database.dart';
+import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/items/item_last_message.dart';
@@ -11,39 +15,68 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-class LastMessageScreen extends StatefulWidget {
+class LastMessageScreen extends StatefulWidget  {
    bool loadData ;
   LastMessageScreen({this.loadData});
   @override
   _LastMessageScreenState createState() => _LastMessageScreenState();
 }
 
-class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen> , WidgetsBindingObserver{
+class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen>  {
   //
   @override
 //  TODO: implement wantKeepAlive
  bool get wantKeepAlive => true;
-  dynamic data;
 
-  List<MessageModel> listMessage = List();
-
-
+  List<LastMessageModel> listMessage = List();
+  AccountBloc accBloc;
+  ReloadMessage loadBloc;
+  bool isLoad;
   @override
   Widget build(BuildContext context) {
+     print('BuildContext');
+    Provider.of<AccountBloc>(context,listen: false);
+     Provider.of<ReloadMessage>(context,listen: false);
     return Container(
       child: listView(),
     );
   }
+  @override
+  void didChangeDependencies() {
+    print('didChangeDependencies');
+    if (!isLoad) {
+      accBloc =   Provider.of<AccountBloc>(context,listen: false);
+      loadBloc = Provider.of<ReloadMessage>(context, listen: false);
+      isLoad =true;
+    }else{
+      print('isload 1 $isLoad');
+      if(accBloc.getAccount()!=null){
+        setState(() {
+          isLoad =true;
+        });
+        init();
+        print('isload 2 $isLoad');
+      }else{
+        setState(() {
+          isLoad =false;
+        });
+        //print('account bloc is null');
+      }
+   }
 
+
+    super.didChangeDependencies();
+  }
   @override
   void initState() {
+    print('initState');
+    isLoad =false;
     super.initState();
-    init();
+   // if(isLoad){
+   //   init();
+   // }
   }
-  @override
-  void dispose() {
-    super.dispose();
-  }
+
   Widget listView() {
     return ListView.separated(
       shrinkWrap: true,
@@ -62,51 +95,20 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   }
 
   void init() async {
-     await Future.delayed(const Duration(seconds: 2), () {
-       showLoading();
-    });
-     hideLoading();
-    // if(messageDao==null){
-    //   await configData();
-    // }
-    await messageDao.getLastMessage().then((value) {
+    print('init()');
+    await lastMessageDao.getSingleLastMessage().then((value) {
+      listMessage.clear();
       setState(() {
         listMessage.addAll(value);
-        // if (listMessage.length > 0) {
-        //   for (MessageModel mgs in listMessage) {
-        //     print('mgs ' + mgs.toString());
-        //   }
-        // }
       });
     });
+    setState(() {
+      isLoad =false;
+    });
+    loadBloc.setReload(false);
   }
-  @override//
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-//    state = state;
-//    print(state);
-//    print(":::::::");
-    switch (state) {
-      case AppLifecycleState.resumed:
-        print('Message resumed()' +widget.loadData.toString());
-        if(widget.loadData){
-          widget.loadData =false;
-        }
-        init();
-        break;
-      case AppLifecycleState.inactive:
-        print('Message inactive()');
-
-        break;
-      case AppLifecycleState.paused:
-        print('Message paused()');
-
-        break;
-      case AppLifecycleState.detached:
-        print('Message paused()');
-
-        break;
-
-    }
+  @override
+  void dispose(){
+    super.dispose();
   }
-
 }
