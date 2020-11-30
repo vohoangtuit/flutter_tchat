@@ -31,50 +31,63 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   List<LastMessageModel> listMessage = List();
   AccountBloc accBloc;
   ReloadMessage loadBloc;
-  bool isLoad;
+  bool isLoad =false;
   @override
   Widget build(BuildContext context) {
-     print('BuildContext');
-    Provider.of<AccountBloc>(context,listen: false);
-     Provider.of<ReloadMessage>(context,listen: false);
+     print('LastMessageScreen BuildContext');
+     userModel = Provider.of<AccountBloc>(context,listen: false).user;
+     isLoad = Provider.of<ReloadMessage>(context,listen: false).reloadMessage;
+     if(userModel!=null){
+     //  isLoad =true;
+       print('LastMessageScreen BuildContext $userModel');
+       //init();
+     }
+   //  isLoad = Provider.of<ReloadMessage>(context,listen: false).reloadMessage;
+//     if(acc!=null){
+//      isLoad =true;
+//      init();
+//     }else{
+//       isLoad =false;
+//     }
     return Container(
       child: listView(),
     );
   }
   @override
   void didChangeDependencies() {
-    print('didChangeDependencies');
-    if (!isLoad) {
-      accBloc =   Provider.of<AccountBloc>(context,listen: false);
-      loadBloc = Provider.of<ReloadMessage>(context, listen: false);
-      isLoad =true;
-    }else{
-      print('isload 1 $isLoad');
-      if(accBloc.getAccount()!=null){
-        setState(() {
-          isLoad =true;
-        });
-        init();
-        print('isload 2 $isLoad');
-      }else{
-        setState(() {
-          isLoad =false;
-        });
-        //print('account bloc is null');
-      }
-   }
-
-
+    print('LastMessageScreen didChangeDependencies');
+   // if(userModel!=null && isLoad){
+      init();
+  //  }
+//    if (!isLoad) {
+//      accBloc =   Provider.of<AccountBloc>(context,listen: false);
+//      loadBloc = Provider.of<ReloadMessage>(context, listen: false);
+//      isLoad =true;
+//    }else{
+//      print('isload 1 $isLoad');
+//      if(accBloc.getAccount()!=null){
+//        setState(() {
+//          isLoad =true;
+//        });
+//        init();
+//        print('isload 2 $isLoad');
+//      }else{
+//        setState(() {
+//          isLoad =false;
+//        });
+//        //print('account bloc is null');
+//      }
+ //  }
     super.didChangeDependencies();
   }
   @override
   void initState() {
-    print('initState');
-    isLoad =false;
+    print('LastMessageScreen initState');
+
     super.initState();
-   // if(isLoad){
-   //   init();
-   // }
+    if(isLoad){
+      init();
+    }
   }
 
   Widget listView() {
@@ -95,17 +108,19 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   }
 
   void init() async {
-    print('init()');
+
+    setState(() {
+      isLoad =false;
+    });
+    //loadBloc.setReload(false);
+    print('LastMessageScreen init()');
     await lastMessageDao.getSingleLastMessage().then((value) {
       listMessage.clear();
       setState(() {
         listMessage.addAll(value);
       });
     });
-    setState(() {
-      isLoad =false;
-    });
-    loadBloc.setReload(false);
+
   }
   @override
   void dispose(){

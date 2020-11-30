@@ -5,6 +5,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:provider/provider.dart';
+import 'package:tchat_app/bloc/account_bloc.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
@@ -21,13 +23,13 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin , WidgetsBindingObserver{
+class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin {
   TabController controller;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
-   // print('main screen ${userModel.fullName}');
+    userModel= Provider.of<AccountBloc>(context,listen: false).user;
       return Scaffold(
         appBar: AppBar(
           title: Text('TChat '),
@@ -63,7 +65,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
   //  print('main screen initState()');
     controller = TabController(length: 5, vsync: this);
     controller.addListener(_handleTabSelection);
@@ -74,9 +75,13 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-  //  print("didChangeDependencies  Main "+onStart.toString());
+    print("didChangeDependencies  Main "+onStart.toString());
 
-    // print
+    if(userModel!=null){
+      print('main user ${userModel.toString()}');
+    }else{
+      print('main user null ::::::');
+    }
   }
   void handleSyncData(){
 
@@ -117,7 +122,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     // Dispose of the Tab Controller
     controller.dispose();
     super.dispose();
@@ -220,29 +224,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
 //        0, 'plain title', 'plain body', platformChannelSpecifics,
 //        payload: 'item x');
   }
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // state = state;
-    // print(state);
-    // print(":::::::");
-    switch (state) {
-      case AppLifecycleState.resumed:
-        print('Main resumed()');
-        break;
-      case AppLifecycleState.inactive:
-        print('Main inactive()');
 
-        break;
-      case AppLifecycleState.paused:
-        print('Main paused()');
-
-        break;
-      case AppLifecycleState.detached:
-        print('Main paused()');
-
-        break;
-
-    }
-  }
 
 }

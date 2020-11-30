@@ -49,9 +49,9 @@ class UsersScreenState extends BaseStatefulState<UsersScreen>
   }
 
   getData() async {
-    await Future.delayed(const Duration(seconds: 2), () {
-      showLoading();
-    });
+//    await Future.delayed(const Duration(seconds: 2), () {
+//      showLoading();
+//    });
     firebaseDatabaseMethods.getAllUser().then((data) {
       setState(() {
         streamUsers = data;

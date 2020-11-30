@@ -6,8 +6,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/bloc/account_bloc.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/main_screen.dart';
@@ -18,7 +20,7 @@ import 'package:tchat_app/widget/loading.dart';
 import '../utils/const.dart';
 import 'home_screen.dart';
 
-class LoginScreen extends StatefulWidget with WidgetsBindingObserver {
+class LoginScreen extends StatefulWidget {
   LoginScreen({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -117,7 +119,9 @@ class LoginScreenState extends BaseStatefulState<LoginScreen> {
       Fluttertoast.showToast(msg: "Sign in success");
       this.setState(() {
         isLoading = false;
+        userModel =user;
       });
+      Provider.of<AccountBloc>(context,listen: false).setAccount(user);
 
       Navigator.pushReplacement(
           context,

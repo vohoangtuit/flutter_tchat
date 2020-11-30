@@ -39,7 +39,7 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   // ReloadMessage reloadMessage;
   @override
   Widget build(BuildContext context) {
-    // Provider.of<AccountBloc>(context);
+    userModel= Provider.of<AccountBloc>(context,listen: false).user;
     // Provider.of<ReloadMessage>(context);
     return Stack(
       children: <Widget>[
@@ -80,6 +80,7 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    //print('base didChangeDependencies start $onStart');
     if(!onStart){
       initConfig();
     }
@@ -87,13 +88,13 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   }
 
   void initConfig()async{
+    print('base initConfig');
     progressBar = ProgressBar();
-    // accountBloc =   Provider.of<AccountBloc>(context,listen: false);
-    // reloadMessage = Provider.of<ReloadMessage>(context, listen: false);
-   // configData();
     baseStatefulState=this;
     fireBaseStore = FirebaseFirestore.instance;
-    onStart =true;
+    // accountBloc =   Provider.of<AccountBloc>(context,listen: false);
+    // reloadMessage = Provider.of<ReloadMessage>(context, listen: false);
+    configData();
   }
   void configData()async{
      var accBloc = Provider.of<AccountBloc>(context,listen: false);
@@ -103,14 +104,18 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     userDao = tChatAppDatabase.userDao;
     messageDao =tChatAppDatabase.messageDao;
     lastMessageDao =tChatAppDatabase.lastMessageDao;
-
-    await userDao.getSingleUser().then((value) {
-      setState(() {
-      userModel =value;
-       // print('Base  '+userModel.toString());
-       });
-      accBloc.setAccount(userModel);
-    });
+    if(userModel==null){
+      await userDao.getSingleUser().then((value) {
+        setState(() {
+          userModel =value;
+           print('Base  '+userModel.toString());
+          onStart =true;
+        });
+        accBloc.setAccount(userModel);
+      });
+    }else{
+      print('Base  1 '+userModel.toString());
+    }
 
    // reloadMessage_.setReload(true);
   }
