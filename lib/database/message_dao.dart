@@ -19,7 +19,7 @@ abstract class MessageDao {
   @insert
   Future<void> insertMessage(MessageModel message);
 
-  @Query("DELETE * FROM MessageModel")
+  @Query("DELETE FROM MessageModel")
   Future<void> deleteAllMessage();
 
 // @transaction

@@ -1,7 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:provider/provider.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
+import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
 
@@ -20,7 +23,6 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     if(userModel==null){
-     // print("_MoreScreenState null user");
       return Container();
     }else{
      // print("_MoreScreenState ${userModel.fullName}");
@@ -45,7 +47,9 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
               SizedBox(height: 10,),
               NormalButton(title: 'Clear Data Chat',onPressed: (){
                messageDao.deleteAllMessage();
-               LastMessageScreen(loadData: true);
+               lastMessageDao.deleteAllLastMessage();
+             // todo handle clear on firebase
+               ProviderController(context).setReloadLastMessage(true);
               },),
             ],
           ),

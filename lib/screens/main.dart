@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/bloc/account_bloc.dart';
 import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
-import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/splash_screen.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
 
-import '../utils/const.dart';
-import 'login_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -15,8 +13,7 @@ void main() async {
   //   MyApp(),
   // );
   runApp(
-    /// Providers are above [MyApp] instead of inside it, so that tests
-    /// can use [MyApp] while mocking the providers
+
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AccountBloc()),
@@ -30,6 +27,8 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Locale myLocale;
+    //print('myLocale ${myLocale.countryCode} ${myLocale.languageCode}');
     return MaterialApp(
       title: 'TChat',
       theme: ThemeData(
@@ -38,6 +37,14 @@ class MyApp extends StatelessWidget {
    //   home: LoginScreen(title: 'VHT TChat'),
       home: SplashScreen(),
       debugShowCheckedModeBanner: false,
+        // ignore: missing_return
+        localeResolutionCallback: (deviceLocale, supportedLocales) {
+          myLocale = deviceLocale ; // here you make your app language similar to device language , but you should check whether the localization is supported by your app
+        // print(myLocale.countryCode);
+        //  print(myLocale.languageCode);
+          SharedPre.saveString(SharedPre.sharedPreLanguageCode, myLocale.languageCode);
+          SharedPre.saveString(SharedPre.sharedPreCountryCode, myLocale.countryCode);
+        }
     );
   }
 }

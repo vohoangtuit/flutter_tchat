@@ -29,6 +29,9 @@ TextStyle mediumTextBlack() {
 TextStyle smallTextGray() {
   return TextStyle(color: Colors.grey, fontSize: 12);
 }
+TextStyle smallerTextGray() {
+  return TextStyle(color: Colors.grey, fontSize: 11);
+}
 TextStyle normalTextGray() {
   return TextStyle(color: Colors.grey, fontSize: 14);
 }

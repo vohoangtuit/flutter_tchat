@@ -23,8 +23,8 @@ abstract class LastMessageDao {
   @insert
   Future<void> insertMessage(LastMessageModel message);
 
-  @Query("DELETE * FROM LastMessageModel")
-  Future<void> deleteAllMessage();
+  @Query("DELETE FROM LastMessageModel")
+  Future<void> deleteAllLastMessage();
 
 // @transaction
 // Future<void> replaceUsers(List<UserData> users) async {

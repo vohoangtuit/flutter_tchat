@@ -18,6 +18,7 @@ import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
+import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -170,10 +171,10 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
   }
 
   initData() async {
-    showLoading();
+    //showLoading();
     await Future.delayed(const Duration(seconds: 2), () {
     });
-    hideLoading();
+   // hideLoading();
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
     isLoading = false;
@@ -219,7 +220,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
         .orderBy('timestamp', descending: true);
 
     userQuery.snapshots().listen((data) {
-      print("data size: "+data.size.toString());
+     // print("data size: "+data.size.toString());
       //print("data doc: "+data.docs.toString());
       LastMessageModel message = LastMessageModel();
       data.docs.forEach((change) {
@@ -241,7 +242,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
         message.status =change.data()[MESSAGE_STATUS];
       });
       updateLastMessageByID(message);
-      LastMessageScreen(loadData: true);
+     // ProviderController(context).setReloadLastMessage(true);
     });
 
   }
@@ -346,7 +347,6 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       });
       //  print('message insert '+messages.toString());
       await messageDao.insertMessage(messages);
-       LastMessageScreen(loadData: true);
 
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);

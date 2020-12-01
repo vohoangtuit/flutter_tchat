@@ -7,7 +7,7 @@ class AccountBloc with ChangeNotifier {
   getAccount() => user;
 
   setAccount(UserModel userModel){
-    user =userModel;
+    this.user =userModel;
     notifyListeners();
   }
 

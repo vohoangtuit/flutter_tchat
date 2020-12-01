@@ -1,5 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 class SharedPre {
+  static String sharedPreLanguageCode ="language_code";
+  static String sharedPreCountryCode ="country_code";
+
   static String sharedPreIsLogin ="IS_LOGGED_IN";
   static String sharedPreUserName ="USER_NAME";
   static String sharedPreUserEmail="USER_EMAIL";

@@ -6,8 +6,8 @@ class ReloadMessage with ChangeNotifier{
 
   getReload() => reloadMessage;
 
-  void setReload(bool reload) async{
-    reloadMessage = reload;
+  void setReload(bool reload){
+    this.reloadMessage = reload;
     notifyListeners();
   }
 }

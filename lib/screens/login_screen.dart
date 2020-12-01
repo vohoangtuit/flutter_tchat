@@ -12,6 +12,7 @@ import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/bloc/account_bloc.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
@@ -116,13 +117,11 @@ class LoginScreenState extends BaseStatefulState<LoginScreen> {
 
       }
       await userDao.InsertUser(user);
-      Fluttertoast.showToast(msg: "Sign in success");
+     // Fluttertoast.showToast(msg: "Sign in success");
       this.setState(() {
         isLoading = false;
-        userModel =user;
       });
-      Provider.of<AccountBloc>(context,listen: false).setAccount(user);
-
+      ProviderController(context).setAccount(user);
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(

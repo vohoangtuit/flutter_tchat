@@ -43,7 +43,6 @@ class UsersScreenState extends BaseStatefulState<UsersScreen>
   @override
   Widget build(BuildContext context) {
     return Container(
-      //
       child: userList(),
     );
   }

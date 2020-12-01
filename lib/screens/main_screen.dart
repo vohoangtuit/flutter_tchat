@@ -29,7 +29,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
-    userModel= Provider.of<AccountBloc>(context,listen: false).user;
       return Scaffold(
         appBar: AppBar(
           title: Text('TChat '),
@@ -75,13 +74,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print("didChangeDependencies  Main "+onStart.toString());
-
-    if(userModel!=null){
-      print('main user ${userModel.toString()}');
-    }else{
-      print('main user null ::::::');
-    }
   }
   void handleSyncData(){
 
@@ -160,7 +152,6 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
         ],)),
     ];
   }
-
 
   void registerNotification() {
     firebaseMessaging.requestNotificationPermissions();

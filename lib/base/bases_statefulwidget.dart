@@ -10,6 +10,7 @@ import 'package:tchat_app/database/user_dao.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -34,13 +35,14 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   LastMessageDao lastMessageDao;
 
   bool newMessage =false;
+
+  String languageCode ='';
   FirebaseDatabaseMethods firebaseDatabaseMethods = new FirebaseDatabaseMethods();
   // AccountBloc accountBloc;
   // ReloadMessage reloadMessage;
   @override
   Widget build(BuildContext context) {
-    userModel= Provider.of<AccountBloc>(context,listen: false).user;
-    // Provider.of<ReloadMessage>(context);
+    userModel =ProviderController(context).getAccount();
     return Stack(
       children: <Widget>[
         Container(
@@ -52,6 +54,50 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   @override
   void initState() {
     super.initState();
+
+   // print('base initState start $onStart');
+    // if(!onStart){
+    //   initConfig();
+    // }
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+   // print('base didChangeDependencies start $onStart');
+    if(!onStart){
+      initConfig();
+    }
+  }
+
+  void initConfig()async{
+   // print('base initConfig');
+    progressBar = ProgressBar();
+    baseStatefulState=this;
+    fireBaseStore = FirebaseFirestore.instance;
+    configData();
+  }
+  void configData()async{
+    //-- todo: database change  reRunning rebuild
+    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
+    userDao = tChatAppDatabase.userDao;
+    messageDao =tChatAppDatabase.messageDao;
+    lastMessageDao =tChatAppDatabase.lastMessageDao;
+    if(userModel==null){
+      await userDao.getSingleUser().then((value) {
+        if(value!=null){
+          setState(() {
+            userModel =value;
+            onStart =true;
+          });
+          ProviderController(context).setAccount(userModel);
+        }
+      });
+    }
+    await SharedPre.getStringKey(SharedPre.sharedPreLanguageCode).then((value) {
+      setState(() {
+        languageCode =value;
+      });
+    });
   }
   // // @override
   // void dispose(){
@@ -61,64 +107,21 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   //   }
   // }
   void updateLastMessageByID(LastMessageModel message) async{
-   var reloadMessage_ = Provider.of<ReloadMessage>(context, listen: false);
    await lastMessageDao.getLastMessageById(message.idReceiver).then((value){
      // print("value "+value.toString());
       if(value!=null){
         message.idDB =value.idDB;
         lastMessageDao.updateLastMessageById(message).then((value) {
         });
-        reloadMessage_.setReload(true);
+
       }else{
           lastMessageDao.insertMessage(message).then((value) => {
-
           });
-          reloadMessage_.setReload(true);
       }
     });
-  }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    //print('base didChangeDependencies start $onStart');
-    if(!onStart){
-      initConfig();
-    }
-
+   ProviderController(context).setReloadLastMessage(true);
   }
 
-  void initConfig()async{
-    print('base initConfig');
-    progressBar = ProgressBar();
-    baseStatefulState=this;
-    fireBaseStore = FirebaseFirestore.instance;
-    // accountBloc =   Provider.of<AccountBloc>(context,listen: false);
-    // reloadMessage = Provider.of<ReloadMessage>(context, listen: false);
-    configData();
-  }
-  void configData()async{
-     var accBloc = Provider.of<AccountBloc>(context,listen: false);
-    // var reloadMessage_ = Provider.of<ReloadMessage>(context, listen: false);
-    //-- todo: database change  reRunning rebuild
-    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
-    userDao = tChatAppDatabase.userDao;
-    messageDao =tChatAppDatabase.messageDao;
-    lastMessageDao =tChatAppDatabase.lastMessageDao;
-    if(userModel==null){
-      await userDao.getSingleUser().then((value) {
-        setState(() {
-          userModel =value;
-           print('Base  '+userModel.toString());
-          onStart =true;
-        });
-        accBloc.setAccount(userModel);
-      });
-    }else{
-      print('Base  1 '+userModel.toString());
-    }
-
-   // reloadMessage_.setReload(true);
-  }
   void showLoading() {
     if(progressBar!=null){
       progressBar.show(context);
