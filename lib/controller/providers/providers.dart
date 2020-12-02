@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:tchat_app/bloc/account_bloc.dart';
-import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
+
 import 'package:tchat_app/models/user_model.dart';
+
+import '../bloc/account_bloc.dart';
+import '../bloc/reload_messsage_bloc.dart';
 
 class ProviderController{
   BuildContext context;

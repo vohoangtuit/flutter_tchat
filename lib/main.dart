@@ -1,10 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tchat_app/bloc/account_bloc.dart';
-import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
+
 import 'package:tchat_app/screens/splash_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
+
+import 'controller/bloc/account_bloc.dart';
+import 'controller/bloc/reload_messsage_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

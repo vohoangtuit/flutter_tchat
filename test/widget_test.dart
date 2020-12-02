@@ -7,7 +7,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tchat_app/screens/main.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/main.dart';
 
 
 void main() {

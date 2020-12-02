@@ -313,7 +313,7 @@ class _$MessageDao extends MessageDao {
 
   @override
   Future<void> deleteAllMessage() async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM MessageModel');
+    await _queryAdapter.queryNoReturn('DELETE FROM MessageModel');
   }
 
   @override
@@ -424,8 +424,8 @@ class _$LastMessageDao extends LastMessageDao {
   }
 
   @override
-  Future<void> deleteAllMessage() async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM LastMessageModel');
+  Future<void> deleteAllLastMessage() async {
+    await _queryAdapter.queryNoReturn('DELETE FROM LastMessageModel');
   }
 
   @override

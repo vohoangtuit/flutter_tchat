@@ -17,7 +17,7 @@ import 'package:tchat_app/widget/text_style.dart';
 
 import 'chat_screen.dart';
 import '../utils/const.dart';
-import 'main.dart';
+import '../main.dart';
 
 class HomeScreen extends StatefulWidget {
   final String currentUserId;

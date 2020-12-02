@@ -1,9 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 
 import 'package:tchat_app/models/last_message_model.dart';
-import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/items/item_last_message.dart';
 
 

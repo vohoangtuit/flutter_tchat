@@ -11,15 +11,43 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>tchat_app</string>
+	<string>TChat</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+    	<array>
+    		<dict>
+    			<key>CFBundleURLSchemes</key>
+    			<array>
+    				<string>fb757901591612156</string>
+    			</array>
+    		</dict>
+    		<dict>
+    			<key>CFBundleTypeRole</key>
+    			<string>Editor</string>
+    			<key>CFBundleURLSchemes</key>
+    			<array>
+    				<string>com.googleusercontent.apps.1051949125089-ruolpquv1nkdut2jntnq16snlhc3rfsf</string>
+    			</array>
+    		</dict>
+    	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FacebookAppID</key>
+    	<string>757901591612156</string>
+    	<key>FacebookDisplayName</key>
+    	<string>Demo Flutter</string>
+    	<key>LSApplicationQueriesSchemes</key>
+    	<array>
+    		<string>fbapi</string>
+    		<string>fb-messenger-share-api</string>
+    		<string>fbauth2</string>
+    		<string>fbshareextension</string>
+    	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

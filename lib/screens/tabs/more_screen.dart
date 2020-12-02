@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
-import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
-import 'package:tchat_app/providers/providers.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/controller/providers/providers.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
 
-import '../main.dart';
+import '../../main.dart';
 import '../setting_screen.dart';
 import 'last_message_screen.dart';
 

@@ -18,7 +18,6 @@ import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
-import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';

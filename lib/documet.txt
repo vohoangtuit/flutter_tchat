@@ -1,0 +1,5 @@
+het key hash for facebook using comment line
+// QoBE8V2pFeiPYaTskgVbs48/1pE=
+// https://stackoverflow.com/questions/23674131/android-facebook-integration-with-invalid-key-hash
+// debug: run : keytool -exportcert -alias androiddebugkey -keystore ~/.android/debug.keystore | openssl sha1 -binary | openssl base64
+// release run: eytool -exportcert -alias "alias of keystore" -keystore "Your path to the keystore when signing app" | openssl sha1 -binary | openssl base64

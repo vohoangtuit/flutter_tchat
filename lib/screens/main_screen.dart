@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-import 'package:tchat_app/bloc/account_bloc.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';

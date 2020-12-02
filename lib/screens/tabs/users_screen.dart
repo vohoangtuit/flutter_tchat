@@ -21,7 +21,7 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-import '../main.dart';
+import '../../main.dart';
 
 class UsersScreen extends StatefulWidget {
   @override

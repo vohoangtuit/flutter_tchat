@@ -49,6 +49,8 @@ dependencies:
   floor: ^0.17.0
   provider: ^4.3.2+2
   timeago: ^2.0.29
+  http: ^0.12.2
+  flutter_facebook_login: ^3.0.0
 
 
 dev_dependencies:

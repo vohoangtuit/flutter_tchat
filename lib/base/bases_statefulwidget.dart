@@ -1,8 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tchat_app/bloc/account_bloc.dart';
-import 'package:tchat_app/bloc/reload_messsage_bloc.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/database/database.dart';
 import 'package:tchat_app/database/last_message_dao.dart';
 import 'package:tchat_app/database/message_dao.dart';
@@ -10,7 +9,6 @@ import 'package:tchat_app/database/user_dao.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/user_model.dart';
-import 'package:tchat_app/providers/providers.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
