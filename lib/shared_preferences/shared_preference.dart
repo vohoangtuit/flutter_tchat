@@ -7,6 +7,8 @@ class SharedPre {
   static String sharedPreUserName ="USER_NAME";
   static String sharedPreUserEmail="USER_EMAIL";
 
+  static String sharedPreAccountType="USER_ACCOUNT_TYPE";
+
   static String sharedPreID ="id";
   static String sharedPreFullName ="fullName";
   static String sharedPrePhotoUrl ="photoUrl";
@@ -20,6 +22,10 @@ class SharedPre {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.setString(key, value);
   }
+  static Future<bool> saveInt(String key,int value) async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.setInt(key, value);
+  }
 
   static Future<bool> getBoolKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -29,6 +35,10 @@ class SharedPre {
   static Future<String> getStringKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     return await sharedPreferences.getString(key);
+  }
+  static Future<int> getIntKey(String key) async{
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return await sharedPreferences.getInt(key);
   }
   static Future<bool> clearKey(String key) async{
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

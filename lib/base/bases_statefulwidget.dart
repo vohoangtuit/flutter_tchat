@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/database/database.dart';
@@ -9,11 +12,13 @@ import 'package:tchat_app/database/user_dao.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/progressbar.dart';
 
+import '../main.dart';
 import 'dialog.dart';
 typedef Int2VoidFunc = void Function(String);
 abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
@@ -35,7 +40,7 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   bool newMessage =false;
 
   String languageCode ='';
-  FirebaseDatabaseMethods firebaseDatabaseMethods = new FirebaseDatabaseMethods();
+
   // AccountBloc accountBloc;
   // ReloadMessage reloadMessage;
   @override
@@ -80,8 +85,12 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     userDao = tChatAppDatabase.userDao;
     messageDao =tChatAppDatabase.messageDao;
     lastMessageDao =tChatAppDatabase.lastMessageDao;
+    String id='';
     if(userModel==null){
-      await userDao.getSingleUser().then((value) {
+      await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
+        id =value;
+      });
+      await userDao.findUserById(id).then((value) {
         if(value!=null){
           setState(() {
             userModel =value;
@@ -147,6 +156,20 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     );
   }
 
+  openMyAppAndRemoveAll(){
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => MyApp()),
+            (Route<dynamic> route) => false);
+  }
+  openMainScreen(bool removeAll){
+    if(removeAll){
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MainScreen(false)),
+              (Route<dynamic> route) => false);
+    }else{
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen(false)));
+    }
+  }
 }
 
 

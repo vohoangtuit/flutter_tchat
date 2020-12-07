@@ -15,6 +15,15 @@ final String USER_CREATED_AT ='createdAt';
 final String USER_STATUS_ACCOUNT ='statusAccount';
 final String USER_PUST_TOKEN ='pushToken';
 final String USER_ISlOGIN ='isLogin';
+final String USER_ACCOUNT_TYPE ='accountType';
+final String USER_ALLOW_SEARCH ='allowSearch';
+final String USER_BIRTH_DAY ='birthday';
+final String USER_COVER ='cover';
+//
+final int USER_ACCOUNT_FACEBOOK =1;
+final int USER_ACCOUNT_GMAIL =2;
+final int USER_ACCOUNT_PHONE =3;
+final int USER_ACCOUNT_EMAIL =4;
 
 @entity
 class UserModel {
@@ -26,14 +35,17 @@ class UserModel {
   String birthday='';
   String email='';
   String photoURL='';
+  String cover='';
   int statusAccount=0;
   String phoneNumber='';
   String createdAt='';
   String pushToken='';
   bool isLogin;
+  int accountType=0;
+  bool allowSearch=true;
 
 
-  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin});
+  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL,this.cover, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin,this.accountType,this.allowSearch});
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data[USER_ID] = this.id;
@@ -42,21 +54,20 @@ class UserModel {
     data[USER_BIRTHDAY] = this.birthday;
     data[USER_EMAIL] = this.email;
     data[USER_PHOTO_URL] = this.photoURL;
+    data[USER_COVER] = this.cover;
     data[USER_STATUS_ACCOUNT] = this.statusAccount;
     data[USER_PHONE] = this.phoneNumber;
     data[USER_CREATED_AT] = this.createdAt;
     data[USER_PUST_TOKEN] = this.pushToken;
     data[USER_ISlOGIN] = this.isLogin;
+    data[USER_ACCOUNT_TYPE] = this.accountType;
+    data[USER_ALLOW_SEARCH] = this.allowSearch;
+    data[USER_ALLOW_SEARCH] = this.allowSearch;
     return data;
   }
-  // UserModel.toUserFromDocument(DocumentSnapshot doc){
-  //   UserModel u =UserModel(id: doc.data()[USER_ID]);
-  //   return u;
-  // }
+
   @override
   String toString() {
-    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, email: $email, photoURL: $photoURL, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin}';
+    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch}';
   }
-//migrations
-
 }

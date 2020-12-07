@@ -74,7 +74,7 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   }
 
   getListLastMessage() {
-    lastMessageDao.getSingleLastMessage().then((value) {
+    lastMessageDao.getSingleLastMessage(userModel.id).then((value) {
       listMessage.clear();
       setState(() {
         listMessage.addAll(value);

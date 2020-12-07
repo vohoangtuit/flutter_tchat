@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:agora_rtc_engine/rtc_engine.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +10,14 @@ import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/base/account_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
-import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
-import 'package:tchat_app/widget/full_photo.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
@@ -36,10 +31,15 @@ class ChatScreen extends StatefulWidget {
   ChatScreen(this.idReceiver, this.photoReceiver, this.nameReceiver);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState();
+  _ChatScreenState createState() => _ChatScreenState(idReceiver,nameReceiver,photoReceiver);
 }
 
-class _ChatScreenState extends BaseStatefulState<ChatScreen> {
+class _ChatScreenState extends AccountBaseState {
+
+  String idReceiver;
+  String photoReceiver;
+  String nameReceiver;
+  _ChatScreenState(this.idReceiver,this.nameReceiver,this.photoReceiver);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
   int _limit = 20;
@@ -64,7 +64,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(widget.nameReceiver, style: mediumTextWhite()),
+        title: Text(nameReceiver, style: mediumTextWhite()),
         actions: <Widget>[
           GestureDetector(
             child: Container(
@@ -179,7 +179,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    groupChatId = userModel.id + '-' + widget.idReceiver;
+    groupChatId = userModel.id + '-' + idReceiver;
     getMessage();
     //initSocket();
     textEditingController.addListener(() {
@@ -214,7 +214,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
     var userQuery=  FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
         .doc(userModel.id)
-        .collection(widget.idReceiver)
+        .collection(idReceiver)
         .limit(1)
         .orderBy('timestamp', descending: true);
 
@@ -222,6 +222,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
      // print("data size: "+data.size.toString());
       //print("data doc: "+data.docs.toString());
       LastMessageModel message = LastMessageModel();
+      message.uid =userModel.id;
       data.docs.forEach((change) {
       //  print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
         if(userModel.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
@@ -248,7 +249,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
   void getMessage() {
     firebaseDatabaseMethods
-        .getMessageChat(userModel.id, widget.idReceiver)
+        .getMessageChat(userModel.id, idReceiver)
         .then((data) {
       //
    //   print('data '+data.toString());
@@ -318,9 +319,9 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
           idSender: userModel.id,
           nameSender: userModel.fullName,
           photoSender: userModel.photoURL,
-          idReceiver: widget.idReceiver,
-          nameReceiver: widget.nameReceiver,
-          photoReceiver: widget.photoReceiver,
+          idReceiver:idReceiver,
+          nameReceiver:nameReceiver,
+          photoReceiver: photoReceiver,
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
           content: content,
           type: type,
@@ -328,11 +329,11 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
       var from = fireBaseStore
           .collection(FIREBASE_MESSAGES)
           .doc(userModel.id)
-          .collection(widget.idReceiver)
+          .collection(idReceiver)
           .doc(); // end doc can use timestamp
       var to = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(widget.idReceiver)
+          .doc(idReceiver)
           .collection(userModel.id)
           .doc(); // end doc can use timestamp
       WriteBatch writeBatch = fireBaseStore.batch();
@@ -564,7 +565,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
               stream: fireBaseStore
                   .collection(FIREBASE_MESSAGES)
                   .doc(userModel.id)
-                  .collection(widget.idReceiver)
+                  .collection(idReceiver)
                   .orderBy('timestamp', descending: true)
                   .limit(_limit)
                   .snapshots(),
@@ -585,7 +586,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
                         index,
                         snapshot.data.documents[index],
                         listMessage,
-                        widget.photoReceiver),
+                        photoReceiver),
                     itemCount: snapshot.data.documents.length,
                     reverse: true,
                     controller: listScrollController,
@@ -612,7 +613,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
                   index,
                   snapshot.data.documents[index],
                   listMessage,
-                  widget.photoReceiver),
+                  photoReceiver),
               itemCount: snapshot.data.documents.length,
               reverse: true,
               controller: listScrollController,
@@ -647,7 +648,7 @@ class _ChatScreenState extends BaseStatefulState<ChatScreen> {
 
   initSocket() async {
     await SharedPre.getStringKey(SharedPre.sharedPreFullName)
-        .then((value) => {widget.nameReceiver = value});
+        .then((value) => {nameReceiver = value});
 
     //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
     socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",

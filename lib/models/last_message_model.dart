@@ -1,4 +1,5 @@
 import 'package:floor/floor.dart';
+final String LAST_MESSAGE_UID ='uid';
 final String LAST_MESSAGE_ID_RECEIVER ='idReceiver';
 final String LAST_MESSAGE_NAME_RECEIVER ='nameReceiver';
 final String LAST_MESSAGE_PHOTO_RECEIVER ='photoReceiver';
@@ -11,6 +12,7 @@ final String LAST_MESSAGE_STATUS ='status';
 class LastMessageModel{
   @PrimaryKey(autoGenerate: true)
   int idDB;
+  String uid;
   String idReceiver='';
   String nameReceiver='';
   String photoReceiver='';
@@ -18,9 +20,10 @@ class LastMessageModel{
   String content='';
   int type=0;//type: 0 = text, 1 = image, 2 = sticker
   int status=0;
-  LastMessageModel({this.idDB,this.idReceiver,this.nameReceiver,this.photoReceiver,this.content,this.type,this.timestamp,this.status});
+  LastMessageModel({this.idDB,this.uid,this.idReceiver,this.nameReceiver,this.photoReceiver,this.content,this.type,this.timestamp,this.status});
 
   LastMessageModel.fromJson(Map<String, dynamic> json){
+    uid = json[LAST_MESSAGE_UID];
     idReceiver = json[LAST_MESSAGE_ID_RECEIVER];
     nameReceiver = json[LAST_MESSAGE_NAME_RECEIVER];
     photoReceiver = json[LAST_MESSAGE_PHOTO_RECEIVER];
@@ -33,6 +36,7 @@ class LastMessageModel{
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
 
+    data[LAST_MESSAGE_UID] = this.uid;
     data[LAST_MESSAGE_ID_RECEIVER] = this.idReceiver;
     data[LAST_MESSAGE_NAME_RECEIVER] = this.nameReceiver;
     data[LAST_MESSAGE_PHOTO_RECEIVER] = this.photoReceiver;

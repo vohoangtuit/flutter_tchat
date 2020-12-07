@@ -20,7 +20,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
-
+import 'package:tchat_app/base/account_statefulwidget.dart';
 import '../../main.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -28,8 +28,7 @@ class UsersScreen extends StatefulWidget {
   State createState() => UsersScreenState();
 }
 
-class UsersScreenState extends BaseStatefulState<UsersScreen>
-    with AutomaticKeepAliveClientMixin<UsersScreen> {
+class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepAliveClientMixin {
   bool isLoading = false;
   List<UserModel> listUser = List();
   Stream streamUsers;

@@ -1,23 +1,19 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/controller/providers/providers.dart';
+
+import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
+import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
-
-import '../../main.dart';
 import '../setting_screen.dart';
-import 'last_message_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override
   _MoreScreenState createState() => _MoreScreenState();
 }
 
-class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepAliveClientMixin<MoreScreen>{
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAliveClientMixin{
+
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
@@ -41,7 +37,7 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
               },),
               SizedBox(height: 10,),
               NormalButton(title: 'LogOut',onPressed: (){
-                handleSignOut();
+                checkAccountForLogout();
               },),
               SizedBox(height: 10,),
               NormalButton(title: 'Clear Data Chat',onPressed: (){
@@ -66,27 +62,52 @@ class _MoreScreenState extends BaseStatefulState<MoreScreen> with AutomaticKeepA
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-  Future<Null> handleSignOut() async {
+  checkAccountForLogout()async{
+    await SharedPre.getIntKey(SharedPre.sharedPreAccountType).then((value) {
+      if(value!=null){
+        if(value==USER_ACCOUNT_FACEBOOK){
+          logOutFacebook();
+        }
+        else if(value==USER_ACCOUNT_GMAIL){
+          logoutGoogle();
+        }else{
+          print('please check again account type');
+        }
+      }
+    });
+  }
+  Future<Null> logoutGoogle() async {
     this.setState(() {
       isLoading = true;
     });
 
-    await FirebaseAuth.instance.signOut();
+    await firebaseAuth.signOut();
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
     await SharedPre.clearData();
 
     this.setState(() {
       isLoading = false;
+      userModel =null;
     });
 
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => MyApp()),
-            (Route<dynamic> route) => false);
+    openMyAppAndRemoveAll();
+  }
+  Future<void> logOutFacebook() async {
+    setState(() {
+      isLoading = true;
+    });
+    await facebookLogin.logOut();
+    setState(() {
+      isLoading = false;
+    });
+    await SharedPre.clearData();
+    openMyAppAndRemoveAll();
   }
 
   @override
   // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  bool get wantKeepAlive =>true;
+
 
 }
