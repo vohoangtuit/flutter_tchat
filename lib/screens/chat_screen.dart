@@ -216,7 +216,8 @@ class _ChatScreenState extends AccountBaseState {
         .doc(userModel.id)
         .collection(idReceiver)
         .limit(1)
-        .orderBy('timestamp', descending: true);
+        .orderBy(MESSAGE_TIMESTAMP, descending: true);
+
 
     userQuery.snapshots().listen((data) {
      // print("data size: "+data.size.toString());

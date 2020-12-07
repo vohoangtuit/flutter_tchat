@@ -84,11 +84,11 @@ class _$TChatAppDatabase extends TChatAppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `email` TEXT, `photoURL` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `pushToken` TEXT, `isLogin` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `LastMessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `LastMessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `uid` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -127,12 +127,17 @@ class _$UserDao extends UserDao {
                   'birthday': item.birthday,
                   'email': item.email,
                   'photoURL': item.photoURL,
+                  'cover': item.cover,
                   'statusAccount': item.statusAccount,
                   'phoneNumber': item.phoneNumber,
                   'createdAt': item.createdAt,
                   'pushToken': item.pushToken,
                   'isLogin':
-                      item.isLogin == null ? null : (item.isLogin ? 1 : 0)
+                      item.isLogin == null ? null : (item.isLogin ? 1 : 0),
+                  'accountType': item.accountType,
+                  'allowSearch': item.allowSearch == null
+                      ? null
+                      : (item.allowSearch ? 1 : 0)
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -154,12 +159,17 @@ class _$UserDao extends UserDao {
             birthday: row['birthday'] as String,
             email: row['email'] as String,
             photoURL: row['photoURL'] as String,
+            cover: row['cover'] as String,
             statusAccount: row['statusAccount'] as int,
             phoneNumber: row['phoneNumber'] as String,
             createdAt: row['createdAt'] as String,
             pushToken: row['pushToken'] as String,
             isLogin:
-                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0));
+                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            accountType: row['accountType'] as int,
+            allowSearch: row['allowSearch'] == null
+                ? null
+                : (row['allowSearch'] as int) != 0));
   }
 
   @override
@@ -174,12 +184,17 @@ class _$UserDao extends UserDao {
             birthday: row['birthday'] as String,
             email: row['email'] as String,
             photoURL: row['photoURL'] as String,
+            cover: row['cover'] as String,
             statusAccount: row['statusAccount'] as int,
             phoneNumber: row['phoneNumber'] as String,
             createdAt: row['createdAt'] as String,
             pushToken: row['pushToken'] as String,
             isLogin:
-                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0));
+                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            accountType: row['accountType'] as int,
+            allowSearch: row['allowSearch'] == null
+                ? null
+                : (row['allowSearch'] as int) != 0));
   }
 
   @override
@@ -193,12 +208,17 @@ class _$UserDao extends UserDao {
             birthday: row['birthday'] as String,
             email: row['email'] as String,
             photoURL: row['photoURL'] as String,
+            cover: row['cover'] as String,
             statusAccount: row['statusAccount'] as int,
             phoneNumber: row['phoneNumber'] as String,
             createdAt: row['createdAt'] as String,
             pushToken: row['pushToken'] as String,
             isLogin:
-                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0));
+                row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            accountType: row['accountType'] as int,
+            allowSearch: row['allowSearch'] == null
+                ? null
+                : (row['allowSearch'] as int) != 0));
   }
 
   @override
@@ -331,6 +351,7 @@ class _$LastMessageDao extends LastMessageDao {
             'LastMessageModel',
             (LastMessageModel item) => <String, dynamic>{
                   'idDB': item.idDB,
+                  'uid': item.uid,
                   'idReceiver': item.idReceiver,
                   'nameReceiver': item.nameReceiver,
                   'photoReceiver': item.photoReceiver,
@@ -345,6 +366,7 @@ class _$LastMessageDao extends LastMessageDao {
             ['idDB'],
             (LastMessageModel item) => <String, dynamic>{
                   'idDB': item.idDB,
+                  'uid': item.uid,
                   'idReceiver': item.idReceiver,
                   'nameReceiver': item.nameReceiver,
                   'photoReceiver': item.photoReceiver,
@@ -369,6 +391,7 @@ class _$LastMessageDao extends LastMessageDao {
     return _queryAdapter.queryList('SELECT * FROM LastMessageModel',
         mapper: (Map<String, dynamic> row) => LastMessageModel(
             idDB: row['idDB'] as int,
+            uid: row['uid'] as String,
             idReceiver: row['idReceiver'] as String,
             nameReceiver: row['nameReceiver'] as String,
             photoReceiver: row['photoReceiver'] as String,
@@ -385,6 +408,7 @@ class _$LastMessageDao extends LastMessageDao {
         arguments: <dynamic>[idReceiver],
         mapper: (Map<String, dynamic> row) => LastMessageModel(
             idDB: row['idDB'] as int,
+            uid: row['uid'] as String,
             idReceiver: row['idReceiver'] as String,
             nameReceiver: row['nameReceiver'] as String,
             photoReceiver: row['photoReceiver'] as String,
@@ -395,11 +419,13 @@ class _$LastMessageDao extends LastMessageDao {
   }
 
   @override
-  Future<List<LastMessageModel>> getSingleLastMessage() async {
+  Future<List<LastMessageModel>> getSingleLastMessage(String uid) async {
     return _queryAdapter.queryList(
-        'SELECT * FROM LastMessageModel GROUP BY idReceiver ORDER BY timestamp DESC',
+        'SELECT * FROM LastMessageModel WHERE uid = ? GROUP BY idReceiver ORDER BY timestamp DESC',
+        arguments: <dynamic>[uid],
         mapper: (Map<String, dynamic> row) => LastMessageModel(
             idDB: row['idDB'] as int,
+            uid: row['uid'] as String,
             idReceiver: row['idReceiver'] as String,
             nameReceiver: row['nameReceiver'] as String,
             photoReceiver: row['photoReceiver'] as String,
@@ -414,6 +440,7 @@ class _$LastMessageDao extends LastMessageDao {
     return _queryAdapter.query('SELECT * FROM LastMessageModel LIMIT 1',
         mapper: (Map<String, dynamic> row) => LastMessageModel(
             idDB: row['idDB'] as int,
+            uid: row['uid'] as String,
             idReceiver: row['idReceiver'] as String,
             nameReceiver: row['nameReceiver'] as String,
             photoReceiver: row['photoReceiver'] as String,

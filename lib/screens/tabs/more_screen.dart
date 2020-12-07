@@ -5,6 +5,7 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/button.dart';
+import 'package:tchat_app/widget/view_header_main_screen.dart';
 import '../setting_screen.dart';
 
 class MoreScreen extends StatefulWidget {
@@ -21,33 +22,40 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
       return Container();
     }else{
      // print("_MoreScreenState ${userModel.fullName}");
-      return SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+      return Container(
+        child: Column(
+          children: [
+            headerMessage(),
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
 
-            children: [
-              SizedBox(height: 20,),
-              Text('FullName: ${userModel.fullName}'),
-              SizedBox(height: 10,),
-              Text('id: ${userModel.id}'),
-              NormalButton(title: 'Setting',onPressed: (){
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => ChatSettings()));
-              },),
-              SizedBox(height: 10,),
-              NormalButton(title: 'LogOut',onPressed: (){
-                checkAccountForLogout();
-              },),
-              SizedBox(height: 10,),
-              NormalButton(title: 'Clear Data Chat',onPressed: (){
-               messageDao.deleteAllMessage();
-               lastMessageDao.deleteAllLastMessage();
-             // todo handle clear on firebase
-               ProviderController(context).setReloadLastMessage(true);
-              },),
-            ],
-          ),
+                  children: [
+                    SizedBox(height: 20,),
+                    Text('FullName: ${userModel.fullName}'),
+                    SizedBox(height: 10,),
+                    Text('id: ${userModel.id}'),
+                    NormalButton(title: 'Setting',onPressed: (){
+                      Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => ChatSettings()));
+                    },),
+                    SizedBox(height: 10,),
+                    NormalButton(title: 'LogOut',onPressed: (){
+                      checkAccountForLogout();
+                    },),
+                    SizedBox(height: 10,),
+                    NormalButton(title: 'Clear Data Chat',onPressed: (){
+                     messageDao.deleteAllMessage();
+                     lastMessageDao.deleteAllLastMessage();
+                   // todo handle clear on firebase
+                     ProviderController(context).setReloadLastMessage(true);
+                    },),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       );
     }

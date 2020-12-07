@@ -15,6 +15,7 @@ import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/button.dart';
+import 'package:tchat_app/widget/button_login.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'dart:convert' as JSON;
 import 'package:http/http.dart' as http;
@@ -72,11 +73,11 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  NormalButton(title: 'Login with Google',onPressed: (){
+                  ButtonLogin(icon:'images/icons/ic_google.png',title: 'Login with Google',onPressed: (){
                     signInGoogle();
                   },),
                   SizedBox(height: 20,),
-                  NormalButton(title: 'Login with Facebook',onPressed: (){
+                  ButtonLogin(icon:'images/icons/ic_facebook.png',title: 'Login with Facebook',onPressed: (){
                     signInFacebook();
                   },),
                 ],

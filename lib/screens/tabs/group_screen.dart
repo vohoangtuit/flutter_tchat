@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/widget/view_header_main_screen.dart';
 class GroupScreen extends StatefulWidget {
   @override
   _GroupScreenState createState() => _GroupScreenState();
@@ -8,7 +9,16 @@ class GroupScreen extends StatefulWidget {
 class _GroupScreenState extends State<GroupScreen> with WidgetsBindingObserver{//AutomaticKeepAliveClientMixin<GroupScreen>,
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Container(
+      child: Column(
+        children: [
+          headerMessage(),
+          Expanded(
+            child: Text('Group'),
+          ),
+        ],
+      ),
+    );
   }
   @override
   void initState() {

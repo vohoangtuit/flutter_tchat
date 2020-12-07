@@ -84,6 +84,9 @@ flutter:
     - images/logo.png
     - images/icons/camera_white.png
     - images/icons/phone_white.png
+    - images/icons/ic_facebook.png
+    - images/icons/ic_google.png
+    - images/icons/ic_search.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

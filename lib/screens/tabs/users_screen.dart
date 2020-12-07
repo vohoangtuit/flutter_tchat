@@ -21,6 +21,7 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/widget/view_header_main_screen.dart';
 import '../../main.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -42,7 +43,14 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: userList(),
+      child: Column(
+        children: [
+          headerMessage(),
+          Expanded(
+            child: userList(),
+          ),
+        ],
+      ),
     );
   }
 

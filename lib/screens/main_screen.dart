@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
@@ -28,34 +29,49 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   @override
   Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('TChat '),
-          centerTitle: false,
-        ),
-        body: TabBarView(
-          physics: NeverScrollableScrollPhysics(),// todo: disable swip
-          // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-          // set the controller
-          controller: controller,
-        ),
-        bottomNavigationBar: Material(
-          // set the color of the bottom navigation bar
-          color: Colors.white,
-          // set the tab bar as the child of bottom navigation bar
-          child:
-          TabBar(
-           // indicatorColor: Colors.transparent,
-            indicatorColor: Colors.blue,
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.grey,
-            labelPadding: EdgeInsets.only(left: 0.0,top: 5.0,right: 0.0,bottom: 0.0),
-            labelStyle: TextStyle(color:Colors.blue,fontSize: 10.5),//,fontFamily: 'Family Name'
-            unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:10.5),//,fontFamily: 'Family Name'
-            tabs:listTab(),
-            controller: controller,
+      return Container(
+        color: Colors.lightBlueAccent,
+        child: Container(
+          child: SafeArea(
+            child: Scaffold(
+              // appBar: AppBar(
+              //   // title: Text('TChat '),
+              //   // centerTitle: false,
+              // ),
+              // ignore: missing_required_param
+              body:AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.light,
+                child:
+                TabBarView(
+                  physics: NeverScrollableScrollPhysics(),// todo: disable swip
+                  // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                  children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                  //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                  // set the controller
+                  controller: controller,
+                ),
+
+              ),
+              bottomNavigationBar: Material(
+                // set the color of the bottom navigation bar
+                color: Colors.white,
+                // set the tab bar as the child of bottom navigation bar
+                child:
+                TabBar(
+                  // indicatorColor: Colors.transparent,
+                  indicatorColor: Colors.blue,
+                  labelColor: Colors.blue,
+                  unselectedLabelColor: Colors.grey,
+                  labelPadding: EdgeInsets.only(left: 0.0,top: 5.0,right: 0.0,bottom: 0.0),
+                  labelStyle: TextStyle(color:Colors.blue,fontSize: 10.5),//,fontFamily: 'Family Name'
+                  unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:10.5),//,fontFamily: 'Family Name'
+                  tabs:listTab(),
+                  controller: controller,
+                ),
+              ),
+
+
+            ),
           ),
         ),
       );
