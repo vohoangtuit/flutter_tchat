@@ -82,9 +82,11 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
         return;
       }else if(value==false){
         return;
+      }else{
+        configData();
       }
     });
-    configData();
+
   }
   void configData()async{
     //-- todo: database change  reRunning rebuild

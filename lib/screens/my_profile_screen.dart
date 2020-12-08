@@ -10,40 +10,168 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
+  ScrollController _scrollController;
+
+  bool lastStatus = true;
+
   @override
   Widget build(BuildContext context) {
-    return NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              expandedHeight: 200.0,
-              floating: true,
-              pinned: true,
-
-              flexibleSpace: FlexibleSpaceBar(
-                centerTitle: false,
-                collapseMode: CollapseMode.parallax,
-                title: Text(
-                  userModel.fullName,
-                  style: mediumTextWhite(),
+    return Scaffold(
+      body: DefaultTabController(
+        length: 2,
+        child: NestedScrollView(
+          controller: _scrollController,
+          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+            return <Widget>[
+              SliverAppBar(
+                expandedHeight: 225.0,
+                floating: true,
+                pinned: true,
+                primary: true,
+                snap: true,
+                backgroundColor: Colors.white,
+                iconTheme: IconThemeData(
+                  color: isShrink
+                      ? Colors.black
+                      : Colors.white, //change your color here
                 ),
-                titlePadding: EdgeInsets.only(left: 53.0,bottom: 18),
-                background: userModel.cover.isEmpty?Image.asset(
-                  'images/cover.png',
-                  fit: BoxFit.cover,
-                ):Image.network(
-                  userModel.cover,
-                  fit: BoxFit.cover,
+                actions: <Widget>[
+                  IconButton(
+                      icon: Icon(Icons.favorite,
+                          color: isShrink ? Colors.black : Colors.white),
+                      onPressed: () {
+                        print('my favorite');
+                      }),
+                  IconButton(
+                      icon: Icon(Icons.more_horiz,
+                          color: isShrink ? Colors.black : Colors.white),
+                      onPressed: () {
+                        openScreen(UpdateAccountScreen());
+                      })
+                ],
+                flexibleSpace: FlexibleSpaceBar(
+                  centerTitle: false,
+                  titlePadding: EdgeInsets.only(left: 50,top: 0.0,right: 0.0,bottom: 10.0),
+                  title: Container(
+                   // height: 225,
+                    alignment: Alignment.bottomLeft,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      //crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Container(
+                          width: 36.0,
+                          height: 36.0,
+                          decoration: BoxDecoration(
+                            color: const Color(0xff7c94b6),
+                            image: DecorationImage(
+                              image: userModel.photoURL.isEmpty
+                                  ? AssetImage('img_not_available.jpeg')
+                                  : NetworkImage(userModel.photoURL),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(36.0)),
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 1.0,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10,),
+                        Text(userModel.fullName, textAlign: TextAlign.center,style:isShrink? mediumTextBlack():mediumTextWhite(),),
+                      ],
+                    ),
+                  ),
+                  background: userModel.cover.isEmpty
+                      ? Image.asset(
+                          'images/cover.png',
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          userModel.cover,
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
-            ),
+              SliverPersistentHeader(
+                delegate: _SliverAppBarDelegate(
+                  TabBar(
+                    labelColor: Colors.black87,
+                    unselectedLabelColor: Colors.grey,
+                    tabs: [
+                      Tab(icon: Icon(Icons.info), text: "Tab 1"),
+                      Tab(icon: Icon(Icons.lightbulb_outline), text: "Tab 2"),
+                    ],
+                  ),
+                ),
+                pinned: true,
+              ),
             ];
-        },
-      body: Column(
-        children: [
-          Text('data'),
-        ],
+          },
+          body: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Text(
+                  'data',
+                  style: normalTextRed(),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_scrollListener);
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    _scrollController = ScrollController();
+    _scrollController.addListener(_scrollListener);
+    super.initState();
+  }
+
+  bool get isShrink {
+    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
+  }
+
+  _scrollListener() {
+    if (isShrink != lastStatus) {
+      setState(() {
+        lastStatus = isShrink;
+      });
+    }
+  }
+}
+
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
+  _SliverAppBarDelegate(this._tabBar);
+
+  final TabBar _tabBar;
+
+  @override
+  double get minExtent => _tabBar.preferredSize.height;
+
+  @override
+  double get maxExtent => _tabBar.preferredSize.height;
+
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    return new Container(
+      child: _tabBar,
+    );
+  }
+
+  @override
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
+    return false;
   }
 }
