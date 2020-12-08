@@ -20,5 +20,11 @@ final String SOCKET_DISCONNECT ='disconnect';
 final String SOCKET_USER_JOINED ='user_joined';
 final String SOCKET_USER_LEFT ='user_left';
 
-//---------todo Firebase------------
-
+//---------todo MAIN SCREEN ACTION CLICK TABBAR------------
+final int MAIN_CLICK_SEARCH =1;
+final int MAIN_CLICK_ADD_TAB_MESSAGE =2;
+final int MAIN_CLICK_ADD_TAB_CONTACT =3;
+final int MAIN_CLICK_ADD_TAB_GROUP =4;
+final int MAIN_CLICK_EDIT_TAB_TIME_LINE =5;
+final int MAIN_CLICK_NOTIFICATION_TAB_TIME_LINE =6;
+final int MAIN_CLICK_SETTING_TAB_MORE =7;

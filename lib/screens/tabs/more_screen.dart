@@ -4,9 +4,12 @@ import 'package:tchat_app/base/account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/button.dart';
-import 'package:tchat_app/widget/view_header_main_screen.dart';
-import '../setting_screen.dart';
+import 'package:tchat_app/widget/text_style.dart';
+import 'package:tchat_app/widget/toolbar_main.dart';
+import '../my_profile_screen.dart';
+import '../update_account_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override
@@ -21,38 +24,31 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
     if(userModel==null){
       return Container();
     }else{
-     // print("_MoreScreenState ${userModel.fullName}");
       return Container(
         child: Column(
           children: [
-            headerMessage(),
             SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
+              child: Column(
+                children: [
+                  myProfile(),
+                  SizedBox(height: 20,),
 
-                  children: [
-                    SizedBox(height: 20,),
-                    Text('FullName: ${userModel.fullName}'),
-                    SizedBox(height: 10,),
-                    Text('id: ${userModel.id}'),
-                    NormalButton(title: 'Setting',onPressed: (){
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => ChatSettings()));
-                    },),
-                    SizedBox(height: 10,),
-                    NormalButton(title: 'LogOut',onPressed: (){
-                      checkAccountForLogout();
-                    },),
-                    SizedBox(height: 10,),
-                    NormalButton(title: 'Clear Data Chat',onPressed: (){
-                     messageDao.deleteAllMessage();
-                     lastMessageDao.deleteAllLastMessage();
-                   // todo handle clear on firebase
-                     ProviderController(context).setReloadLastMessage(true);
-                    },),
-                  ],
-                ),
+                  NormalButton(title: 'Setting',onPressed: (){
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => UpdateAccountScreen()));
+                  },),
+                  SizedBox(height: 10,),
+                  NormalButton(title: 'LogOut',onPressed: (){
+                    checkAccountForLogout();
+                  },),
+                  SizedBox(height: 10,),
+                  NormalButton(title: 'Clear Data Chat',onPressed: (){
+                   messageDao.deleteAllMessage();
+                   lastMessageDao.deleteAllLastMessage();
+                 // todo handle clear on firebase
+                   ProviderController(context).setReloadLastMessage(true);
+                  },),
+                ],
               ),
             ),
           ],
@@ -69,6 +65,44 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+  }
+  Widget myProfile(){
+    return GestureDetector(
+      child: Container(
+        color: Colors.white,
+        child: Container(
+          margin: EdgeInsets.only(left: 10.0,top: 10.0,right: 10.0,bottom: 10.0),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(36.0),
+                child: userModel.photoURL.isEmpty?Icon(
+                  Icons.account_circle,
+                  size: 50.0,
+                  color: greyColor2,
+                ):Image.network(userModel.photoURL,width: 50,height: 50,),
+              ),
+              SizedBox(width: 20,),
+              Expanded(
+                child: Container(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(userModel.fullName,style: mediumTextBlack(), overflow: TextOverflow.ellipsis, maxLines: 1,),
+                      SizedBox(height: 5,),
+                      Text('My Profile',style: smallTextGray(),),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      onTap: (){
+        openScreen(MyProfileScreen());
+      },
+    );
   }
   checkAccountForLogout()async{
     await SharedPre.getIntKey(SharedPre.sharedPreAccountType).then((value) {

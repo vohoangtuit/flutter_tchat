@@ -15,13 +15,13 @@ import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
-import 'package:tchat_app/screens/setting_screen.dart';
+import 'package:tchat_app/screens/update_account_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/base/account_statefulwidget.dart';
-import 'package:tchat_app/widget/view_header_main_screen.dart';
+import 'package:tchat_app/widget/toolbar_main.dart';
 import '../../main.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -45,7 +45,6 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
     return Container(
       child: Column(
         children: [
-          headerMessage(),
           Expanded(
             child: userList(),
           ),

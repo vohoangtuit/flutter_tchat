@@ -5,7 +5,7 @@ import 'package:tchat_app/controller/providers/providers.dart';
 
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/screens/items/item_last_message.dart';
-import 'package:tchat_app/widget/view_header_main_screen.dart';
+import 'package:tchat_app/widget/toolbar_main.dart';
 
 
 class LastMessageScreen extends StatefulWidget  {
@@ -31,7 +31,7 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
     return Container(
       child: Column(
         children: [
-          headerMessage(),
+          //headerMessage(),
           Expanded(
             child: listView(),
           ),
@@ -85,9 +85,12 @@ class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with 
   getListLastMessage() {
     lastMessageDao.getSingleLastMessage(userModel.id).then((value) {
       listMessage.clear();
-      setState(() {
-        listMessage.addAll(value);
-      });
+      for(int i = 0; i<15;i++){
+        setState(() {
+          listMessage.addAll(value);
+        });
+      }
+
     });
 
   }

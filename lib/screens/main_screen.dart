@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/setting_screen.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
@@ -16,6 +17,7 @@ import 'package:tchat_app/screens/tabs/time_line_screen.dart';
 import 'package:tchat_app/screens/tabs/users_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/widget/toolbar_main.dart';
 class MainScreen extends StatefulWidget {
    bool synData;
   MainScreen( this.synData);
@@ -24,54 +26,60 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin {
-  TabController controller;
+  TabController tabController;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  int positionTab=0;
+  ValueChanged data;
   @override
   Widget build(BuildContext context) {
       return Container(
-        color: Colors.lightBlueAccent,
-        child: Container(
-          child: SafeArea(
-            child: Scaffold(
-              // appBar: AppBar(
-              //   // title: Text('TChat '),
-              //   // centerTitle: false,
-              // ),
-              // ignore: missing_required_param
-              body:AnnotatedRegion<SystemUiOverlayStyle>(
-              value: SystemUiOverlayStyle.light,
-                child:
-                TabBarView(
-                  physics: NeverScrollableScrollPhysics(),// todo: disable swip
-                  // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-                  children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-                  //   children: <Widget>[UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-                  // set the controller
-                  controller: controller,
+        margin: const EdgeInsets.only(top: 0.0),
+        color: Colors.lightBlue,
+        child: SafeArea(
+          child: Column(
+            children: [
+              //Container(color: Colors.lightBlueAccent,height: 56,),
+              //(0,data),
+              ToolBarMain(position: positionTab,onClick: (click){
+                handleClick(click);
+              },),
+              Expanded(
+                child: Scaffold(
+                  // appBar: AppBar(
+                  //   // title: Text('TChat '),
+                  //   // centerTitle: false,
+                  // ),
+                  body:
+                  TabBarView(
+                    physics: NeverScrollableScrollPhysics(),// todo: disable swip
+                    // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                    children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                    // set the controller
+                    controller: tabController,
+                  ),
+                  bottomNavigationBar: Material(
+                    // set the color of the bottom navigation bar
+                    color: Colors.white,
+                    // set the tab bar as the child of bottom navigation bar
+                    child:
+                    TabBar(
+                      // indicatorColor: Colors.transparent,
+                      indicatorColor: Colors.blue,
+                      labelColor: Colors.blue,
+                      unselectedLabelColor: Colors.grey,
+                      labelPadding: EdgeInsets.only(left: 0.0,top: 5.0,right: 0.0,bottom: 0.0),
+                      labelStyle: TextStyle(color:Colors.blue,fontSize: 10.5),//,fontFamily: 'Family Name'
+                      unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:10.5),//,fontFamily: 'Family Name'
+                      tabs:listTab(),
+                      controller: tabController,
+                    ),
+                  ),
+
+
                 ),
-
               ),
-              bottomNavigationBar: Material(
-                // set the color of the bottom navigation bar
-                color: Colors.white,
-                // set the tab bar as the child of bottom navigation bar
-                child:
-                TabBar(
-                  // indicatorColor: Colors.transparent,
-                  indicatorColor: Colors.blue,
-                  labelColor: Colors.blue,
-                  unselectedLabelColor: Colors.grey,
-                  labelPadding: EdgeInsets.only(left: 0.0,top: 5.0,right: 0.0,bottom: 0.0),
-                  labelStyle: TextStyle(color:Colors.blue,fontSize: 10.5),//,fontFamily: 'Family Name'
-                  unselectedLabelStyle: TextStyle(color:Colors.grey,fontSize:10.5),//,fontFamily: 'Family Name'
-                  tabs:listTab(),
-                  controller: controller,
-                ),
-              ),
-
-
-            ),
+            ],
           ),
         ),
       );
@@ -80,10 +88,21 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   void initState() {
     super.initState();
   //  print('main screen initState()');
-    controller = TabController(length: 5, vsync: this);
-    controller.addListener(_handleTabSelection);
+    tabController = TabController(length: 5, vsync: this);
+    tabController.addListener(handleTabSelection);
     if(widget.synData){
 
+    }
+  }
+  void handleTabSelection() {
+    setState(() {
+      positionTab =tabController.index;
+    });
+    //print("Selected Index: " + tabController.index.toString());
+  }
+  handleClick(int click){
+    if(click==MAIN_CLICK_SETTING_TAB_MORE){
+      openScreen(SettingScreen());
     }
   }
   @override
@@ -130,39 +149,36 @@ class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerPr
   @override
   void dispose() {
     // Dispose of the Tab Controller
-    controller.dispose();
+    tabController.dispose();
     super.dispose();
   }
-  void _handleTabSelection() {
-    setState(() {
-    });
-  }
+
   List<Tab> listTab(){
     return <Tab>[
       // todo: custom view tabs
       Tab(child: Column(children: [
         SizedBox(height: 3,),
-        Icon(Icons.message, color: controller.index == 0 ? Colors.blue : Colors.grey),
+        Icon(Icons.message, color: tabController.index == 0 ? Colors.blue : Colors.grey),
         Text("Messages"),
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 5,),
-        Icon(Icons.account_box_outlined, color: controller.index == 1 ? Colors.blue : Colors.grey),
+        Icon(Icons.account_box_outlined, color: tabController.index == 1 ? Colors.blue : Colors.grey),
         Text("Contacts"),
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 5,),
-        Icon(Icons.group, color: controller.index == 2 ? Colors.blue : Colors.grey),
+        Icon(Icons.group, color: tabController.index == 2 ? Colors.blue : Colors.grey),
         Text("Group"),
       ],)),
       Tab(child: Column(children: [
         SizedBox(height: 5,),
-        Icon(Icons.timelapse_outlined, color: controller.index == 3 ? Colors.blue : Colors.grey),
+        Icon(Icons.timelapse_outlined, color: tabController.index == 3 ? Colors.blue : Colors.grey),
         Text("TimeLine"),
       ],)),
       Tab(child: Column(children: [
           SizedBox(height: 5,),
-          Icon(Icons.category, color: controller.index == 4 ? Colors.blue : Colors.grey),
+          Icon(Icons.category, color: tabController.index == 4 ? Colors.blue : Colors.grey),
           Text("More"),
         ],)),
     ];

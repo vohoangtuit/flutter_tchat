@@ -77,6 +77,13 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     progressBar = ProgressBar();
     baseStatefulState=this;
     fireBaseStore = FirebaseFirestore.instance;
+    await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
+      if(value==null){
+        return;
+      }else if(value==false){
+        return;
+      }
+    });
     configData();
   }
   void configData()async{
@@ -86,6 +93,7 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     messageDao =tChatAppDatabase.messageDao;
     lastMessageDao =tChatAppDatabase.lastMessageDao;
     String id='';
+
     if(userModel==null){
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
@@ -143,6 +151,9 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
 
   void baseMethod() {
     // Parent method
+  }
+  void openScreen(Widget screen){
+    Navigator.push(context, MaterialPageRoute(builder: (context)=>screen));
   }
   showBaseDialog(String title,String description){
     if(dialog!=null){

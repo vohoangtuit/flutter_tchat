@@ -26,6 +26,9 @@ TextStyle normalTextBlack() {
 TextStyle mediumTextBlack() {
   return TextStyle(color: Colors.black, fontSize: 16);
 }
+TextStyle largeTextBlack() {
+  return TextStyle(color: Colors.black, fontSize: 18);
+}
 TextStyle smallTextGray() {
   return TextStyle(color: Colors.grey, fontSize: 12);
 }
@@ -51,6 +54,9 @@ TextStyle normalTextWhite() {
 
 TextStyle mediumTextWhite() {
   return TextStyle(color: Colors.white, fontSize: 16);
+}
+TextStyle textHeaderBar() {
+  return TextStyle(color: Colors.white70, fontSize: 15,decoration: TextDecoration.none);
 }
 TextStyle smallTextRed() {
   return TextStyle(color: Colors.red, fontSize: 12);

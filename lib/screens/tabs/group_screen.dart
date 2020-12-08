@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
-import 'package:tchat_app/widget/view_header_main_screen.dart';
+import 'package:tchat_app/widget/toolbar_main.dart';
 class GroupScreen extends StatefulWidget {
   @override
   _GroupScreenState createState() => _GroupScreenState();
@@ -12,7 +12,6 @@ class _GroupScreenState extends State<GroupScreen> with WidgetsBindingObserver{/
     return Container(
       child: Column(
         children: [
-          headerMessage(),
           Expanded(
             child: Text('Group'),
           ),
