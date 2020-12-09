@@ -12,7 +12,7 @@ class LastMessageScreen extends StatefulWidget  {
   @override
   _LastMessageScreenState createState() => _LastMessageScreenState();
 }
-class _LastMessageScreenState extends BaseStatefulState<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen>  {
+class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen>  {
   //
   @override
 //  TODO: implement wantKeepAlive

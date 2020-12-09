@@ -6,7 +6,7 @@ class TimeLineScreen extends StatefulWidget {
   _TimeLineScreenState createState() => _TimeLineScreenState();
 }
 
-class _TimeLineScreenState extends BaseStatefulState<TimeLineScreen> with AutomaticKeepAliveClientMixin<TimeLineScreen>{
+class _TimeLineScreenState extends BaseStatefulWidget<TimeLineScreen> with AutomaticKeepAliveClientMixin<TimeLineScreen>{
   @override
   Widget build(BuildContext context) {
     return Container(

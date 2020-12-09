@@ -35,7 +35,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
 
                   NormalButton(title: 'Setting',onPressed: (){
                     Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => UpdateAccountScreen()));
+                        context, MaterialPageRoute(builder: (context) => UpdateAccountScreen(userModel)));
                   },),
                   SizedBox(height: 10,),
                   NormalButton(title: 'LogOut',onPressed: (){

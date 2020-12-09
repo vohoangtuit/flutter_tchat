@@ -92,7 +92,7 @@ class HomeScreenState extends State<HomeScreen> {
       handleSignOut();
     } else {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => UpdateAccountScreen()));
+          context, MaterialPageRoute(builder: (context) => UpdateAccountScreen(null)));
     }
   }
 

@@ -81,4 +81,11 @@ BoxDecoration decorationButton(Color color, double borderRadius) {
     color: color,
     borderRadius: BorderRadius.circular(borderRadius),
   );
+
+}
+InputDecoration inputDecoratio(String hintText){
+  return InputDecoration.collapsed(
+    hintText: hintText,
+    border: InputBorder.none,
+  );
 }

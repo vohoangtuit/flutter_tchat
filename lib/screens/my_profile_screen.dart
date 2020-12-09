@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/screens/update_account_screen.dart';
 import 'package:tchat_app/widget/button.dart';
+import 'package:tchat_app/widget/sliver_appbar_delegate.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -9,11 +10,9 @@ class MyProfileScreen extends StatefulWidget {
   _MyProfileScreenState createState() => _MyProfileScreenState();
 }
 
-class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
+class _MyProfileScreenState extends BaseStatefulWidget<MyProfileScreen> {
   ScrollController _scrollController;
-
   bool lastStatus = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,7 +45,7 @@ class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
                       icon: Icon(Icons.more_horiz,
                           color: isShrink ? Colors.black : Colors.white),
                       onPressed: () {
-                        openScreen(UpdateAccountScreen());
+                        openScreen(UpdateAccountScreen(userModel));
                       })
                 ],
                 flexibleSpace: FlexibleSpaceBar(
@@ -94,8 +93,8 @@ class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
                         ),
                 ),
               ),
-              SliverPersistentHeader(
-                delegate: _SliverAppBarDelegate(
+              SliverPersistentHeader(// todo using to keep when scroll to top
+                delegate: SliverAppBarDelegate(
                   TabBar(
                     labelColor: Colors.black87,
                     unselectedLabelColor: Colors.grey,
@@ -133,6 +132,7 @@ class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
 
   @override
   void initState() {
+    //print('profile '+userModel.toString());
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
@@ -151,27 +151,3 @@ class _MyProfileScreenState extends BaseStatefulState<MyProfileScreen> {
   }
 }
 
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._tabBar);
-
-  final TabBar _tabBar;
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return new Container(
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
-  }
-}

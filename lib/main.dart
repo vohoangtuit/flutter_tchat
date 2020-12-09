@@ -15,7 +15,6 @@ void main() async {
   //   MyApp(),
   // );
   runApp(
-
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AccountBloc()),

@@ -51,6 +51,7 @@ dependencies:
   timeago: ^2.0.29
   http: ^0.12.2
   flutter_facebook_login: ^3.0.0
+  group_radio_button: ^1.0.1
 
 
 dev_dependencies:
@@ -92,6 +93,7 @@ flutter:
     - images/icons/ic_edit.png
     - images/icons/ic_notification.png
     - images/icons/ic_settings.png
+    - images/icons/ic_pen_gray.png
     - images/cover.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -21,9 +21,9 @@ import 'package:tchat_app/widget/progressbar.dart';
 import '../main.dart';
 import 'dialog.dart';
 typedef Int2VoidFunc = void Function(String);
-abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
+abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   BaseDialog  dialog;
- static BaseStatefulState baseStatefulState;
+ static BaseStatefulWidget baseStatefulState;
   var  restApi;
   ProgressBar progressBar;
   bool onStart =false;
@@ -57,16 +57,12 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
   @override
   void initState() {
     super.initState();
-
-   // print('base initState start $onStart');
-    // if(!onStart){
-    //   initConfig();
-    // }
+    //print('base initState userModel '+userModel.toString());
   }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-   // print('base didChangeDependencies start $onStart');
+    //print('base didChangeDependencies '+onStart.toString());
     if(!onStart){
       initConfig();
     }
@@ -77,25 +73,21 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
     progressBar = ProgressBar();
     baseStatefulState=this;
     fireBaseStore = FirebaseFirestore.instance;
+
+    initDataBase();
     await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
       if(value==null){
         return;
       }else if(value==false){
         return;
       }else{
-        configData();
+        getUserAccount();
       }
     });
-
   }
-  void configData()async{
-    //-- todo: database change  reRunning rebuild
-    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
-    userDao = tChatAppDatabase.userDao;
-    messageDao =tChatAppDatabase.messageDao;
-    lastMessageDao =tChatAppDatabase.lastMessageDao;
+  void getUserAccount()async{
+    print('get user');
     String id='';
-
     if(userModel==null){
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
@@ -110,6 +102,13 @@ abstract class BaseStatefulState<T extends StatefulWidget> extends State<T> {
         }
       });
     }
+  }
+  void initDataBase()async{
+    //-- todo: database change  reRunning rebuild
+    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
+    userDao = tChatAppDatabase.userDao;
+    messageDao =tChatAppDatabase.messageDao;
+    lastMessageDao =tChatAppDatabase.lastMessageDao;
     await SharedPre.getStringKey(SharedPre.sharedPreLanguageCode).then((value) {
       setState(() {
         languageCode =value;

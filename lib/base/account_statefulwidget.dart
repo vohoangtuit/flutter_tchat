@@ -6,7 +6,7 @@ import 'package:tchat_app/firebase_services/firebase_database.dart';
 
 import 'bases_statefulwidget.dart';
 
-abstract class AccountBaseState <T extends StatefulWidget> extends BaseStatefulState{
+abstract class AccountBaseState <T extends StatefulWidget> extends BaseStatefulWidget{
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;

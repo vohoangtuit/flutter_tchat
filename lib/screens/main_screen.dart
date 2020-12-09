@@ -25,7 +25,7 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends BaseStatefulState<MainScreen> with SingleTickerProviderStateMixin {
+class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerProviderStateMixin {
   TabController tabController;
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
