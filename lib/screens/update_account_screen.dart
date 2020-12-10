@@ -13,6 +13,7 @@ import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/utils/utils.dart';
 import 'package:tchat_app/widget/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
 
@@ -37,9 +38,13 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   bool isLoading = false;
   File avatarImageFile;
 
+  DateTime selectedDate = DateTime.now();
+
   final FocusNode focusNodeFullName = FocusNode();
   final FocusNode focusNodeAboutMe = FocusNode();
   int _genderValue = 0;
+  String birthday ='';
+  //String timesnapBirthday='';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -208,11 +213,16 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
                                   Divider(),
                                   Container(
                                     height: 35,
-                                    child: Row(
-                                      children: [
-                                      Expanded(child: Text(widget.user.birthday.isEmpty?'01/01/1970':widget.user.birthday)),
-                                        iconEditInfo(),
-                                    ],),
+                                    child: GestureDetector(
+                                      onTap: (){
+                                        _selectDate(context);
+                                      },
+                                      child: Row(
+                                        children: [
+                                        Expanded(child: Text(birthday)),
+                                          iconEditInfo(),
+                                      ],),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -262,8 +272,18 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       });
     }
     controllerFullName = TextEditingController(text: widget.user.fullName);
+     if(widget.user.birthday!=null){
+       
+       setState(() {
+         birthday =Utils().formatTimesnapToDate(int.parse(widget.user.birthday));
+       });
 
-    // Force refresh input
+     }else{
+       setState(() {
+         birthday ='1/1/1990';
+       });
+     }
+
 
   }
 
@@ -340,7 +360,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       isLoading = true;
     });
 
-    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({USER_FULLNAME:  widget.user.fullName,USER_GENDER: widget.user.gender, USER_PHOTO_URL: widget.user.photoURL
+    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({USER_FULLNAME:  widget.user.fullName,USER_GENDER: widget.user.gender,USER_BIRTHDAY:widget.user.birthday, USER_PHOTO_URL: widget.user.photoURL
     }).then((data) async {
       updateUserDatabase(widget.user);
       ProviderController(context).setAccount(widget.user);
@@ -357,5 +377,19 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
 
       Fluttertoast.showToast(msg: err.toString());
     });
+  }
+  _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(1960),
+      lastDate: DateTime(2021),
+    );
+    if (picked != null && picked != selectedDate)
+      setState(() {
+        selectedDate = picked;
+        birthday =Utils().formatDate_dd_mm_yyy(selectedDate);
+        widget.user.birthday =Utils().covertTimesnapToMilliseconds(selectedDate);
+      });
   }
 }

@@ -19,37 +19,46 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
-    	<array>
-    		<dict>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>fb757901591612156</string>
-    			</array>
-    		</dict>
-    		<dict>
-    			<key>CFBundleTypeRole</key>
-    			<string>Editor</string>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>com.googleusercontent.apps.1051949125089-ruolpquv1nkdut2jntnq16snlhc3rfsf</string>
-    			</array>
-    		</dict>
-    	</array>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb757901591612156</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1051949125089-ruolpquv1nkdut2jntnq16snlhc3rfsf</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>FacebookAppID</key>
-    	<string>757901591612156</string>
-    	<key>FacebookDisplayName</key>
-    	<string>Demo Flutter</string>
-    	<key>LSApplicationQueriesSchemes</key>
-    	<array>
-    		<string>fbapi</string>
-    		<string>fb-messenger-share-api</string>
-    		<string>fbauth2</string>
-    		<string>fbshareextension</string>
-    	</array>
+	<string>757901591612156</string>
+	<key>FacebookDisplayName</key>
+	<string>Demo Flutter</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need open camera for you capture a photo</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need open gallery for you choose a photo</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -69,14 +78,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>NSCameraUsageDescription</key>
-    	<string>We need open camera for you capture a photo</string>
-    	<key>NSPhotoLibraryUsageDescription</key>
-    	<string>We need open gallery for you choose a photo</string>
-    	<key>UIBackgroundModes</key>
-    	<array>
-        		<string>fetch</string>
-        		<string>remote-notification</string>
-        	</array>
 </dict>
 </plist>
