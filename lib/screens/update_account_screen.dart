@@ -10,7 +10,10 @@ import 'package:group_radio_button/group_radio_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
+import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/widget/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
 
 import '../utils/const.dart';
@@ -24,8 +27,6 @@ class UpdateAccountScreen extends StatefulWidget {
 
 class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> {
   TextEditingController controllerFullName = TextEditingController();
-  TextEditingController controllerAboutMe = TextEditingController();
-
   SharedPreferences prefs;
 
   String id = '';
@@ -38,8 +39,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
 
   final FocusNode focusNodeFullName = FocusNode();
   final FocusNode focusNodeAboutMe = FocusNode();
-  int _stackIndex = 0;
-  String _singleValue = "Male";
+  int _genderValue = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,95 +51,14 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
               child: Column(
                 children: <Widget>[
                   information(),
-                  // Input
-                  Column(
-                    children: <Widget>[
-                      // Username
-                      Container(
-                        child: Text(
-                          'Nickname',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
-                        ),
-                        margin:
-                            EdgeInsets.only(left: 10.0, bottom: 5.0, top: 10.0),
-                      ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Sweetie',
-                              contentPadding: EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
-                            ),
-                            controller: controllerFullName,
-                            onChanged: (value) {
-                              fullName = value;
-                            },
-                            focusNode: focusNodeFullName,
-                          ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
-
-                      // About me
-                      Container(
-                        child: Text(
-                          'About me',
-                          style: TextStyle(
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.bold,
-                              color: primaryColor),
-                        ),
-                        margin:
-                            EdgeInsets.only(left: 10.0, top: 30.0, bottom: 5.0),
-                      ),
-                      Container(
-                        child: Theme(
-                          data: Theme.of(context)
-                              .copyWith(primaryColor: primaryColor),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              hintText: 'Fun, like travel and play PES...',
-                              contentPadding: EdgeInsets.all(5.0),
-                              hintStyle: TextStyle(color: greyColor),
-                            ),
-                            controller: controllerAboutMe,
-                            onChanged: (value) {
-                              aboutMe = value;
-                            },
-                            focusNode: focusNodeAboutMe,
-                          ),
-                        ),
-                        margin: EdgeInsets.only(left: 30.0, right: 30.0),
-                      ),
-                    ],
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                  ),
-
-                  // Button
                   Container(
-                    child: FlatButton(
-                      onPressed: handleUpdateData,
-                      child: Text(
-                        'UPDATE',
-                        style: TextStyle(fontSize: 16.0),
-                      ),
-                      color: primaryColor,
-                      highlightColor: Color(0xff8d93a0),
-                      splashColor: Colors.transparent,
-                      textColor: Colors.white,
-                      padding: EdgeInsets.fromLTRB(30.0, 10.0, 30.0, 10.0),
-                    ),
+                      child: BaseButton(title: 'Update',onPressed: (){
+                        handleUpdateData();
+                      },),
                     margin: EdgeInsets.only(top: 50.0, bottom: 50.0),
                   ),
                 ],
               ),
-            //  padding: EdgeInsets.only(left: 15.0, right: 15.0),
             ),
             // Loading
             Positioned(
@@ -159,134 +78,159 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   }
 
   Widget information() {
-    return Container(
-      color: Colors.grey[300],
-      margin: EdgeInsets.only(left: 0.0, top: 10.0, right: 0.0, bottom: 10.0),
-      child: Container(
-        margin: EdgeInsets.only(left: 0.0, top: 0.5, right: 0.0, bottom: 0.5),
-        color: Colors.white,
-        child: Container(
-          margin: EdgeInsets.all(10.0),
-          child: Row(
-            children: [
-              Stack(
-                children: <Widget>[
-                  (avatarImageFile == null)
-                      ? (widget.user.photoURL != ''
-                      ? Material(
-                    child: CachedNetworkImage(
-                      placeholder: (context, url) =>
-                          Container(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2.0,
-                              valueColor:
-                              AlwaysStoppedAnimation<Color>(
-                                  themeColor),
-                            ),
-                            width: 70.0,
-                            height: 70.0,
-                            padding: EdgeInsets.all(20.0),
-                          ),
-                      imageUrl: widget.user.photoURL,
-                      width: 70.0,
-                      height: 70.0,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(45.0)),
-                    clipBehavior: Clip.hardEdge,
-                  )
-                      : Icon(
-                    Icons.account_circle,
-                    size: 70.0,
-                    color: greyColor,
-                  ))
-                      : Material(
-                    child: Image.file(
-                      avatarImageFile,
-                      width: 70.0,
-                      height: 70.0,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius:
-                    BorderRadius.all(Radius.circular(45.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.camera_alt,
-                      color: primaryColor.withOpacity(0.5),
-                    ),
-                    onPressed: getImage,
-                    padding: EdgeInsets.all(30.0),
-                    splashColor: Colors.transparent,
-                    highlightColor: greyColor,
-                    iconSize: 30.0,
-                  ),
-                ],
-              ),
-              SizedBox(width: 10,),
-              Flexible(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                //  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                            decoration: inputDecoratio('Full Name'),
-                            controller: controllerFullName,
-                            onChanged: (value) {
-                              userModel.fullName = value;
-                            },
-                            focusNode: focusNodeFullName,
-                          ),
-                        ),
-                        Container(
-                            alignment: Alignment.centerRight,
-                            child: Image.asset('images/icons/ic_pen_gray.png',width: 15,height: 15,)),
-                      ],
-                    ),
-                    Divider(),
-                    Row(
-                      children: [
-                        RadioButton(
-                          description: "Male",
-                          value: "Male",
-                          groupValue: _singleValue,
-                          onChanged: (value) => setState(
-                                () => _singleValue = value,
-                          ),
-                        ),
-                        RadioButton(
-                          description: "FeMale",
-                          value: "FeMale",
-                          groupValue: _singleValue,
-                          onChanged: (value) => setState(
-                                () => _singleValue = value,
-                          ),
-                          textPosition: RadioButtonTextPosition.left,
-                        ),
-                      ],
-                    ),Divider(),
-                    Row(
-                      children: [
-                      Expanded(child: Text(widget.user.birthday.isEmpty?'01/01/1970':widget.user.birthday)),
+    return Column(
+      children: [
+        Divider(height: 1),
+        Container(
+        margin:EdgeInsets.only(top: 14),
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                Divider(height: 1),
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: Column(
+                    children: [
                       Container(
-                          alignment: Alignment.centerRight,
-                          child: Image.asset('images/icons/ic_pen_gray.png',width: 15,height: 15,)),
-                    ],),
-                    Divider(),
-                  ],
-                ),
-              ),
+                        child: Row(
+                          children: [
+                            Stack(
+                              children: <Widget>[
+                                (avatarImageFile == null)
+                                    ? (widget.user.photoURL != ''
+                                    ? Material(
+                                  child: CachedNetworkImage(
+                                    placeholder: (context, url) =>
+                                        Container(
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2.0,
+                                            valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                themeColor),
+                                          ),
+                                          width: 70.0,
+                                          height: 70.0,
+                                          padding: EdgeInsets.all(20.0),
+                                        ),
+                                    imageUrl: widget.user.photoURL,
+                                    width: 70.0,
+                                    height: 70.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius: BorderRadius.all(
+                                      Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                )
+                                    : Icon(
+                                  Icons.account_circle,
+                                  size: 70.0,
+                                  color: greyColor,
+                                ))
+                                    : Material(
+                                  child: Image.file(
+                                    avatarImageFile,
+                                    width: 70.0,
+                                    height: 70.0,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  borderRadius:
+                                  BorderRadius.all(Radius.circular(45.0)),
+                                  clipBehavior: Clip.hardEdge,
+                                ),
 
-            ],
+                                Positioned.fill(
+                                  left: 0.0,top: 0.0,right: 0.0,bottom: 0.0,
+                                  child: Align(
+                                    alignment: Alignment.bottomRight,
+                                    child: Material(
+                                      borderRadius: BorderRadius.all(Radius.circular(25.0),),
+                                      clipBehavior: Clip.hardEdge,
+                                      shadowColor: Colors.black,
+                                      child: Container(
+                                        color: Colors.white,
+                                        height: 20,width: 20,
+                                        child: Positioned.fill(
+                                          child: Icon(Icons.camera_alt, color: primaryColor.withOpacity(0.5),size: 15,),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(width: 10,),
+                            Flexible(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    height: 35,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: TextField(
+                                            decoration: inputDecoratio('Full Name'),
+                                            controller: controllerFullName,
+                                            onChanged: (value) {
+                                              widget.user.fullName = value;
+                                            },
+                                            focusNode: focusNodeFullName,
+                                          ),
+                                        ),
+                                        SizedBox(width: 5,),
+                                        iconEditInfo(),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(),
+                                  Container(
+                                    height: 35,
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          value: 1,
+                                          groupValue: _genderValue,
+                                          onChanged: _handleRadioValueChange,
+                                        ),
+                                        Text('Male'),
+                                        Radio(
+                                          value: 0,
+                                          groupValue: _genderValue,
+                                          onChanged: _handleRadioValueChange,
+                                        ),
+                                        Text('Female'),
+                                      ],
+                                    ),
+                                  ),
+                                  Divider(),
+                                  Container(
+                                    height: 35,
+                                    child: Row(
+                                      children: [
+                                      Expanded(child: Text(widget.user.birthday.isEmpty?'01/01/1970':widget.user.birthday)),
+                                        iconEditInfo(),
+                                    ],),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+        Divider(height: 0.5,
+        ),
+      ],
     );
   }
 
@@ -295,19 +239,31 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
     super.initState();
     readLocal();
   }
-
+  void _handleRadioValueChange(int value) {
+    setState(() {
+      _genderValue = value;
+      widget.user.gender =_genderValue;
+      switch (_genderValue) {
+        case 0:
+          break;
+        case 1:
+          break;
+      }
+    });
+  }
   void readLocal() async {
-    prefs = await SharedPreferences.getInstance();
-    id = prefs.getString('id') ?? '';
-    fullName = prefs.getString('nickname') ?? '';
-    aboutMe = prefs.getString('aboutMe') ?? '';
-    photoUrl = prefs.getString('photoUrl') ?? '';
-
+    if(widget.user.gender!=null){
+      setState(() {
+        _genderValue =widget.user.gender;
+      });
+    }else{
+      setState(() {
+         widget.user.gender=_genderValue;
+      });
+    }
     controllerFullName = TextEditingController(text: widget.user.fullName);
-    controllerAboutMe = TextEditingController(text: aboutMe);
 
     // Force refresh input
-
 
   }
 
@@ -337,13 +293,15 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       if (value.error == null) {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-          photoUrl = downloadUrl;
-          FirebaseFirestore.instance.collection('users').doc(id).update({
-            'nickname': fullName,
-            'aboutMe': aboutMe,
-            'photoUrl': photoUrl
+          widget.user.photoURL = downloadUrl;
+          FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(id).update({
+            USER_FULLNAME: widget.user.fullName,
+            USER_GENDER: widget.user.gender,
+            USER_PHOTO_URL: widget.user.photoURL
           }).then((data) async {
-            await prefs.setString('photoUrl', photoUrl);
+            //await prefs.setString('photoUrl', photoUrl);
+            ProviderController(context).setAccount(widget.user);
+            updateUserDatabase(widget.user);
             setState(() {
               isLoading = false;
             });
@@ -382,14 +340,10 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       isLoading = true;
     });
 
-    FirebaseFirestore.instance.collection('users').doc(id).update({
-      'nickname': fullName,
-      'aboutMe': aboutMe,
-      'photoUrl': photoUrl
+    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({USER_FULLNAME:  widget.user.fullName,USER_GENDER: widget.user.gender, USER_PHOTO_URL: widget.user.photoURL
     }).then((data) async {
-      await prefs.setString('nickname', fullName);
-      await prefs.setString('aboutMe', aboutMe);
-      await prefs.setString('photoUrl', photoUrl);
+      updateUserDatabase(widget.user);
+      ProviderController(context).setAccount(widget.user);
 
       setState(() {
         isLoading = false;

@@ -89,3 +89,9 @@ InputDecoration inputDecoratio(String hintText){
     border: InputBorder.none,
   );
 }
+Container iconEditInfo(){
+  return Container(
+      alignment: Alignment.centerRight,
+      child: Image.asset('images/icons/ic_pen_gray.png',width: 15,height: 15,)
+  );
+}

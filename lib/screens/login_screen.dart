@@ -151,7 +151,8 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     UserModel user;
     if (documents.length == 0) {
     // Update data to server if new user
-    user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true);
+      // todo insert data to firebase
+    user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',gender: 0,email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true);
     FirebaseFirestore.instance
         .collection(FIREBASE_USERS)
         .doc(firebaseUser.uid)
@@ -170,8 +171,23 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_FULLNAME]);
     await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_PHOTO_URL]);
     await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,documents[0].data()[USER_EMAIL]);
-    user = UserModel(id:documents[0].data()[USER_ID], userName:'', fullName:documents[0].data()[USER_FULLNAME], birthday:'',email:documents[0].data()[USER_EMAIL], photoURL:documents[0].data()[USER_PHOTO_URL],cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true);
-
+    // todo get data from firebase
+    user = UserModel(
+        id:documents[0].data()[USER_ID],
+        userName:documents[0].data()[USER_USERNAME],
+        fullName:documents[0].data()[USER_FULLNAME],
+        birthday:documents[0].data()[USER_BIRTHDAY],
+        gender: documents[0].data()[USER_GENDER],
+        email:documents[0].data()[USER_EMAIL],
+        photoURL:documents[0].data()[USER_PHOTO_URL],
+        cover: documents[0].data()[USER_COVER],
+        statusAccount:documents[0].data()[USER_STATUS_ACCOUNT],
+        phoneNumber:documents[0].data()[USER_PHONE],
+        createdAt:documents[0].data()[USER_CREATED_AT],
+        pushToken:documents[0].data()[USER_PUST_TOKEN],
+        isLogin:true,
+        accountType: documents[0].data()[USER_ACCOUNT_TYPE],
+        allowSearch: documents[0].data()[USER_ALLOW_SEARCH]);
     }
     await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
 

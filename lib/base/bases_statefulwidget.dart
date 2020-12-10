@@ -156,6 +156,14 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   void openScreen(Widget screen){
     Navigator.push(context, MaterialPageRoute(builder: (context)=>screen));
   }
+ updateUserDatabase(UserModel user){
+    if(userDao!=null){
+      userDao.updateUser(user);
+      setState(() {
+        userModel =user;
+      });
+    }
+  }
   showBaseDialog(String title,String description){
     if(dialog!=null){
       dialog.dismiss();

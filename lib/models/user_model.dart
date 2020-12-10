@@ -11,13 +11,13 @@ final String USER_EMAIL ='email';
 final String USER_PHOTO_URL ='photoURL';
 final String USER_PHONE ='phoneNumber';
 final String USER_BIRTHDAY ='birthday';
+final String USER_GENDER ='gender';
 final String USER_CREATED_AT ='createdAt';
 final String USER_STATUS_ACCOUNT ='statusAccount';
 final String USER_PUST_TOKEN ='pushToken';
 final String USER_ISlOGIN ='isLogin';
 final String USER_ACCOUNT_TYPE ='accountType';
 final String USER_ALLOW_SEARCH ='allowSearch';
-final String USER_BIRTH_DAY ='birthday';
 final String USER_COVER ='cover';
 //
 final int USER_ACCOUNT_FACEBOOK =1;
@@ -33,6 +33,7 @@ class UserModel {
   String userName='';
   String fullName='';
   String birthday='';
+  int gender=0;
   String email='';
   String photoURL='';
   String cover='';
@@ -45,13 +46,14 @@ class UserModel {
   bool allowSearch=true;
 
 
-  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday, this.email, this.photoURL,this.cover, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin,this.accountType,this.allowSearch});
+  UserModel({this.idDB,this.id, this.userName,this.fullName, this.birthday,this.gender, this.email, this.photoURL,this.cover, this.statusAccount,this.phoneNumber, this.createdAt,this.pushToken,this.isLogin,this.accountType,this.allowSearch});
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data[USER_ID] = this.id;
     data[USER_USERNAME] = this.userName;
     data[USER_FULLNAME] = this.fullName;
     data[USER_BIRTHDAY] = this.birthday;
+    data[USER_GENDER] = this.gender;
     data[USER_EMAIL] = this.email;
     data[USER_PHOTO_URL] = this.photoURL;
     data[USER_COVER] = this.cover;
@@ -68,6 +70,6 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch}';
+    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch}';
   }
 }

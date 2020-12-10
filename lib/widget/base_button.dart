@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-class ButtonLogin extends StatelessWidget {
+class BaseButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  final String icon;
   final String title;
 
-  ButtonLogin({@required this.onPressed,@required this.icon,@required this.title});
+  BaseButton({@required this.onPressed,@required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -20,18 +19,14 @@ class ButtonLogin extends StatelessWidget {
             borderRadius: new BorderRadius.circular(8.0)),
         child: Container(
           width: 200,
-          child: Row(
-            children: [
-              Image.asset(icon,width: 26,height: 26,),
-              SizedBox(width: 15,),
-              Text(
-                title,
-                style: textWhiteButtonDefault(),
-              ),
-            ],
+          child: Center(
+            child: Text(
+              title,
+              style: textWhiteButtonDefault(),
+            ),
           ),
         ),
-        
+
       ),
     );
   }

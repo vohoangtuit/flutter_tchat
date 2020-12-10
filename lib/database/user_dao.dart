@@ -16,8 +16,12 @@ abstract class UserDao {
   @insert
   Future<void> InsertUser(UserModel user);
 
-  @Query("DELETE * FROM UserModel")
+  @Query('DELETE * FROM UserModel')
   Future<void> deleteAllUsers();
+
+  @update
+  Future<void> updateUser(UserModel user);
+
 
   // @transaction
   // Future<void> replaceUsers(List<UserData> users) async {

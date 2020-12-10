@@ -65,7 +65,7 @@ class _MyProfileScreenState extends BaseStatefulWidget<MyProfileScreen> {
                             color: const Color(0xff7c94b6),
                             image: DecorationImage(
                               image: userModel.photoURL.isEmpty
-                                  ? AssetImage('img_not_available.jpeg')
+                                  ? AssetImage('images/img_not_available.jpeg')
                                   : NetworkImage(userModel.photoURL),
                               fit: BoxFit.cover,
                             ),
