@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:tchat_app/controller/bloc/account_bloc.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/database/database.dart';
 import 'package:tchat_app/database/last_message_dao.dart';
@@ -37,20 +38,27 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   MessageDao messageDao;
   LastMessageDao lastMessageDao;
 
-  bool newMessage =false;
+  bool userChange =false;
 
   String languageCode ='';
+  var reloadUser;
 
   // AccountBloc accountBloc;
   // ReloadMessage reloadMessage;
   @override
   Widget build(BuildContext context) {
     userModel =ProviderController(context).getAccount();
-    return Stack(
-      children: <Widget>[
-        Container(
-        )
-      ],
+    if(userChange){
+      this.reloadUser =reloadUserData();
+    }
+    return ChangeNotifierProvider<AccountBloc>(
+      create: (_) => AccountBloc(),
+      child: Stack(
+        children: <Widget>[
+          Container(
+          )
+        ],
+      ),
     );
   }
 
@@ -83,6 +91,13 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
       }else{
         getUserAccount();
       }
+    });
+  }
+   reloadUserData(){
+     print('reloadUserData');
+    getUserAccount();
+    setState(() {
+      reloadUser =false;
     });
   }
   void getUserAccount()async{

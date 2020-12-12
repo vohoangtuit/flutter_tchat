@@ -30,10 +30,6 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   TextEditingController controllerFullName = TextEditingController();
   SharedPreferences prefs;
 
-  String id = '';
-  String fullName = '';
-  String aboutMe = '';
-  String photoUrl = '';
 
   bool isLoading = false;
   File avatarImageFile;
@@ -44,13 +40,14 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   final FocusNode focusNodeAboutMe = FocusNode();
   int _genderValue = 0;
   String birthday ='';
+  String oldAvatar='';
   //String timesnapBirthday='';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: appBarWithTitleCenter(context, 'Profile Information'),
         //  body: UpdateScreen(),
-        body:userModel==null?Container(): Stack(
+        body: Stack(
           children: <Widget>[
             SingleChildScrollView(
               child: Column(
@@ -66,18 +63,16 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
               ),
             ),
             // Loading
-            Positioned(
-              child: isLoading
-                  ? Container(
-                      child: Center(
-                        child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(themeColor)),
-                      ),
-                      color: Colors.white.withOpacity(0.8),
-                    )
-                  : Container(),
-            ),
+            isLoading
+                ? Container(
+                    child: Center(
+                      child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(themeColor)),
+                    ),
+                    color: Colors.white.withOpacity(0.8),
+                  )
+                : Container(),
           ],
         ));
   }
@@ -100,69 +95,71 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
                       Container(
                         child: Row(
                           children: [
-                            Stack(
-                              children: <Widget>[
-                                (avatarImageFile == null)
-                                    ? (widget.user.photoURL != ''
-                                    ? Material(
-                                  child: CachedNetworkImage(
-                                    placeholder: (context, url) =>
-                                        Container(
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2.0,
-                                            valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                themeColor),
+                            GestureDetector(
+                              onTap: getImage,
+                              child: Stack(
+                                children: <Widget>[
+                                  (avatarImageFile == null)
+                                      ? (widget.user.photoURL != ''
+                                      ? Material(
+                                    child: CachedNetworkImage(
+                                      placeholder: (context, url) =>
+                                          Container(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.0,
+                                              valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                  themeColor),
+                                            ),
+                                            width: 70.0,
+                                            height: 70.0,
+                                            padding: EdgeInsets.all(20.0),
                                           ),
-                                          width: 70.0,
-                                          height: 70.0,
-                                          padding: EdgeInsets.all(20.0),
-                                        ),
-                                    imageUrl: widget.user.photoURL,
-                                    width: 70.0,
-                                    height: 70.0,
-                                    fit: BoxFit.cover,
+                                      imageUrl: widget.user.photoURL,
+                                      width: 70.0,
+                                      height: 70.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  )
+                                      : Icon(
+                                    Icons.account_circle,
+                                    size: 70.0,
+                                    color: greyColor,
+                                  ))
+                                      : Material(
+                                    child: Image.file(
+                                      avatarImageFile,
+                                      width: 70.0,
+                                      height: 70.0,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(45.0)),
+                                    clipBehavior: Clip.hardEdge,
                                   ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                )
-                                    : Icon(
-                                  Icons.account_circle,
-                                  size: 70.0,
-                                  color: greyColor,
-                                ))
-                                    : Material(
-                                  child: Image.file(
-                                    avatarImageFile,
-                                    width: 70.0,
-                                    height: 70.0,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  borderRadius:
-                                  BorderRadius.all(Radius.circular(45.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-
-                                Positioned.fill(
-                                  left: 0.0,top: 0.0,right: 0.0,bottom: 0.0,
-                                  child: Align(
+                                  Container(
                                     alignment: Alignment.bottomRight,
+                                    width: 70,
+                                    height: 70,
                                     child: Material(
                                       borderRadius: BorderRadius.all(Radius.circular(25.0),),
                                       clipBehavior: Clip.hardEdge,
                                       shadowColor: Colors.black,
-                                      child: Container(
-                                        color: Colors.white,
-                                        height: 20,width: 20,
-                                        child: Positioned.fill(
+                                        child: Container(
+                                          color: Colors.white,
+                                          height: 20,width: 20,
                                           child: Icon(Icons.camera_alt, color: primaryColor.withOpacity(0.5),size: 15,),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ],
+
+
+
+                                ],
+                              ),
                             ),
                             SizedBox(width: 10,),
                             Flexible(
@@ -272,7 +269,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       });
     }
     controllerFullName = TextEditingController(text: widget.user.fullName);
-     if(widget.user.birthday!=null){
+     if(widget.user.birthday.isNotEmpty){
        
        setState(() {
          birthday =Utils().formatTimesnapToDate(int.parse(widget.user.birthday));
@@ -305,8 +302,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   }
 
   Future uploadFile() async {
-    String fileName = id;
-    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDatabaseMethods().getStringPathAvatar(widget.user.id));
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
     uploadTask.onComplete.then((value) {
@@ -314,9 +310,9 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           widget.user.photoURL = downloadUrl;
-          FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(id).update({
-            USER_FULLNAME: widget.user.fullName,
-            USER_GENDER: widget.user.gender,
+          FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({// todo update row document user
+          //  USER_FULLNAME: widget.user.fullName,
+           // USER_GENDER: widget.user.gender,
             USER_PHOTO_URL: widget.user.photoURL
           }).then((data) async {
             //await prefs.setString('photoUrl', photoUrl);
@@ -324,6 +320,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
             updateUserDatabase(widget.user);
             setState(() {
               isLoading = false;
+              userChange =true;
             });
             Fluttertoast.showToast(msg: "Upload success");
           }).catchError((err) {
@@ -347,10 +344,12 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
     }, onError: (err) {
       setState(() {
         isLoading = false;
+
       });
       Fluttertoast.showToast(msg: err.toString());
     });
   }
+
 
   void handleUpdateData() {
     focusNodeFullName.unfocus();
@@ -367,6 +366,8 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
 
       setState(() {
         isLoading = false;
+        userModel =widget.user;
+        reloadUser =true;
       });
 
       Fluttertoast.showToast(msg: "Update success");
