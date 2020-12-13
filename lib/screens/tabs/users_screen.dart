@@ -15,7 +15,7 @@ import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
-import 'package:tchat_app/screens/update_account_screen.dart';
+import 'package:tchat_app/screens/account/update_account_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
@@ -108,5 +108,10 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+    // TODO: implement uploadAvatarCover
+  }
 
 }

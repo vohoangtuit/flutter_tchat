@@ -15,6 +15,7 @@ import 'package:tchat_app/base/account_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
+import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -721,6 +722,11 @@ class _ChatScreenState extends AccountBaseState {
     setState(() {
       typing = false;
     });
+  }
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+    // TODO: implement uploadAvatarCover
   }
 
 }

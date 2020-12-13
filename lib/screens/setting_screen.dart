@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/account_statefulwidget.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/button.dart';
@@ -69,5 +70,10 @@ class _SettingScreenState extends AccountBaseState<SettingScreen> {
     });
     await SharedPre.clearData();
     openMyAppAndRemoveAll();
+  }
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+
   }
 }

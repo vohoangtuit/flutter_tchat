@@ -51,7 +51,6 @@ dependencies:
   timeago: ^2.0.29
   http: ^0.12.2
   flutter_facebook_login: ^3.0.0
-  group_radio_button: ^1.0.1
   geolocator: ^6.1.13
     #1.1 location
   location: ^3.1.0

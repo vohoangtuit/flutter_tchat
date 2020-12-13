@@ -6,27 +6,29 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:group_radio_button/group_radio_button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tchat_app/base/account_statefulwidget.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
+import 'package:tchat_app/firebase_services/upload.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/utils/utils.dart';
 import 'package:tchat_app/widget/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
 
-import '../utils/const.dart';
+import '../../utils/const.dart';
 
 class UpdateAccountScreen extends StatefulWidget {
   UserModel user;
   UpdateAccountScreen(this.user);
   @override
-  _UpdateAccountScreenState createState() => _UpdateAccountScreenState();
+  _UpdateAccountScreenState createState() => _UpdateAccountScreenState(user);
 }
 
-class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> {
+class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
+  final UserModel user;
   TextEditingController controllerFullName = TextEditingController();
   SharedPreferences prefs;
 
@@ -41,6 +43,8 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   int _genderValue = 0;
   String birthday ='';
   String oldAvatar='';
+
+  _UpdateAccountScreenState(this.user);
   //String timesnapBirthday='';
   @override
   Widget build(BuildContext context) {
@@ -100,7 +104,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
                               child: Stack(
                                 children: <Widget>[
                                   (avatarImageFile == null)
-                                      ? (widget.user.photoURL != ''
+                                      ? (user.photoURL != ''
                                       ? Material(
                                     child: CachedNetworkImage(
                                       placeholder: (context, url) =>
@@ -115,7 +119,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
                                             height: 70.0,
                                             padding: EdgeInsets.all(20.0),
                                           ),
-                                      imageUrl: widget.user.photoURL,
+                                      imageUrl: user.photoURL,
                                       width: 70.0,
                                       height: 70.0,
                                       fit: BoxFit.cover,
@@ -177,7 +181,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
                                             decoration: inputDecoratio('Full Name'),
                                             controller: controllerFullName,
                                             onChanged: (value) {
-                                              widget.user.fullName = value;
+                                              user.fullName = value;
                                             },
                                             focusNode: focusNodeFullName,
                                           ),
@@ -249,7 +253,7 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
   void _handleRadioValueChange(int value) {
     setState(() {
       _genderValue = value;
-      widget.user.gender =_genderValue;
+     user.gender =_genderValue;
       switch (_genderValue) {
         case 0:
           break;
@@ -259,20 +263,20 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
     });
   }
   void readLocal() async {
-    if(widget.user.gender!=null){
+    if(user.gender!=null){
       setState(() {
-        _genderValue =widget.user.gender;
+        _genderValue =user.gender;
       });
     }else{
       setState(() {
-         widget.user.gender=_genderValue;
+         user.gender=_genderValue;
       });
     }
-    controllerFullName = TextEditingController(text: widget.user.fullName);
-     if(widget.user.birthday.isNotEmpty){
+    controllerFullName = TextEditingController(text: user.fullName);
+     if(user.birthday.isNotEmpty){
        
        setState(() {
-         birthday =Utils().formatTimesnapToDate(int.parse(widget.user.birthday));
+         birthday =Utils().formatTimesnapToDate(int.parse(user.birthday));
        });
 
      }else{
@@ -298,58 +302,9 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
         isLoading = true;
       });
     }
-    uploadFile();
+
+    FirebaseUpload(uploadAvatarCover).uploadFileAvatar(user, avatarImageFile);
   }
-
-  Future uploadFile() async {
-    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDatabaseMethods().getStringPathAvatar(widget.user.id));
-    StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
-    StorageTaskSnapshot storageTaskSnapshot;
-    uploadTask.onComplete.then((value) {
-      if (value.error == null) {
-        storageTaskSnapshot = value;
-        storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-          widget.user.photoURL = downloadUrl;
-          FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({// todo update row document user
-          //  USER_FULLNAME: widget.user.fullName,
-           // USER_GENDER: widget.user.gender,
-            USER_PHOTO_URL: widget.user.photoURL
-          }).then((data) async {
-            //await prefs.setString('photoUrl', photoUrl);
-            ProviderController(context).setAccount(widget.user);
-            updateUserDatabase(widget.user);
-            setState(() {
-              isLoading = false;
-              userChange =true;
-            });
-            Fluttertoast.showToast(msg: "Upload success");
-          }).catchError((err) {
-            setState(() {
-              isLoading = false;
-            });
-            Fluttertoast.showToast(msg: err.toString());
-          });
-        }, onError: (err) {
-          setState(() {
-            isLoading = false;
-          });
-          Fluttertoast.showToast(msg: 'This file is not an image');
-        });
-      } else {
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(msg: 'This file is not an image');
-      }
-    }, onError: (err) {
-      setState(() {
-        isLoading = false;
-
-      });
-      Fluttertoast.showToast(msg: err.toString());
-    });
-  }
-
 
   void handleUpdateData() {
     focusNodeFullName.unfocus();
@@ -359,14 +314,14 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       isLoading = true;
     });
 
-    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(widget.user.id).update({USER_FULLNAME:  widget.user.fullName,USER_GENDER: widget.user.gender,USER_BIRTHDAY:widget.user.birthday, USER_PHOTO_URL: widget.user.photoURL
+    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL
     }).then((data) async {
-      updateUserDatabase(widget.user);
-      ProviderController(context).setAccount(widget.user);
+      updateUserDatabase(user);
+      ProviderController(context).setAccount(user);
 
       setState(() {
         isLoading = false;
-        userModel =widget.user;
+        userModel =user;
         reloadUser =true;
       });
 
@@ -390,7 +345,20 @@ class _UpdateAccountScreenState extends BaseStatefulWidget<UpdateAccountScreen> 
       setState(() {
         selectedDate = picked;
         birthday =Utils().formatDate_dd_mm_yyy(selectedDate);
-        widget.user.birthday =Utils().covertTimesnapToMilliseconds(selectedDate);
+        this.user.birthday =Utils().covertTimesnapToMilliseconds(selectedDate);
       });
+  }
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+    print('uploadCallBack');
+    setState(() {
+      isLoading =false;
+      if(success){
+        ProviderController(context).setAccount(user);
+        userModel =user;
+        updateUserDatabase(user);
+      }
+    });
   }
 }

@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:tchat_app/screens/update_account_screen.dart';
+import 'package:tchat_app/screens/account/update_account_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';

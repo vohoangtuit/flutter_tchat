@@ -8,6 +8,7 @@ class AccountBloc with ChangeNotifier {
 
   setAccount(UserModel userModel){
     this.user =userModel;
+    print('user notify change');
     notifyListeners();
   }
 

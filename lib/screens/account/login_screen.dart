@@ -228,4 +228,9 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     print("profile "+profile.toString());
 
   }
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+    // TODO: implement uploadAvatarCover
+  }
 }

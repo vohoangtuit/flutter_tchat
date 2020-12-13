@@ -8,8 +8,8 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/button.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
-import '../my_profile_screen.dart';
-import '../update_account_screen.dart';
+import '../account/my_profile_screen.dart';
+import '../account/update_account_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override
@@ -21,6 +21,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {
+    userModel =ProviderController(context).getAccount();
     if(userModel==null){
       return Container();
     }else{
@@ -151,5 +152,9 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive =>true;
 
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+    print('uploadCallBack MoreScreen');
+  }
 
 }
