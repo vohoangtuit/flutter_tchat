@@ -78,3 +78,6 @@ class UserModel {
     return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';
   }
 }
+
+
+

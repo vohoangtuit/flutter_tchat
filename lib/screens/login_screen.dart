@@ -95,8 +95,16 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     this.setState(() {
       isLoading = true;
     });
-    GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    GoogleSignInAccount googleUser = await googleSignIn.signIn().then((value) {
+      if(value==null){// todo handle user acction cancel
+        this.setState(() {
+          isLoading = false;
+          return;
+        });
+      }
+    });
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
 
     AuthCredential credential=  GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
@@ -120,9 +128,15 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
           break;
         case FacebookLoginStatus.cancelledByUser:
           print('FacebookLoginStatus cancel');
+          setState(() {
+            isLoading =false;
+          });
           break;
         case FacebookLoginStatus.error:
           print('FacebookLoginStatus error');
+          setState(() {
+            isLoading =false;
+          });
           break;
       }
     }else{
