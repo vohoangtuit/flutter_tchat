@@ -1,9 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -14,9 +14,11 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/firebase_services/upload.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/utils.dart';
 import 'package:tchat_app/widget/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
+import 'package:tchat_app/widget/loading.dart';
 
 import '../../utils/const.dart';
 
@@ -32,8 +34,6 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
   TextEditingController controllerFullName = TextEditingController();
   SharedPreferences prefs;
 
-
-  bool isLoading = false;
   File avatarImageFile;
 
   DateTime selectedDate = DateTime.now();
@@ -68,14 +68,7 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
             ),
             // Loading
             isLoading
-                ? Container(
-                    child: Center(
-                      child: CircularProgressIndicator(
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(themeColor)),
-                    ),
-                    color: Colors.white.withOpacity(0.8),
-                  )
+                ? LoadingCircle()
                 : Container(),
           ],
         ));
@@ -317,14 +310,10 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
     FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL
     }).then((data) async {
       updateUserDatabase(user);
-      ProviderController(context).setAccount(user);
-
       setState(() {
         isLoading = false;
-        userModel =user;
-        reloadUser =true;
       });
-
+      saveAccountToShared(user);
       Fluttertoast.showToast(msg: "Update success");
     }).catchError((err) {
       setState(() {
@@ -355,9 +344,7 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
     setState(() {
       isLoading =false;
       if(success){
-        ProviderController(context).setAccount(user);
-        userModel =user;
-        updateUserDatabase(user);
+        saveAccountToShared(user);
       }
     });
   }

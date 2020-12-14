@@ -1,20 +1,14 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tchat_app/base/account_statefulwidget.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
-import 'package:tchat_app/callback/UserUpload.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
-import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/firebase_services/upload.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/account/update_account_screen.dart';
-import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/sliver_appbar_delegate.dart';
 import 'package:tchat_app/widget/text_style.dart';
+import 'package:tchat_app/widget/loading.dart';
 
 class MyProfileScreen extends StatefulWidget {
   @override
@@ -24,16 +18,21 @@ class MyProfileScreen extends StatefulWidget {
 class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
   ScrollController _scrollController;
   bool lastStatus = true;
-  bool isLoading = false;
+
   File avatarImageFile;
   File coverImageFile;
+  var reload;
 
   @override
   Widget build(BuildContext context) {
-    userModel =ProviderController(context).getAccount();
-    if(userModel==null){
+    //userModel =ProviderController(context).getAccount();
+    if (ProviderController(context).getUserUpdated()) {
+      reload =
+          getAccount(); // todo call back when user update info from other screen
+    }
+    if (userModel == null) {
       return Container();
-    }else{
+    } else {
       return Scaffold(
         body: Stack(
           children: [
@@ -41,7 +40,8 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
               length: 2,
               child: NestedScrollView(
                 controller: _scrollController,
-                headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                headerSliverBuilder:
+                    (BuildContext context, bool innerBoxIsScrolled) {
                   return <Widget>[
                     SliverAppBar(
                       expandedHeight: 225.0,
@@ -71,7 +71,8 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                       ],
                       flexibleSpace: FlexibleSpaceBar(
                         centerTitle: false,
-                        titlePadding: EdgeInsets.only(left: 50,top: 0.0,right: 0.0,bottom: 10.0),
+                        titlePadding: EdgeInsets.only(
+                            left: 50, top: 0.0, right: 0.0, bottom: 10.0),
                         title: Container(
                           // height: 225,
                           alignment: Alignment.bottomLeft,
@@ -87,56 +88,84 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                                     color: const Color(0xff7c94b6),
                                     image: DecorationImage(
                                       image: userModel.photoURL.isEmpty
-                                          ? AssetImage('images/img_not_available.jpeg')
+                                          ? AssetImage(
+                                              'images/img_not_available.jpeg')
                                           : NetworkImage(userModel.photoURL),
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius:
-                                    BorderRadius.all(Radius.circular(36.0)),
+                                        BorderRadius.all(Radius.circular(36.0)),
                                     border: Border.all(
                                       color: Colors.white,
                                       width: 1.0,
                                     ),
                                   ),
                                 ),
-                                onTap:(){
+                                onTap: () {
                                   getImage(true);
                                 },
                               ),
-                              SizedBox(width: 10,),
-                              Text(userModel.fullName, textAlign: TextAlign.center,style:isShrink? mediumTextBlack():mediumTextWhite(),),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                userModel.fullName,
+                                textAlign: TextAlign.center,
+                                style: isShrink
+                                    ? mediumTextBlack()
+                                    : mediumTextWhite(),
+                              ),
                             ],
                           ),
                         ),
                         background: userModel.cover.isEmpty
                             ? InkWell(
-                          child: Image.asset(
-                            'images/cover.png',
-                            fit: BoxFit.cover,
-                          ),
-                          onTap: (){
-                            getImage(false);
-                          },
-                        )
+                                child: Image.asset(
+                                  'images/cover.png',
+                                  fit: BoxFit.cover,
+                                ),
+                                onTap: () {
+                                  getImage(false);
+                                },
+                              )
                             : InkWell(
-                            child: Image.network(
-                              userModel.cover,
-                              fit: BoxFit.cover,
-                            ),
-                            onTap: (){
-                              getImage(false);
-                            }
-                        ),
+                                child: Image.network(
+                                  userModel.cover,
+                                  fit: BoxFit.cover,
+                                ),
+                                onTap: () {
+                                  getImage(false);
+                                }),
                       ),
                     ),
-                    SliverPersistentHeader(// todo using to keep when scroll to top
+                    SliverPersistentHeader(
+                      // todo using to keep when scroll to top
                       delegate: SliverAppBarDelegate(
                         TabBar(
                           labelColor: Colors.black87,
                           unselectedLabelColor: Colors.grey,
+                          indicatorSize: TabBarIndicatorSize.tab,
                           tabs: [
-                            Tab(icon: Icon(Icons.info), text: "Tab 1"),
-                            Tab(icon: Icon(Icons.lightbulb_outline), text: "Tab 2"),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.wysiwyg),
+                                  SizedBox(width: 10,),
+                                  Text("Logs"),
+                                ],
+                              ),
+                            ),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.photo),
+                                  SizedBox(width: 10,),
+                                  Text("Photos"),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -157,24 +186,12 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                 ),
               ),
             ),
-            isLoading
-                ? Container(
-              child: Center(
-                child: CircularProgressIndicator(
-                    valueColor:
-                    AlwaysStoppedAnimation<Color>(themeColor)),
-              ),
-              color: Colors.white.withOpacity(0.8),
-            )
-                : Container(),
+            isLoading ? LoadingCircle() : Container(),
           ],
-
         ),
       );
     }
-
   }
-
 
   @override
   void dispose() {
@@ -191,7 +208,8 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
   }
 
   bool get isShrink {
-    return _scrollController.hasClients && _scrollController.offset > (200 - kToolbarHeight);
+    return _scrollController.hasClients &&
+        _scrollController.offset > (200 - kToolbarHeight);
   }
 
   _scrollListener() {
@@ -201,9 +219,11 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
       });
     }
   }
-  uploadCallBack(UserModel user,bool success){// todo handle upload from other class and callback
 
+  uploadCallBack(UserModel user, bool success) {
+    // todo handle upload from other class and callback
   }
+
   Future getImage(bool avatar) async {
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
@@ -214,31 +234,31 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
 
     if (image != null) {
       setState(() {
-        if(avatar){
+        if (avatar) {
           avatarImageFile = image;
-        }else{
-          coverImageFile =image;
+        } else {
+          coverImageFile = image;
         }
         isLoading = true;
       });
     }
-    if(avatar){
-      FirebaseUpload(uploadAvatarCover).uploadFileAvatar(userModel, avatarImageFile);
-    }else{
-      FirebaseUpload(uploadAvatarCover).uploadFileCover(userModel, coverImageFile);
+    if (avatar) {
+      FirebaseUpload(uploadAvatarCover)
+          .uploadFileAvatar(userModel, avatarImageFile);
+    } else {
+      FirebaseUpload(uploadAvatarCover)
+          .uploadFileCover(userModel, coverImageFile);
     }
   }
+
   @override
   void uploadAvatarCover(UserModel user, bool success) {
     print('uploadCallBack');
     setState(() {
-      isLoading =false;
-      if(success){
-        ProviderController(context).setAccount(user);
-          userModel =user;
-        updateUserDatabase(user);
+      isLoading = false;
+      if (success) {
+        saveAccountToShared(user);
       }
     });
   }
 }
-

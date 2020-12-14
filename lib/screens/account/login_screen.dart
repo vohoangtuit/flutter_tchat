@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,7 +32,7 @@ class LoginScreen extends StatefulWidget {
 
 class LoginScreenState extends AccountBaseState<LoginScreen> {
 
-  bool isLoading = false;
+
   bool isLoggedIn = false;
   User currentUser;
   @override
@@ -84,7 +85,7 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
               ),
             ),
             Positioned(
-              child: isLoading ? const Loading() : Container(),
+              child: isLoading ? const LoadingCircle() : Container(),
             ),
           ],
 
@@ -95,24 +96,26 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     this.setState(() {
       isLoading = true;
     });
-    GoogleSignInAccount googleUser = await googleSignIn.signIn().then((value) {
-      if(value==null){// todo handle user acction cancel
-        this.setState(() {
-          isLoading = false;
-          return;
-        });
-      }
+    GoogleSignInAccount googleUser = await googleSignIn.signIn().catchError((onError){
+      print("onError $onError");
     });
-    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    if(googleUser!=null){
+      GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      AuthCredential credential=  GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      //registerAuthCredential(credential);
+      User firebaseUser = (await firebaseAuth.signInWithCredential(credential)).user;
+      registerAuthCredential(firebaseUser,USER_ACCOUNT_GMAIL);
+    }else{
+      print("GoogleSignInAccount in null");
+          this.setState(() {
+            isLoading = false;
+            return;
+          });
+    }
 
-
-    AuthCredential credential=  GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    //registerAuthCredential(credential);
-     User firebaseUser = (await firebaseAuth.signInWithCredential(credential)).user;
-    registerAuthCredential(firebaseUser,USER_ACCOUNT_GMAIL);
   }
 
   signInFacebook()async{
@@ -175,16 +178,12 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     currentUser = firebaseUser;
     await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
     await SharedPre.saveString(SharedPre.sharedPreID,currentUser.uid);
-    await SharedPre.saveString(SharedPre.sharedPreFullName,currentUser.displayName);
-    await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,currentUser.photoURL);
 
     } else {
     // Write data to local
     await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
     await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()[USER_ID]);
-    await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_FULLNAME]);
-    await SharedPre.saveString(SharedPre.sharedPreFullName,documents[0].data()[USER_PHOTO_URL]);
-    await SharedPre.saveString(SharedPre.sharedPrePhotoUrl,documents[0].data()[USER_EMAIL]);
+
     // todo get data from firebase
     print('USER_PHOTO_URL $USER_PHOTO_URL');
     user = UserModel(
@@ -206,9 +205,7 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
          latitude: 0.0,longitude: 0.0,
     );
     }
-    await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
-
-    await userDao.InsertUser(user);
+    saveAccountToShared(user);
     this.setState(() {
     isLoading = false;
     });
@@ -220,13 +217,6 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     Fluttertoast.showToast(msg: "registerAuthCredential  fail ");
     });
     }
-  }
-  _getFBProfile(String token)async{
-    final graphResponse = await http.get(
-        'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email,picture&access_token=${token}');
-    final profile = JSON.jsonDecode(graphResponse.body);
-    print("profile "+profile.toString());
-
   }
 
   @override

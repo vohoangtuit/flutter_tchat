@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/shared_preferences/shared_preference.dart';
 
 import 'bases_statefulwidget.dart';
 
@@ -20,4 +24,10 @@ abstract class AccountBaseState <T extends StatefulWidget> extends BaseStatefulW
     return super.build(context);
   }
   void uploadAvatarCover(UserModel user,bool success);
+
+  void saveAccountToShared(UserModel user)async{
+    await SharedPre.saveString(SharedPre.sharedPreUSer, jsonEncode(user));
+    ProviderController(context).setUserUpdated(true);
+    getAccount();
+  }
 }

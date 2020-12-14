@@ -23,7 +23,7 @@
           }
         },
         {
-          "client_id": "521036740132-g4fcor3rp271m9klno77g6422hngn15e.apps.googleusercontent.com",
+          "client_id": "521036740132-rg6vlg5nrk4efblj8c558vqjqup9hasn.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "vht.tchat.com",
@@ -48,10 +48,10 @@
               "client_type": 3
             },
             {
-              "client_id": "521036740132-mprn6n3v1qsbvr8p73tcbt62v33hpuur.apps.googleusercontent.com",
+              "client_id": "521036740132-110lfta38pij8cb33svaasin6lo3ompj.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "vht.tchat.com"
+                "bundle_id": "vht.tchatapp.com"
               }
             }
           ]

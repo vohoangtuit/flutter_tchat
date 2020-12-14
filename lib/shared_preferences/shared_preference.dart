@@ -8,6 +8,7 @@ class SharedPre {
   static String sharedPreUserEmail="USER_EMAIL";
 
   static String sharedPreAccountType="USER_ACCOUNT_TYPE";
+  static String sharedPreUSer="USER";
 
   static String sharedPreID ="id";
   static String sharedPreFullName ="fullName";
@@ -49,4 +50,6 @@ class SharedPre {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.clear();
   }
+
+
 }

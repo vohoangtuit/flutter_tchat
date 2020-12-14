@@ -68,7 +68,8 @@ class _SettingScreenState extends AccountBaseState<SettingScreen> {
     setState(() {
       isLoading = false;
     });
-    await SharedPre.clearData();
+
+  await SharedPre.clearData();
     openMyAppAndRemoveAll();
   }
 

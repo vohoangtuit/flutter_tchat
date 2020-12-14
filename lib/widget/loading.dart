@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../utils/const.dart';
 
-class Loading extends StatelessWidget {
-  const Loading();
+class LoadingCircle extends StatelessWidget {
+  const LoadingCircle();
 
   @override
   Widget build(BuildContext context) {

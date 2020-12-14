@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -31,82 +33,89 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   FirebaseFirestore fireBaseStore;
   FirebaseFirestore userRef;
   FirebaseFirestore msgRef;
-
+  bool isLoading=false;
   TChatAppDatabase tChatAppDatabase;
   UserDao userDao;
   UserModel userModel;
   MessageDao messageDao;
   LastMessageDao lastMessageDao;
 
-  bool userChange =false;
-
   String languageCode ='';
-  var reloadUser;
 
-  // AccountBloc accountBloc;
-  // ReloadMessage reloadMessage;
   @override
   Widget build(BuildContext context) {
-    userModel =ProviderController(context).getAccount();
-    if(userChange){
-      this.reloadUser =reloadUserData();
-    }
-    return ChangeNotifierProvider<AccountBloc>(
-      create: (_) => AccountBloc(),
-      child: Stack(
-        children: <Widget>[
-          Container(
-          )
-        ],
-      ),
+    //print('base BuildContext ');
+    return Stack(
+      children: <Widget>[
+        Container(
+        )
+      ],
     );
   }
 
   @override
   void initState() {
+    initConfig();
     super.initState();
-    //print('base initState userModel '+userModel.toString());
   }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    //print('base didChangeDependencies '+onStart.toString());
-    if(!onStart){
-      initConfig();
-    }
   }
 
+  Future<UserModel>getAccount() async{
+   Map<String, dynamic> userShared;
+   final String userStr = await SharedPre.getStringKey(SharedPre.sharedPreUSer);
+   if (userStr != null) {
+     userShared = jsonDecode(userStr) as Map<String, dynamic>;
+   }
+   if (userShared != null) {
+     setState(() {
+       userModel = UserModel.fromJson(userShared);
+     });
+   }
+   return userModel;
+  }
   void initConfig()async{
-   // print('base initConfig');
+    //print('base initConfig');
     progressBar = ProgressBar();
     baseStatefulState=this;
     fireBaseStore = FirebaseFirestore.instance;
-
-    initDataBase();
     await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
       if(value==null){
         return;
       }else if(value==false){
         return;
       }else{
-        getUserAccount();
+        getAccount();
       }
     });
+    initDataBase();
   }
-   reloadUserData(){
-     print('reloadUserData');
-    getUserAccount();
-    setState(() {
-      reloadUser =false;
+
+
+  void initDataBase()async{
+    //-- todo: database change  reRunning rebuild
+    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
+    userDao = tChatAppDatabase.userDao;
+    messageDao =tChatAppDatabase.messageDao;
+    lastMessageDao =tChatAppDatabase.lastMessageDao;
+
+   // getUserAccount();
+    await SharedPre.getStringKey(SharedPre.sharedPreLanguageCode).then((value) {
+      setState(() {
+        languageCode =value;
+      });
     });
   }
-  void getUserAccount()async{
+  void getUserAccountDatabase()async{
     print('get user');
     String id='';
     if(userModel==null){
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
       });
+
       await userDao.findUserById(id).then((value) {
         if(value!=null){
           setState(() {
@@ -118,25 +127,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
       });
     }
   }
-  void initDataBase()async{
-    //-- todo: database change  reRunning rebuild
-    tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
-    userDao = tChatAppDatabase.userDao;
-    messageDao =tChatAppDatabase.messageDao;
-    lastMessageDao =tChatAppDatabase.lastMessageDao;
-    await SharedPre.getStringKey(SharedPre.sharedPreLanguageCode).then((value) {
-      setState(() {
-        languageCode =value;
-      });
-    });
-  }
-  // // @override
-  // void dispose(){
-  //   super.dispose();
-  //   if(progressBar!=null){
-  //     progressBar.hide();
-  //   }
-  // }
   void updateLastMessageByID(LastMessageModel message) async{
    await lastMessageDao.getLastMessageById(message.idReceiver).then((value){
      // print("value "+value.toString());
@@ -150,7 +140,7 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
           });
       }
     });
-   ProviderController(context).setReloadLastMessage(true);
+ //  ProviderController(context).setReloadLastMessage(true);
   }
 
   void showLoading() {

@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
@@ -244,17 +245,14 @@ class _ChatScreenState extends AccountBaseState {
         message.status =change.data()[MESSAGE_STATUS];
       });
       updateLastMessageByID(message);
-     // ProviderController(context).setReloadLastMessage(true);
+      ProviderController(context).setReloadLastMessage(true);
     });
-
   }
 
   void getMessage() {
     firebaseDatabaseMethods
         .getMessageChat(userModel.id, idReceiver)
         .then((data) {
-      //
-   //   print('data '+data.toString());
       setState(() {
         chatStream =data;
        // if(data.)
@@ -485,7 +483,7 @@ class _ChatScreenState extends AccountBaseState {
 
   Widget buildLoading() {
     return Positioned(
-      child: isLoading ? const Loading() : Container(),
+      child: isLoading ? const LoadingCircle() : Container(),
     );
   }
 

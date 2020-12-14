@@ -19,9 +19,12 @@ class MoreScreen extends StatefulWidget {
 class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAliveClientMixin{
 
   bool isLoading = false;
+  var reload;
   @override
   Widget build(BuildContext context) {
-    userModel =ProviderController(context).getAccount();
+   if(ProviderController(context).getUserUpdated()){
+     reload =getAccount();// todo call back when user update info from other screen
+   }
     if(userModel==null){
       return Container();
     }else{
@@ -74,6 +77,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
         child: Container(
           margin: EdgeInsets.only(left: 10.0,top: 10.0,right: 10.0,bottom: 10.0),
           child: Row(
+
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(36.0),
@@ -81,7 +85,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
                   Icons.account_circle,
                   size: 50.0,
                   color: greyColor2,
-                ):Image.network(userModel.photoURL,width: 50,height: 50,),
+                ):Image.network(userModel.photoURL,width: 50,height: 50,fit: BoxFit.cover),
               ),
               SizedBox(width: 20,),
               Expanded(
@@ -149,8 +153,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
   }
 
   @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive =>true;
+  bool get wantKeepAlive => true;
 
   @override
   void uploadAvatarCover(UserModel user, bool success) {

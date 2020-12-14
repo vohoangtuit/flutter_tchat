@@ -84,7 +84,7 @@ class _$TChatAppDatabase extends TChatAppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER, `latitude` REAL, `longitude` REAL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
         await database.execute(
@@ -138,7 +138,9 @@ class _$UserDao extends UserDao {
                   'accountType': item.accountType,
                   'allowSearch': item.allowSearch == null
                       ? null
-                      : (item.allowSearch ? 1 : 0)
+                      : (item.allowSearch ? 1 : 0),
+                  'latitude': item.latitude,
+                  'longitude': item.longitude
                 }),
         _userModelUpdateAdapter = UpdateAdapter(
             database,
@@ -163,7 +165,9 @@ class _$UserDao extends UserDao {
                   'accountType': item.accountType,
                   'allowSearch': item.allowSearch == null
                       ? null
-                      : (item.allowSearch ? 1 : 0)
+                      : (item.allowSearch ? 1 : 0),
+                  'latitude': item.latitude,
+                  'longitude': item.longitude
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -198,7 +202,9 @@ class _$UserDao extends UserDao {
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
-                : (row['allowSearch'] as int) != 0));
+                : (row['allowSearch'] as int) != 0,
+            latitude: row['latitude'] as double,
+            longitude: row['longitude'] as double));
   }
 
   @override
@@ -224,7 +230,9 @@ class _$UserDao extends UserDao {
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
-                : (row['allowSearch'] as int) != 0));
+                : (row['allowSearch'] as int) != 0,
+            latitude: row['latitude'] as double,
+            longitude: row['longitude'] as double));
   }
 
   @override
@@ -249,7 +257,9 @@ class _$UserDao extends UserDao {
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
-                : (row['allowSearch'] as int) != 0));
+                : (row['allowSearch'] as int) != 0,
+            latitude: row['latitude'] as double,
+            longitude: row['longitude'] as double));
   }
 
   @override

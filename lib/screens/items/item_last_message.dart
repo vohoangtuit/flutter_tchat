@@ -32,7 +32,7 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
                   child: Container(
                     padding: EdgeInsets.only(left: 8.0,top: 0.0,right: 40.0,bottom: 0.0),
                     child: Column(
-                     // crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(message.nameReceiver,style: normalTextBlack(), overflow: TextOverflow.ellipsis, maxLines: 1,),
                         SizedBox(height: 5,),

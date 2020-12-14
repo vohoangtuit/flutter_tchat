@@ -304,7 +304,7 @@ class HomeScreenState extends State<HomeScreen> {
 
             // Loading
             Positioned(
-              child: isLoading ? const Loading() : Container(),
+              child: isLoading ? const LoadingCircle() : Container(),
             )
           ],
         ),

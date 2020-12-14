@@ -28,4 +28,12 @@ class ProviderController{
     return Provider.of<AccountBloc>(context,listen: false).getAccount();
    // return Provider.of<AccountBloc>(context).user;
   }
+
+  setUserUpdated(bool update){
+    Provider.of<AccountBloc>(context, listen: false).setUserUpdated(update);
+  }
+  bool getUserUpdated(){
+    return  Provider.of<AccountBloc>(context, listen: false).getUserUpdated();
+    //return  Provider.of<ReloadMessage>(context).reloadMessage;
+  }
 }
