@@ -189,7 +189,7 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
       ],)),
       Tab(child: Column(children: [
           SizedBox(height: 5,),
-          Icon(Icons.category, color: tabController.index == 4 ? Colors.blue : Colors.grey),
+          Icon(Icons.category_outlined, color: tabController.index == 4 ? Colors.blue : Colors.grey),
           Text("More"),
         ],)),
     ];

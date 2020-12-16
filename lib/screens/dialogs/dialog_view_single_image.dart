@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:tchat_app/base/base_dialog.dart';
 class DialogViewSingleImage extends BaseDialog {
   final String url;
@@ -28,10 +29,29 @@ class DialogViewSingleImage extends BaseDialog {
 
   Widget initUI() {
     return Container(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Center(
+                child: Container(
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height - 80,
+                  child: url.isNotEmpty ?
+                  PhotoView(
+                    maxScale: PhotoViewComputedScale.covered * 2.0,
+                    minScale: PhotoViewComputedScale.contained * 0.8,
+                    initialScale: PhotoViewComputedScale.contained * 0.8, imageProvider: NetworkImage(url),)
+                      : Image.asset('images/image_not-available.png', fit: BoxFit.fitHeight,
+                  ),),
+
+              ),
+            ],
+          ),
           Container(
             width: 50,
             height: 50,
@@ -50,26 +70,8 @@ class DialogViewSingleImage extends BaseDialog {
               },
             ),
           ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Center(
-                child: Container(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height - 80,
-                  child: url.isNotEmpty ? Image.network(
-                    url, fit: BoxFit.fitHeight,) : Image.asset(
-                    'images/cover.png',
-                    fit: BoxFit.cover,
-                  ),),
-
-              ),
-            ],
-          ),
         ],
+
       ),);
 
   }

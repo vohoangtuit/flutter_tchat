@@ -1,5 +1,9 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tchat_app/utils/const.dart';
 
 Widget materialApp(BuildContext context, String title) {
   return MaterialApp(
@@ -93,5 +97,46 @@ Container iconEditInfo(){
   return Container(
       alignment: Alignment.centerRight,
       child: Image.asset('images/icons/ic_pen_gray.png',width: 15,height: 15,)
+  );
+}
+CachedNetworkImage cachedImage (String url,double width, double height){
+  return CachedNetworkImage(
+    placeholder: (context, url) =>
+        Container(
+          child: CircularProgressIndicator(
+            strokeWidth: 2.0,
+            valueColor:
+            AlwaysStoppedAnimation<Color>(
+                themeColor),
+          ),
+          width: width,
+          height: height,
+          padding: EdgeInsets.all(20.0),
+        ),
+    imageUrl: url,
+    width: width,
+    height: height,
+    fit: BoxFit.cover,
+  );
+ }
+ Icon iconNoImage(double size){
+  return Icon(
+    Icons.account_circle,
+    size:size,
+    color: greyColor,
+  );
+ }
+
+Material loadFileMaterial(File file, double width, double height){
+ return Material(
+    child: Image.file(
+      file,
+      width: width,
+      height: height,
+      fit: BoxFit.cover,
+    ),
+    borderRadius:
+    BorderRadius.all(Radius.circular(45.0)),
+    clipBehavior: Clip.hardEdge,
   );
 }

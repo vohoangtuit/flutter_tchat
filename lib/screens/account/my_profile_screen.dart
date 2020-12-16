@@ -89,22 +89,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                 child: Container(
                                   width: 36.0,
                                   height: 36.0,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xff7c94b6),
-                                    image: DecorationImage(
-                                      image: userModel.photoURL.isEmpty
-                                          ? AssetImage(
-                                              'images/img_not_available.jpeg')
-                                          : CachedNetworkImageProvider( userModel.photoURL),
-
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(36.0)),
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1.0,
-                                    ),
+                                  child: CircleAvatar(
+                                    radius: 30.0,
+                                    backgroundImage:  userModel.photoURL.isEmpty ? AssetImage('images/img_not_available.jpeg'):NetworkImage(userModel.photoURL),
+                                    backgroundColor: Colors.transparent,
                                   ),
                                 ),
                                 onTap: () {

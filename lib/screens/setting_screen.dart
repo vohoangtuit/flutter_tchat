@@ -8,6 +8,9 @@ import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/button.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/widget/custom_row_setting.dart';
+
+import 'account/update_account_screen.dart';
 
 class SettingScreen extends StatefulWidget {
   @override
@@ -21,58 +24,38 @@ class _SettingScreenState extends AccountBaseState<SettingScreen> {
     return Scaffold(
       appBar: appBarWithTitle(context,'Settings'),
       body: Container(
-        child: Column(
-          children: [
-            NormalButton(title: 'LogOut',onPressed: (){
-              checkAccountForLogout();
-            },),
-          ],
-        ),
+        child: initUI(),
       ),
     );
   }
-  checkAccountForLogout()async{
-    await SharedPre.getIntKey(SharedPre.sharedPreAccountType).then((value) {
-      if(value!=null){
-        if(value==USER_ACCOUNT_FACEBOOK){
-          logOutFacebook();
-        }
-        else if(value==USER_ACCOUNT_GMAIL){
-          logoutGoogle();
-        }else{
-          print('please check again account type');
-        }
-      }
-    });
+Widget initUI(){
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          CustomRowSetting(
+            onPressed: (){
+              openScreen(UpdateAccountScreen(userModel));
+            },
+            title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
+          ),
+          CustomRowSetting(
+            onPressed: (){
+              messageDao.deleteAllMessage();
+              lastMessageDao.deleteAllLastMessage();
+              // todo handle clear on firebase
+              ProviderController(context).setReloadLastMessage(true);
+            },
+            title: 'Clear Data Chat', icon: 'images/icons/ic_remove_red.png',
+          ),
+          CustomRowSetting(
+            onPressed: (){
+              checkAccountForLogout();
+            },
+            title: 'Logout', icon: 'images/icons/ic_logout.png',
+          ),
+
+        ],
+      ),
+    );
   }
-  Future<Null> logoutGoogle() async {
-    this.setState(() {
-      isLoading = true;
-    });
-
-    await firebaseAuth.signOut();
-    await googleSignIn.disconnect();
-    await googleSignIn.signOut();
-    await SharedPre.clearData();
-
-    this.setState(() {
-      isLoading = false;
-      userModel =null;
-    });
-
-    openMyAppAndRemoveAll();
-  }
-  Future<void> logOutFacebook() async {
-    setState(() {
-      isLoading = true;
-    });
-    await facebookLogin.logOut();
-    setState(() {
-      isLoading = false;
-    });
-
-  await SharedPre.clearData();
-    openMyAppAndRemoveAll();
-  }
-
 }
