@@ -8,13 +8,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tchat_app/base/account_statefulwidget.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
+
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/firebase_services/upload.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/account/base_account_update.dart';
+import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/utils/camera_library_open.dart';
 import 'package:tchat_app/utils/utils.dart';
 import 'package:tchat_app/widget/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
@@ -29,7 +31,7 @@ class UpdateAccountScreen extends StatefulWidget {
   _UpdateAccountScreenState createState() => _UpdateAccountScreenState(user);
 }
 
-class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
+class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   final UserModel user;
   TextEditingController controllerFullName = TextEditingController();
   SharedPreferences prefs;
@@ -43,12 +45,14 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
   int _genderValue = 0;
   String birthday ='';
   String oldAvatar='';
-
   _UpdateAccountScreenState(this.user);
-  //String timesnapBirthday='';
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    if (ProviderController(context).getUserUpdated()) {
+      reload = getAccount(); // todo call back when user update info from other screen
+    }
+    return userModel==null?Container():Scaffold(
         appBar: appBarWithTitleCenter(context, 'Profile Information'),
         //  body: UpdateScreen(),
         body: Stack(
@@ -92,13 +96,13 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
                       Container(
                         child: Row(
                           children: [
-                            GestureDetector(
-                              onTap: getImage,
+                            InkWell(
+                              onTap: (){
+                                DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_AVATAR, viewDialogPicture);
+                              },
                               child: Stack(
                                 children: <Widget>[
-                                  (avatarImageFile == null)
-                                      ? (user.photoURL != ''
-                                      ? Material(
+                                  (avatarImageFile == null) ? (user.photoURL != '' ? Material(
                                     child: CachedNetworkImage(
                                       placeholder: (context, url) =>
                                           Container(
@@ -120,13 +124,11 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(45.0)),
                                     clipBehavior: Clip.hardEdge,
-                                  )
-                                      : Icon(
+                                  ) : Icon(
                                     Icons.account_circle,
                                     size: 70.0,
                                     color: greyColor,
-                                  ))
-                                      : Material(
+                                  )) : Material(
                                     child: Image.file(
                                       avatarImageFile,
                                       width: 70.0,
@@ -243,6 +245,7 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
     super.initState();
     readLocal();
   }
+
   void _handleRadioValueChange(int value) {
     setState(() {
       _genderValue = value;
@@ -281,24 +284,6 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
 
   }
 
-  Future getImage() async {
-    ImagePicker imagePicker = ImagePicker();
-    PickedFile pickedFile;
-
-    pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
-
-    File image = File(pickedFile.path);
-
-    if (image != null) {
-      setState(() {
-        avatarImageFile = image;
-        isLoading = true;
-      });
-    }
-
-    FirebaseUpload(uploadAvatarCover).uploadFileAvatar(user, avatarImageFile);
-  }
-
   void handleUpdateData() {
     focusNodeFullName.unfocus();
     focusNodeAboutMe.unfocus();
@@ -309,7 +294,7 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
 
     FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL
     }).then((data) async {
-      updateUserDatabase(user);
+     // updateUserDatabase(user);
       setState(() {
         isLoading = false;
       });
@@ -347,5 +332,43 @@ class _UpdateAccountScreenState extends AccountBaseState<UpdateAccountScreen> {
         saveAccountToShared(user);
       }
     });
+  }
+
+  @override
+  void callBackCamera(File file, type) {
+    setState(() {
+      isLoading =false;
+    });
+    if(file!=null){
+      setState(() {
+        isLoading =true;
+        avatarImageFile =file;
+      });
+      if(type ==PICTURE_TYPE_AVATAR){
+        FirebaseUpload(uploadAvatarCover)
+            .uploadFileAvatar(userModel, file);
+      }else{
+        FirebaseUpload(uploadAvatarCover)
+            .uploadFileCover(userModel, file);
+      }
+    }
+  }
+
+  @override
+  void callBackLibrary(File file, type) {
+    setState(() {
+      isLoading =false;
+    });
+    if(file!=null){
+      setState(() {
+        isLoading =true;
+        avatarImageFile =file;
+      });
+      if(type ==PICTURE_TYPE_AVATAR){
+        FirebaseUpload(uploadAvatarCover).uploadFileAvatar(userModel, file);
+      }else{
+        FirebaseUpload(uploadAvatarCover).uploadFileCover(userModel, file);
+      }
+    }
   }
 }

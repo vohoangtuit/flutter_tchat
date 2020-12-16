@@ -1,34 +1,39 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/upload.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/account/update_account_screen.dart';
+import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
+import 'package:tchat_app/utils/camera_library_open.dart';
+import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/sliver_appbar_delegate.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/loading.dart';
+
+import 'base_account_update.dart';
 
 class MyProfileScreen extends StatefulWidget {
   @override
   _MyProfileScreenState createState() => _MyProfileScreenState();
 }
 
-class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
+class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
   ScrollController _scrollController;
   bool lastStatus = true;
 
   File avatarImageFile;
   File coverImageFile;
-  var reload;
 
   @override
   Widget build(BuildContext context) {
     //userModel =ProviderController(context).getAccount();
     if (ProviderController(context).getUserUpdated()) {
-      reload =
-          getAccount(); // todo call back when user update info from other screen
+      reload = getAccount(); // todo call back when user update info from other screen
     }
     if (userModel == null) {
       return Container();
@@ -40,8 +45,8 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
               length: 2,
               child: NestedScrollView(
                 controller: _scrollController,
-                headerSliverBuilder:
-                    (BuildContext context, bool innerBoxIsScrolled) {
+                headerSliverBuilder: (BuildContext context_, bool innerBoxIsScrolled) {
+                  context =context_;
                   return <Widget>[
                     SliverAppBar(
                       expandedHeight: 225.0,
@@ -90,7 +95,8 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                                       image: userModel.photoURL.isEmpty
                                           ? AssetImage(
                                               'images/img_not_available.jpeg')
-                                          : NetworkImage(userModel.photoURL),
+                                          : CachedNetworkImageProvider( userModel.photoURL),
+
                                       fit: BoxFit.cover,
                                     ),
                                     borderRadius:
@@ -102,7 +108,7 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                                   ),
                                 ),
                                 onTap: () {
-                                  getImage(true);
+                                  DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_AVATAR, viewDialogPicture);
                                 },
                               ),
                               SizedBox(
@@ -125,16 +131,15 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
                                   fit: BoxFit.cover,
                                 ),
                                 onTap: () {
-                                  getImage(false);
+                                  DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_COVER, viewDialogPicture);
                                 },
                               )
                             : InkWell(
-                                child: Image.network(
-                                  userModel.cover,
-                                  fit: BoxFit.cover,
-                                ),
+                                child:
+                                //CachedNetworkImageProvider(userModel.cover),
+                                Image.network(userModel.cover, fit: BoxFit.cover,),
                                 onTap: () {
-                                  getImage(false);
+                                  DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_COVER, viewDialogPicture);
                                 }),
                       ),
                     ),
@@ -201,6 +206,7 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
 
   @override
   void initState() {
+
     //print('profile '+userModel.toString());
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
@@ -219,38 +225,6 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
       });
     }
   }
-
-  uploadCallBack(UserModel user, bool success) {
-    // todo handle upload from other class and callback
-  }
-
-  Future getImage(bool avatar) async {
-    ImagePicker imagePicker = ImagePicker();
-    PickedFile pickedFile;
-
-    pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
-
-    File image = File(pickedFile.path);
-
-    if (image != null) {
-      setState(() {
-        if (avatar) {
-          avatarImageFile = image;
-        } else {
-          coverImageFile = image;
-        }
-        isLoading = true;
-      });
-    }
-    if (avatar) {
-      FirebaseUpload(uploadAvatarCover)
-          .uploadFileAvatar(userModel, avatarImageFile);
-    } else {
-      FirebaseUpload(uploadAvatarCover)
-          .uploadFileCover(userModel, coverImageFile);
-    }
-  }
-
   @override
   void uploadAvatarCover(UserModel user, bool success) {
     print('uploadCallBack');
@@ -261,4 +235,40 @@ class _MyProfileScreenState extends AccountBaseState<MyProfileScreen> {
       }
     });
   }
+  @override
+  void callBackCamera(File file, type) {
+    setState(() {
+      isLoading =false;
+    });
+    if(file!=null){
+      setState(() {
+        isLoading =true;
+      });
+      if(type ==PICTURE_TYPE_AVATAR){
+        FirebaseUpload(uploadAvatarCover)
+            .uploadFileAvatar(userModel, file);
+      }else{
+        FirebaseUpload(uploadAvatarCover)
+            .uploadFileCover(userModel, file);
+      }
+    }
+  }
+
+  @override
+  void callBackLibrary(File file, type) {
+    setState(() {
+      isLoading =false;
+    });
+    if(file!=null){
+      setState(() {
+        isLoading =true;
+      });
+      if(type ==PICTURE_TYPE_AVATAR){
+        FirebaseUpload(uploadAvatarCover).uploadFileAvatar(userModel, file);
+      }else{
+        FirebaseUpload(uploadAvatarCover).uploadFileCover(userModel, file);
+      }
+    }
+  }
+
 }

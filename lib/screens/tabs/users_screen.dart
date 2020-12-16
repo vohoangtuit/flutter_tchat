@@ -20,7 +20,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
-import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
 import '../../main.dart';
 
@@ -104,14 +104,8 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
       },
     );
   }
-
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-
-  @override
-  void uploadAvatarCover(UserModel user, bool success) {
-    // TODO: implement uploadAvatarCover
-  }
 
 }

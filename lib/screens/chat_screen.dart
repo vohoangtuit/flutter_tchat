@@ -11,7 +11,7 @@ import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
@@ -725,6 +725,11 @@ class _ChatScreenState extends AccountBaseState {
   @override
   void uploadAvatarCover(UserModel user, bool success) {
     // TODO: implement uploadAvatarCover
+  }
+
+  @override
+  void callBackCamera(File file, type) {
+    // TODO: implement callBackCamera
   }
 
 }

@@ -1,6 +1,9 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -18,7 +21,6 @@ class MoreScreen extends StatefulWidget {
 
 class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAliveClientMixin{
 
-  bool isLoading = false;
   var reload;
   @override
   Widget build(BuildContext context) {
@@ -85,7 +87,12 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
                   Icons.account_circle,
                   size: 50.0,
                   color: greyColor2,
-                ):Image.network(userModel.photoURL,width: 50,height: 50,fit: BoxFit.cover),
+                ):
+                CachedNetworkImage(
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  imageUrl: userModel.photoURL,width: 50,height: 50,
+                ),
+                //Image.network(userModel.photoURL,width: 50,height: 50,fit: BoxFit.cover),
               ),
               SizedBox(width: 20,),
               Expanded(
@@ -110,18 +117,14 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
     );
   }
   checkAccountForLogout()async{
-    await SharedPre.getIntKey(SharedPre.sharedPreAccountType).then((value) {
-      if(value!=null){
-        if(value==USER_ACCOUNT_FACEBOOK){
-          logOutFacebook();
-        }
-        else if(value==USER_ACCOUNT_GMAIL){
-          logoutGoogle();
-        }else{
-          print('please check again account type');
-        }
-      }
-    });
+    print('Logout ${userModel.accountType}');
+    if(userModel.accountType==USER_ACCOUNT_FACEBOOK){
+      logOutFacebook();
+    }else if(userModel.accountType==USER_ACCOUNT_GMAIL){
+      logoutGoogle();
+    }else{
+      print('unknow type');
+    }
   }
   Future<Null> logoutGoogle() async {
     this.setState(() {
@@ -154,10 +157,5 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
 
   @override
   bool get wantKeepAlive => true;
-
-  @override
-  void uploadAvatarCover(UserModel user, bool success) {
-    print('uploadCallBack MoreScreen');
-  }
 
 }

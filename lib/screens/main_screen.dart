@@ -18,6 +18,9 @@ import 'package:tchat_app/screens/tabs/users_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
+
+import 'dialogs/dialog_base_notify.dart';
+import 'dialogs/dialog_controller.dart';
 class MainScreen extends StatefulWidget {
    bool synData;
   MainScreen( this.synData);
@@ -103,6 +106,14 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
   handleClick(int click){
     if(click==MAIN_CLICK_SETTING_TAB_MORE){
       openScreen(SettingScreen());
+    }
+    if(click==MAIN_CLICK_EDIT_TAB_TIME_LINE){
+      //showBaseDialog('Edit','tab timeline',);
+      DialogController(context).showBaseNotification(dialog, 'Edit', 'tab timeline');
+    }
+    if(click==MAIN_CLICK_NOTIFICATION_TAB_TIME_LINE){
+     // showBaseDialog('notification', 'tab timeline',);
+      DialogController(context).showBaseNotification(dialog, 'notification', 'tab timeline');
     }
   }
   @override

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,11 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:tchat_app/base/account_statefulwidget.dart';
+import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
@@ -30,7 +32,7 @@ class LoginScreen extends StatefulWidget {
   LoginScreenState createState() => LoginScreenState();
 }
 
-class LoginScreenState extends AccountBaseState<LoginScreen> {
+class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
 
 
   bool isLoggedIn = false;
@@ -185,7 +187,7 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
     await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()[USER_ID]);
 
     // todo get data from firebase
-    print('USER_PHOTO_URL $USER_PHOTO_URL');
+
     user = UserModel(
         id:documents[0].data()[USER_ID],
         userName:documents[0].data()[USER_USERNAME],
@@ -205,6 +207,7 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
          latitude: 0.0,longitude: 0.0,
     );
     }
+   // await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
     saveAccountToShared(user);
     this.setState(() {
     isLoading = false;
@@ -220,7 +223,18 @@ class LoginScreenState extends AccountBaseState<LoginScreen> {
   }
 
   @override
-  void uploadAvatarCover(UserModel user, bool success) {
-    // TODO: implement uploadAvatarCover
+  void callBackCamera(File file, type) {
+
   }
+
+  @override
+  void uploadAvatarCover(UserModel user, bool success) {
+
+  }
+
+  @override
+  void callBackLibrary(File file, type) {
+    // TODO: implement callBackLibrary
+  }
+
 }

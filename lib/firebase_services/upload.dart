@@ -22,12 +22,10 @@ class FirebaseUpload{
       if (value.error == null) {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-
           FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({// todo update row document user
             USER_PHOTO_URL: user.photoURL
           }).then((data) async {
             user.photoURL = downloadUrl;
-
             callback(user,true);
             Fluttertoast.showToast(msg: "Upload success");
           }).catchError((err) {
@@ -56,9 +54,8 @@ class FirebaseUpload{
       if (value.error == null) {
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-
           FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({// todo update row document user
-            USER_PHOTO_URL: user.cover
+            USER_COVER: user.cover
           }).then((data) async {
             user.cover = downloadUrl;
             callback(user,true);

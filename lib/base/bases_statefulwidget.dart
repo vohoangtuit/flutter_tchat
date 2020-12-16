@@ -22,7 +22,8 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/progressbar.dart';
 
 import '../main.dart';
-import 'dialog.dart';
+import '../screens/dialogs/dialog_base_notify.dart';
+import 'base_dialog.dart';
 typedef Int2VoidFunc = void Function(String);
 abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   BaseDialog  dialog;
@@ -169,18 +170,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
       });
     }
   }
-  showBaseDialog(String title,String description){
-    if(dialog!=null){
-      dialog.dismiss();
-    }
-    dialog = new BaseDialog(title: title, description: description);
-    showDialog(
-     // barrierDismissible: false,// touch outside dismiss
-      context: context,
-      builder: (BuildContext context) => dialog
-    );
-  }
-
   openMyAppAndRemoveAll(){
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => MyApp()),
