@@ -113,6 +113,26 @@ class UserModel {
       latitude: json[USER_LOCATION_LAT],
       longitude: json[USER_LOCATION_LONG]);
 
+  factory UserModel.fromDocumentSnapshot (DocumentSnapshot doc) =>UserModel(
+      id: doc[USER_ID],
+      userName: doc[USER_USERNAME],
+      fullName: doc[USER_FULLNAME],
+      birthday: doc[USER_BIRTHDAY],
+      gender: doc[USER_GENDER],
+      email: doc[USER_EMAIL],
+      photoURL: doc[USER_PHOTO_URL],
+      cover: doc[USER_COVER],
+      statusAccount: doc[USER_STATUS_ACCOUNT],
+      phoneNumber: doc[USER_PHONE],
+      createdAt: doc[USER_CREATED_AT],
+      pushToken: doc[USER_PUST_TOKEN],
+      isLogin: doc[USER_ISlOGIN] as bool,
+      accountType: doc[USER_ACCOUNT_TYPE],
+      allowSearch: doc[USER_ALLOW_SEARCH] as bool,
+      latitude: doc[USER_LOCATION_LAT],
+      longitude: doc[USER_LOCATION_LONG]
+  );
+
   @override
   String toString() {
     return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';

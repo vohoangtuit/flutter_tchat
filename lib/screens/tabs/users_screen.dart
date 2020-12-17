@@ -54,37 +54,14 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
   }
 
   getData() async {
-//    await Future.delayed(const Duration(seconds: 2), () {
-//      showLoading();
-//    });
-    firebaseDatabaseMethods.getAllUser().then((data) {
+
+    firebaseDataService.getAllUser().then((data) {
       setState(() {
         streamUsers = data;
       });
       hideLoading();
     });
 
-    // todo: detect data to other use
-    // final QuerySnapshot result = await firebaseDatabaseMethods.getAllUser();
-    // final List<DocumentSnapshot> documents = result.docs;
-    // if (documents.isNotEmpty) {
-    //   for (DocumentSnapshot doc in documents) {
-    //     UserModel userModel = UserModel(
-    //       id: doc.data()[USER_ID],
-    //       userName: doc.data()[USER_USERNAME],
-    //       fullName: doc.data()[USER_FULLNAME],
-    //       birthday: doc.data()[USER_BIRTHDAY],
-    //       email: doc.data()[USER_EMAIL],
-    //       photoURL: doc.data()[USER_PHOTO_URL],
-    //       statusAccount: doc.data()[USER_STATUS_ACCOUNT],
-    //       phoneNumber: doc.data()[USER_PHONE],
-    //       createdAt: doc.data()[USER_CREATED_AT],
-    //       pushToken: doc.data()[USER_ISlOGIN],
-    //     );
-    //   }
-    //   listUser.add(userModel);
-    // }
-    // print("listUse "+listUser.toString());
   }
 
   Widget userList() {
@@ -94,11 +71,11 @@ class UsersScreenState extends AccountBaseState<UsersScreen> with AutomaticKeepA
         return snapshot.hasData
             ? ListView.builder(
                 shrinkWrap: true,
-                padding: EdgeInsets.all(10.0),
+                padding: EdgeInsets.all(4.0),
                 itemCount: snapshot.data.documents.length,
                 // snapshot.data.documents.length
                 itemBuilder: (context, index) => ItemUser(
-                    context, snapshot.data.documents[index], userModel),
+                    context, snapshot.data.documents[index], userModel,false),
               )
             : Container();
       },

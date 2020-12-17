@@ -56,7 +56,7 @@ TextStyle mediumTextWhite() {
   return TextStyle(color: Colors.white, fontSize: 16);
 }
 TextStyle textHeaderBar() {
-  return TextStyle(color: Colors.white70, fontSize: 15,decoration: TextDecoration.none);
+  return TextStyle(color: Colors.white70, fontSize: 17,decoration: TextDecoration.none);
 }
 TextStyle smallTextRed() {
   return TextStyle(color: Colors.red, fontSize: 12);
@@ -73,7 +73,7 @@ TextStyle mediumTextRedBold() {
 }
 
 TextStyle titleTextWhite() {
-  return TextStyle(color: Colors.white, fontSize: 18);
+  return TextStyle(color: Colors.white, fontSize: 16);
 }
 
 TextStyle normalTextStyleButton(Color color) {

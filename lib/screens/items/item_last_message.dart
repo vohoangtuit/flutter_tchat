@@ -7,6 +7,7 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/utils/time_ago.dart';
 import 'package:tchat_app/widget/drawhorizontalline.dart';
 import 'package:tchat_app/widget/text_style.dart';
+import 'package:tchat_app/widget/widget.dart';
 
 import '../chat_screen.dart';
 
@@ -21,13 +22,13 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                message.photoReceiver.isEmpty?Icon(
-                  Icons.account_circle,
-                  size: 50.0,
-                  color: greyColor,
-                ):ClipRRect(
-                    borderRadius: BorderRadius.circular(32.0),
-                    child: Image.network(message.photoReceiver,width: 50,height: 50,)),
+                Container(
+                  child:  CircleAvatar(radius: 30.0,
+                    backgroundImage: message.photoReceiver.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(message.photoReceiver),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  width: 45,height: 45,
+                ),
                 Flexible(
                   child: Container(
                     padding: EdgeInsets.only(left: 8.0,top: 0.0,right: 40.0,bottom: 0.0),
@@ -53,11 +54,14 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
         ),
       ),
       onPressed: (){
+        UserModel toUser =UserModel();
+        toUser.id =message.idReceiver;
+        toUser.fullName =message.nameReceiver;
+        toUser.photoURL =message.photoReceiver;
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChatScreen(message.idReceiver, message.photoReceiver, message.nameReceiver
-                )));
+                builder: (context) => ChatScreen(toUser)));
       },
     ),
   );

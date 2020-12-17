@@ -17,8 +17,8 @@ import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
-import 'package:tchat_app/widget/button.dart';
-import 'package:tchat_app/widget/button_login.dart';
+import 'package:tchat_app/widget/button/button_login.dart';
+
 import 'package:tchat_app/widget/loading.dart';
 import 'dart:convert' as JSON;
 import 'package:http/http.dart' as http;
@@ -187,25 +187,25 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
     await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()[USER_ID]);
 
     // todo get data from firebase
-
-    user = UserModel(
-        id:documents[0].data()[USER_ID],
-        userName:documents[0].data()[USER_USERNAME],
-        fullName:documents[0].data()[USER_FULLNAME],
-        birthday:documents[0].data()[USER_BIRTHDAY],
-        gender: documents[0].data()[USER_GENDER],
-        email:documents[0].data()[USER_EMAIL],
-        photoURL:documents[0].data()[USER_PHOTO_URL],
-        cover: documents[0].data()[USER_COVER],
-        statusAccount:documents[0].data()[USER_STATUS_ACCOUNT],
-        phoneNumber:documents[0].data()[USER_PHONE],
-        createdAt:documents[0].data()[USER_CREATED_AT],
-        pushToken:documents[0].data()[USER_PUST_TOKEN],
-        isLogin:true,
-        accountType: documents[0].data()[USER_ACCOUNT_TYPE],
-        allowSearch: documents[0].data()[USER_ALLOW_SEARCH],
-         latitude: 0.0,longitude: 0.0,
-    );
+    user= UserModel.fromDocumentSnapshot(documents[0]);
+    // user = UserModel(
+    //     id:documents[0].data()[USER_ID],
+    //     userName:documents[0].data()[USER_USERNAME],
+    //     fullName:documents[0].data()[USER_FULLNAME],
+    //     birthday:documents[0].data()[USER_BIRTHDAY],
+    //     gender: documents[0].data()[USER_GENDER],
+    //     email:documents[0].data()[USER_EMAIL],
+    //     photoURL:documents[0].data()[USER_PHOTO_URL],
+    //     cover: documents[0].data()[USER_COVER],
+    //     statusAccount:documents[0].data()[USER_STATUS_ACCOUNT],
+    //     phoneNumber:documents[0].data()[USER_PHONE],
+    //     createdAt:documents[0].data()[USER_CREATED_AT],
+    //     pushToken:documents[0].data()[USER_PUST_TOKEN],
+    //     isLogin:true,
+    //     accountType: documents[0].data()[USER_ACCOUNT_TYPE],
+    //     allowSearch: documents[0].data()[USER_ALLOW_SEARCH],
+    //      latitude: 0.0,longitude: 0.0,
+    // );
     }
    // await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
     saveAccountToShared(user);
@@ -228,7 +228,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
   }
 
   @override
-  void uploadAvatarCover(UserModel user, bool success) {
+  void updateProfile(UserModel user, bool success) {
 
   }
 

@@ -100,6 +100,8 @@ flutter:
     - images/icons/ic_logout.png
     - images/icons/ic_edit_blue.png
     - images/icons/ic_remove_red.png
+    - images/icons/ic_avatar_not_available.png
+    - images/icons/ic_friends_light_blue.png
     - images/cover.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

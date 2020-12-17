@@ -59,7 +59,7 @@ TextStyle mediumTextWhite() {
 }
 
 TextStyle titleTextWhite() {
-  return TextStyle(color: Colors.white, fontSize: 18);
+  return TextStyle(color: Colors.white, fontSize: 15);
 }
 
 TextStyle normalTextStyleButton(Color color) {
@@ -126,6 +126,13 @@ CachedNetworkImage cachedImage (String url,double width, double height){
     color: greyColor,
   );
  }
+
+Image avatarNotAvailable(double size){
+  return Image.asset(
+    PATH_AVATAR_NOT_AVAILABLE,
+    width: size,height: size,
+  );
+}
 
 Material loadFileMaterial(File file, double width, double height){
  return Material(

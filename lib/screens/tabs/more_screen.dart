@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 
 import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
-import 'package:tchat_app/widget/button.dart';
+import 'package:tchat_app/screens/friends/suggest_friends_screen.dart';
+import 'package:tchat_app/utils/const.dart';
+import 'package:tchat_app/widget/custom_row_setting.dart';
 import 'package:tchat_app/widget/text_style.dart';
-import 'package:tchat_app/widget/toolbar_main.dart';
 import '../account/my_profile_screen.dart';
 import '../account/update_account_screen.dart';
 
@@ -32,9 +33,9 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
             SingleChildScrollView(
               child: Column(
                 children: [
-                  myProfile(),
+                  myProFileUI(),
                   SizedBox(height: 20,),
-                  SizedBox(height: 10,),
+                  listOptionUI(),
                 ],
               ),
             ),
@@ -51,7 +52,7 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
   void didChangeDependencies() {
     super.didChangeDependencies();
   }
-  Widget myProfile(){
+  Widget myProFileUI(){
     return GestureDetector(
       child: Container(
         color: Colors.white,
@@ -59,11 +60,15 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
           margin: EdgeInsets.only(left: 10.0,top: 10.0,right: 10.0,bottom: 10.0),
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 30.0,
-                backgroundImage: userModel.photoURL.isEmpty ? AssetImage('images/img_not_available.jpeg'):NetworkImage(userModel.photoURL),
-                backgroundColor: Colors.transparent,
+              Container(
+                child:  CircleAvatar(
+                  radius: 30.0,
+                  backgroundImage: userModel.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(userModel.photoURL),
+                  backgroundColor: Colors.transparent,
+                ),
+                width: 45,height: 45,
               ),
+
               SizedBox(width: 20,),
               Expanded(
                 child: Container(
@@ -87,7 +92,40 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
     );
   }
 
+  Widget listOptionUI() {
+    return Column(
+      children: [
+        CustomRowSetting(
+          onPressed: () {
+            openScreen(UpdateAccountScreen(userModel));
+          },
+          title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
+        ),
+        CustomRowSetting(
+          onPressed: () {
+            openScreen(SuggestFriendsScreen());
+          },
+          title: 'Suggest Friends', icon: 'images/icons/ic_friends_light_blue.png',
+        ),
+        CustomRowSetting(
+          onPressed: () {
+            messageDao.deleteAllMessage();
+            lastMessageDao.deleteAllLastMessage();
+            // todo handle clear on firebase
+            ProviderController(context).setReloadLastMessage(true);
+          },
+          title: 'Clear Data Chat', icon: 'images/icons/ic_remove_red.png',
+        ),
+        CustomRowSetting(
+          onPressed: () {
+            checkAccountForLogout();
+          },
+          title: 'Logout', icon: 'images/icons/ic_logout.png',
+        ),
 
+      ],
+    );
+  }
   @override
   bool get wantKeepAlive => true;
 

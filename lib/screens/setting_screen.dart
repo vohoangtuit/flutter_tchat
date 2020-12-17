@@ -2,12 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/base_account_statefulwidget.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
-import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/widget/basewidget.dart';
-import 'package:tchat_app/widget/button.dart';
-import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
 
 import 'account/update_account_screen.dart';

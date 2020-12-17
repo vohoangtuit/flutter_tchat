@@ -37,3 +37,7 @@ final int PICTURE_TYPE_COVER =2;
 final int CHOOSE_PICTURE_CAMERA =1;
 final int CHOOSE_PICTURE_LIBRARY =2;
 final int CHOOSE_PICTURE_VIEW_PICTURE =3;
+
+//
+final String PATH_AVATAR_NOT_AVAILABLE ='images/avatar_not_available.png';
+final String PATH_COVER_NOT_AVAILABLE ='images/cover.png';

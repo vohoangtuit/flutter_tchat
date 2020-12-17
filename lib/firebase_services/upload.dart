@@ -15,7 +15,7 @@ class FirebaseUpload{
 
   FirebaseUpload(this.callback);
   Future uploadFileAvatar(UserModel user,File avatarImageFile) async {
-    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDatabaseMethods().getStringPathAvatar(user.id));
+    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDataFunc(null).getStringPathAvatar(user.id));
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
     uploadTask.onComplete.then((value) {
@@ -47,7 +47,7 @@ class FirebaseUpload{
     });
   }
   Future uploadFileCover(UserModel user,File avatarImageFile) async {
-    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDatabaseMethods().getStringPathCover(user.id));
+    StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDataFunc(null).getStringPathCover(user.id));
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
     uploadTask.onComplete.then((value) {

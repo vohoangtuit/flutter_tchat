@@ -15,7 +15,7 @@ import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 
 import 'package:tchat_app/utils/utils.dart';
-import 'package:tchat_app/widget/base_button.dart';
+import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/widget/button/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
 import 'package:tchat_app/widget/loading.dart';
 
@@ -104,7 +104,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
                                     borderRadius: BorderRadius.all(
                                         Radius.circular(45.0)),
                                     clipBehavior: Clip.hardEdge,
-                                  ) : iconNoImage(70.0)) : loadFileMaterial(avatarImageFile,70.0,70.0),
+                                  ) : avatarNotAvailable(70.0)) : loadFileMaterial(avatarImageFile,70.0,70.0),
                                   Container(
                                     alignment: Alignment.bottomRight,
                                     width: 70,
@@ -251,26 +251,11 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   void handleUpdateData() {
     focusNodeFullName.unfocus();
     focusNodeAboutMe.unfocus();
-
     setState(() {
       isLoading = true;
     });
+    updateUserAccount(user);
 
-    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL
-    }).then((data) async {
-     // updateUserDatabase(user);
-      setState(() {
-        isLoading = false;
-      });
-      saveAccountToShared(user);
-      Fluttertoast.showToast(msg: "Update success");
-    }).catchError((err) {
-      setState(() {
-        isLoading = false;
-      });
-
-      Fluttertoast.showToast(msg: err.toString());
-    });
   }
   _selectDate(BuildContext context) async {
     final DateTime picked = await showDatePicker(
@@ -288,8 +273,8 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   }
 
   @override
-  void uploadAvatarCover(UserModel user, bool success) {
-    print('uploadCallBack');
+  void updateProfile(UserModel user, bool success) {
+    print('update callback');
     setState(() {
       isLoading =false;
       if(success){
@@ -309,10 +294,10 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
         avatarImageFile =file;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(uploadAvatarCover)
+        FirebaseUpload(updateProfile)
             .uploadFileAvatar(userModel, file);
       }else{
-        FirebaseUpload(uploadAvatarCover)
+        FirebaseUpload(updateProfile)
             .uploadFileCover(userModel, file);
       }
     }
@@ -329,9 +314,9 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
         avatarImageFile =file;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(uploadAvatarCover).uploadFileAvatar(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(userModel, file);
       }else{
-        FirebaseUpload(uploadAvatarCover).uploadFileCover(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileCover(userModel, file);
       }
     }
   }

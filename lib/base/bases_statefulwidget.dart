@@ -1,30 +1,20 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:provider/provider.dart';
-import 'package:tchat_app/controller/bloc/account_bloc.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/database/database.dart';
 import 'package:tchat_app/database/last_message_dao.dart';
 import 'package:tchat_app/database/message_dao.dart';
 import 'package:tchat_app/database/user_dao.dart';
-import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/main_screen.dart';
-import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
-import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/progressbar.dart';
 
 import '../main.dart';
-import '../screens/dialogs/dialog_base_notify.dart';
 import 'base_dialog.dart';
-typedef Int2VoidFunc = void Function(String);
 abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   BaseDialog  dialog;
  static BaseStatefulWidget baseStatefulState;

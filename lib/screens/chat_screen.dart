@@ -26,22 +26,16 @@ import 'package:tchat_app/widget/text_style.dart';
 import 'items/item_chat.dart';
 
 class ChatScreen extends StatefulWidget {
-  String idReceiver;
-  String photoReceiver;
-  String nameReceiver;
-
-  ChatScreen(this.idReceiver, this.photoReceiver, this.nameReceiver);
+  final UserModel toUser;
+  ChatScreen(this.toUser);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState(idReceiver,nameReceiver,photoReceiver);
+  _ChatScreenState createState() => _ChatScreenState(toUser);
 }
 
 class _ChatScreenState extends AccountBaseState {
-
-  String idReceiver;
-  String photoReceiver;
-  String nameReceiver;
-  _ChatScreenState(this.idReceiver,this.nameReceiver,this.photoReceiver);
+  final UserModel toUser;
+  _ChatScreenState(this.toUser);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
   int _limit = 20;
@@ -66,7 +60,7 @@ class _ChatScreenState extends AccountBaseState {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(nameReceiver, style: mediumTextWhite()),
+        title: Text(toUser.fullName, style: mediumTextWhite()),
         actions: <Widget>[
           GestureDetector(
             child: Container(
@@ -181,7 +175,7 @@ class _ChatScreenState extends AccountBaseState {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    groupChatId = userModel.id + '-' + idReceiver;
+    groupChatId = userModel.id + '-' + toUser.id;
     getMessage();
     //initSocket();
     textEditingController.addListener(() {
@@ -216,7 +210,7 @@ class _ChatScreenState extends AccountBaseState {
     var userQuery=  FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
         .doc(userModel.id)
-        .collection(idReceiver)
+        .collection(toUser.id)
         .limit(1)
         .orderBy(MESSAGE_TIMESTAMP, descending: true);
 
@@ -250,8 +244,8 @@ class _ChatScreenState extends AccountBaseState {
   }
 
   void getMessage() {
-    firebaseDatabaseMethods
-        .getMessageChat(userModel.id, idReceiver)
+    firebaseDataService
+        .getMessageChat(userModel.id, toUser.id)
         .then((data) {
       setState(() {
         chatStream =data;
@@ -319,9 +313,9 @@ class _ChatScreenState extends AccountBaseState {
           idSender: userModel.id,
           nameSender: userModel.fullName,
           photoSender: userModel.photoURL,
-          idReceiver:idReceiver,
-          nameReceiver:nameReceiver,
-          photoReceiver: photoReceiver,
+          idReceiver:toUser.id,
+          nameReceiver:toUser.fullName,
+          photoReceiver: toUser.photoURL,
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
           content: content,
           type: type,
@@ -329,11 +323,11 @@ class _ChatScreenState extends AccountBaseState {
       var from = fireBaseStore
           .collection(FIREBASE_MESSAGES)
           .doc(userModel.id)
-          .collection(idReceiver)
+          .collection(toUser.id)
           .doc(); // end doc can use timestamp
       var to = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(idReceiver)
+          .doc(toUser.id)
           .collection(userModel.id)
           .doc(); // end doc can use timestamp
       WriteBatch writeBatch = fireBaseStore.batch();
@@ -565,7 +559,7 @@ class _ChatScreenState extends AccountBaseState {
               stream: fireBaseStore
                   .collection(FIREBASE_MESSAGES)
                   .doc(userModel.id)
-                  .collection(idReceiver)
+                  .collection(toUser.id)
                   .orderBy('timestamp', descending: true)
                   .limit(_limit)
                   .snapshots(),
@@ -586,7 +580,7 @@ class _ChatScreenState extends AccountBaseState {
                         index,
                         snapshot.data.documents[index],
                         listMessage,
-                        photoReceiver),
+                        toUser.photoURL),
                     itemCount: snapshot.data.documents.length,
                     reverse: true,
                     controller: listScrollController,
@@ -613,7 +607,7 @@ class _ChatScreenState extends AccountBaseState {
                   index,
                   snapshot.data.documents[index],
                   listMessage,
-                  photoReceiver),
+                  toUser.photoURL),
               itemCount: snapshot.data.documents.length,
               reverse: true,
               controller: listScrollController,
@@ -648,7 +642,7 @@ class _ChatScreenState extends AccountBaseState {
 
   initSocket() async {
     await SharedPre.getStringKey(SharedPre.sharedPreFullName)
-        .then((value) => {nameReceiver = value});
+        .then((value) => {toUser.fullName = value});
 
     //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
     socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",

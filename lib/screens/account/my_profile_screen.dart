@@ -91,7 +91,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                   height: 36.0,
                                   child: CircleAvatar(
                                     radius: 30.0,
-                                    backgroundImage:  userModel.photoURL.isEmpty ? AssetImage('images/img_not_available.jpeg'):NetworkImage(userModel.photoURL),
+                                    backgroundImage:  userModel.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(userModel.photoURL),
                                     backgroundColor: Colors.transparent,
                                   ),
                                 ),
@@ -115,7 +115,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                         background: userModel.cover.isEmpty
                             ? InkWell(
                                 child: Image.asset(
-                                  'images/cover.png',
+                                  PATH_COVER_NOT_AVAILABLE,
                                   fit: BoxFit.cover,
                                 ),
                                 onTap: () {
@@ -214,7 +214,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
     }
   }
   @override
-  void uploadAvatarCover(UserModel user, bool success) {
+  void updateProfile(UserModel user, bool success) {
     print('uploadCallBack');
     setState(() {
       isLoading = false;
@@ -233,10 +233,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
         isLoading =true;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(uploadAvatarCover)
+        FirebaseUpload(updateProfile)
             .uploadFileAvatar(userModel, file);
       }else{
-        FirebaseUpload(uploadAvatarCover)
+        FirebaseUpload(updateProfile)
             .uploadFileCover(userModel, file);
       }
     }
@@ -252,9 +252,9 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
         isLoading =true;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(uploadAvatarCover).uploadFileAvatar(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(userModel, file);
       }else{
-        FirebaseUpload(uploadAvatarCover).uploadFileCover(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileCover(userModel, file);
       }
     }
   }

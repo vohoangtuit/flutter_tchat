@@ -375,14 +375,14 @@ class HomeScreenState extends State<HomeScreen> {
             ],
           ),
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                          document.id,
-                          document.data()['photoUrl'],
-                          document.data()['fullName']
-                        )));
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //         builder: (context) => ChatScreen(
+            //               document.id,
+            //               document.data()['photoUrl'],
+            //               document.data()['fullName']
+            //             )));
           },
           color: greyColor2,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),

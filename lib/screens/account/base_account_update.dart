@@ -1,9 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tchat_app/base/base_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
+import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -16,8 +19,7 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends AccountBaseS
   void callBackCamera(File file, type);
   void callBackLibrary(File file, type);
 
-  void uploadAvatarCover(UserModel user,bool success);// todo create callback
-//  void cameraToUpload(File file);// todo create callback
+  void updateProfile(UserModel user,bool success);// todo create callback
 
   void saveAccountToShared(UserModel user)async{// todo create callback
     await SharedPre.saveString(SharedPre.sharedPreUSer, jsonEncode(user));
@@ -49,5 +51,9 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends AccountBaseS
         CameraLibraryOpening(callBackCamera).libraryOpen(type);
       }
     }
+  }
+
+  void updateUserAccount(UserModel user){
+    FirebaseDataFunc(updateProfile).updateUserInfo(user);
   }
 }

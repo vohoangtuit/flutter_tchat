@@ -11,21 +11,18 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 
 import 'bases_statefulwidget.dart';
 
-abstract class AccountBaseState <T extends StatefulWidget> extends BaseStatefulWidget{// with WidgetsBindingObserver
+abstract class AccountBaseState <T extends StatefulWidget> extends BaseStatefulWidget{
 
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final facebookLogin = FacebookLogin();
-  FirebaseDatabaseMethods firebaseDatabaseMethods = new FirebaseDatabaseMethods();
-
-
+  FirebaseDataFunc firebaseDataService = new FirebaseDataFunc(null);
 @override
   void initState() {
     super.initState();
-   // WidgetsBinding.instance.addObserver(this);
   }
   checkAccountForLogout()async{
-    print('Logout ${userModel.accountType}');
+   // print('Logout ${userModel.accountType}');
     if(userModel.accountType==USER_ACCOUNT_FACEBOOK){
       logOutFacebook();
     }else if(userModel.accountType==USER_ACCOUNT_GMAIL){
