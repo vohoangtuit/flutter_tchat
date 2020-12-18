@@ -6,33 +6,37 @@ import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
+import 'package:tchat_app/screens/tabs/profile/profile_photos.dart';
+import 'package:tchat_app/screens/tabs/profile/profile_timeline.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/button/custom_button_with_title.dart';
 import 'package:tchat_app/widget/loading.dart';
+import 'package:tchat_app/widget/sliver_appbar_delegate.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
-class NormalUserProfileScreen extends StatefulWidget {
+class UserProfileScreen extends StatefulWidget {
   UserModel myProfile;
   UserModel user;
 
-  NormalUserProfileScreen({this.myProfile, this.user});
+  UserProfileScreen({this.myProfile, this.user});
 
   @override
-  _NormalUserProfileScreenState createState() =>
-      _NormalUserProfileScreenState(myProfile, user);
+  _UserProfileScreenState createState() =>
+      _UserProfileScreenState(myProfile, user);
 }
 
-class _NormalUserProfileScreenState
-    extends AccountBaseState<NormalUserProfileScreen> {
+class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
   UserModel myProfile;
   UserModel user;
+  TabController _tabController;
 
-  _NormalUserProfileScreenState(this.myProfile, this.user);
+  _UserProfileScreenState(this.myProfile, this.user);
 
   ScrollController _scrollController;
   bool lastStatus = true;
-  bool isFriend = false;
-  int statusRequest = 0;
+
+  // bool isFriend = false;
+  int statusRequest = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -172,15 +176,34 @@ class _NormalUserProfileScreenState
                   //     ),
                   //   ),
                   //   pinned: true,
+                  //  // children: <Widget>[ProfileTimeLine(), ProfilePhotos()],
                   // ),
                 ];
               },
               body: Container(
                 color: Colors.white,
-                child: Column(
+                child: Stack(
                   children: [
-                    isFriend ? Container() : addFriend(),
-                    //addFriend(),
+                    Column(
+                      children: [
+                        //isFriend ? Container() : viewAddFriend(),
+                        statusRequest == FRIEND_NOT_REQUEST
+                            ? viewAddFriend()
+                            : statusRequest == FRIEND_SEND_REQUEST
+                                ? viewAddFriend()
+                                : statusRequest == FRIEND_WAITING_CONFIRM
+                                    ? viewAcceptFriend()
+                                    : Container(),
+                        statusRequest == FRIEND_SUCEESS
+                            ? viewTabBarActivity()
+                            : Container(),
+                      ],
+                    ),
+                    statusRequest == FRIEND_WAITING_CONFIRM
+                        ? viewButtonChat()
+                        : statusRequest == FRIEND_SUCEESS
+                            ? viewButtonChat()
+                            : Container(),
                   ],
                 ),
               ),
@@ -207,50 +230,25 @@ class _NormalUserProfileScreenState
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
-    // print('user cover ${user.cover}');
+    // _tabController = new TabController(length: 2, vsync: this);
     checkIsFriend();
   }
 
-  checkIsFriend() async {
-    final snapshot = await FirebaseFirestore.instance
-        .collection(FIREBASE_FRIENDS)
-        .doc(myProfile.id)
-        .collection(user.id)
-        .snapshots();
-    if (snapshot != null) {
-      // ignore: unrelated_type_equality_checks
-      if (snapshot.length == 0) {
-        setState(() {
-          print('1111');
-          isFriend = false;
-        });
-      } else {
-        setState(() {
-          isFriend = true;
-        });
-      }
-    }
-    setState(() {
-      print('2222');
-      isFriend = false;
-    });
-  }
-
-  Widget addFriend() {
+  Widget viewAddFriend() {
     return Container(
-      color: Colors.white,
+      color: Colors.grey[50],
       child: Padding(
         padding:
             const EdgeInsets.only(left: 40, top: 20, right: 40, bottom: 10),
         child: Column(
           children: [
             Text(
-              'Make friend with ${user.fullName} and have cool\n and unforgettable conversations together!',
+              'Make friend with ${user.fullName} and have cool and unforgettable conversations together!',
               style: textBlackMedium(),
+              textAlign: TextAlign.center,
             ),
             SizedBox(
               height: 10,
@@ -268,9 +266,15 @@ class _NormalUserProfileScreenState
                   },
                 ),
                 CustomButtonWithTitle(
-                  title: statusRequest == FRIEND_NOT_REQUEST ? 'ADD FRIEND' : 'UNDO REQUEST',
-                  colorButton: statusRequest == FRIEND_NOT_REQUEST?Colors.blue:Colors.blue[50],
-                  colorText: statusRequest == FRIEND_NOT_REQUEST?Colors.white:Colors.black45,
+                  title: statusRequest == FRIEND_NOT_REQUEST
+                      ? 'ADD FRIEND'
+                      : 'UNDO REQUEST',
+                  colorButton: statusRequest == FRIEND_NOT_REQUEST
+                      ? Colors.blue
+                      : Colors.blue[50],
+                  colorText: statusRequest == FRIEND_NOT_REQUEST
+                      ? Colors.white
+                      : Colors.black45,
                   sizeText: 14.0,
                   onPressed: () {
                     if (statusRequest == FRIEND_NOT_REQUEST) {
@@ -288,8 +292,174 @@ class _NormalUserProfileScreenState
     );
   }
 
-  void requestAddFriend() async {
-    //https://stackoverflow.com/questions/46618601/how-to-create-update-multiple-documents-at-once-in-firestore?noredirect=1&lq=1
+  Widget viewAcceptFriend() {
+    return Container(
+      color: Colors.grey[50],
+      child: Padding(
+        padding: EdgeInsets.only(left: 40, top: 20, right: 40, bottom: 10),
+        child: Column(
+          children: [
+            Text(
+              'Wants to be friends',
+              style: textBlackMedium(),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(
+              height: 15,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                CustomButtonWithTitle(
+                  title: 'DECLINE',
+                  colorButton: Colors.blue[100],
+                  colorText: Colors.black,
+                  sizeText: 14.0,
+                  onPressed: () {
+                    // declineFriend();
+                    undoRequest();
+                  },
+                ),
+                CustomButtonWithTitle(
+                  title: 'ACCEPT',
+                  colorButton: Colors.blue,
+                  colorText: Colors.white,
+                  sizeText: 14.0,
+                  onPressed: () {
+                    acceptFriend();
+                  },
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget viewButtonChat() {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 10, bottom: 10),
+        child: ButtonTheme(
+          child: RaisedButton(
+            onPressed: () {
+              openScreen(ChatScreen(user));
+            },
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: new BorderRadius.circular(30.0)),
+            child: Container(
+              width: 60,
+              height: 30,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Icon(
+                    Icons.message,
+                    color: Colors.blue,
+                    size: 20,
+                  ),
+                  //  SizedBox(width: 8.0,),
+                  Text(
+                    'Chat',
+                    style: textBlackNormal(),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget viewTabBarActivity() {
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            child: TabBar(
+              indicatorColor: Colors.blueGrey,
+              indicatorWeight: 1,
+              //indicatorSize: TabBarIndicatorSize.label,
+           //   isScrollable: true,
+              labelColor: Colors.blue,
+              unselectedLabelColor: Colors.grey[350],
+              tabs: listTab(),
+            ),
+          ),
+          Expanded(
+            child: TabBarView(
+              children: <Widget>[ProfileTimeLine(), ProfilePhotos()],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  List<Tab> listTab() {
+    return <Tab>[
+      Tab(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.wysiwyg),
+            SizedBox(
+              width: 8.0,
+            ),
+            Text("Logs"),
+          ],
+        ),
+      ),
+      Tab(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.photo),
+            SizedBox(
+              width: 8.0,
+            ),
+            Text("Photos"),
+          ],
+        ),
+      ),
+    ];
+  }
+
+  checkIsFriend() async {
+    setState(() {
+      isLoading = true;
+    });
+    DocumentSnapshot variable =
+        await firebaseDataService.checkUserIsFriend(myProfile.id, user.id);
+    if (variable != null) {
+      if (variable.data() != null) {
+        print('variable ' + variable.data()['statusRequest'].toString());
+        setState(() {
+          statusRequest = variable.data()[FRIEND_STATUS_REQUEST];
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          statusRequest = FRIEND_NOT_REQUEST;
+          isLoading = false;
+        });
+        print('222222');
+      }
+    } else {
+      setState(() {
+        isLoading = false;
+        statusRequest = FRIEND_NOT_REQUEST;
+      });
+      print('3333');
+    }
+  }
+
+  requestAddFriend() async {
+    // https://stackoverflow.com/questions/46618601/how-to-create-update-multiple-documents-at-once-in-firestore?noredirect=1&lq=1
     setState(() {
       isLoading = true;
     });
@@ -360,4 +530,37 @@ class _NormalUserProfileScreenState
       });
     });
   }
+
+  acceptFriend() {
+    // https://stackoverflow.com/questions/46618601/how-to-create-update-multiple-documents-at-once-in-firestore?noredirect=1&lq=1
+    setState(() {
+      isLoading = true;
+    });
+    WriteBatch writeBatch = fireBaseStore.batch();
+    DocumentReference from = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(myProfile.id)
+        .collection(user.id)
+        .doc(user.id);
+    DocumentReference to = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(user.id)
+        .collection(myProfile.id)
+        .doc(myProfile.id);
+    writeBatch.update(from, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
+    writeBatch.update(to, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
+
+    writeBatch.commit().then((value) {
+      setState(() {
+        statusRequest = FRIEND_SUCEESS;
+        isLoading = false;
+      });
+    }).catchError((onError) {
+      setState(() {
+        isLoading = false;
+      });
+    });
+  }
+
+  declineFriend() {}
 }

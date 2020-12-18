@@ -8,8 +8,8 @@ final String FRIEND_STATUS_REQUEST  = 'statusRequest';
 
 final int FRIEND_NOT_REQUEST =0;
 final int FRIEND_SEND_REQUEST =1;
-final int FRIEND_WAITING_CONFIRM =2;
-final int FRIEND_SUCEESS =3;
+final int FRIEND_WAITING_CONFIRM =2;// show icon chat
+final int FRIEND_SUCEESS =3;//// show icon chat
 class FriendModel{
   String id;
   String fullName;

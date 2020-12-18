@@ -45,6 +45,12 @@ class FirebaseDataFunc{
             .limit(20)
             .snapshots();
   }
+  getFriend(String id)async{
+    return await FirebaseFirestore.instance
+        .collection(FIREBASE_FRIENDS)
+        .doc( id)
+        .snapshots();
+  }
   getLastMessage(String idSender, String idReceiver)async{
     FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
@@ -53,12 +59,13 @@ class FirebaseDataFunc{
         .limit(1)
         .orderBy(MESSAGE_TIMESTAMP, descending: true).snapshots();
   }
-  checkUserIsFriend(String idMe,String idFriend)async{
-    return await FirebaseFirestore.instance
+  Future<DocumentSnapshot> checkUserIsFriend(String idMe,String idFriend)async{
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
         .collection(FIREBASE_FRIENDS)
         .doc(idMe)
-        .collection(idFriend)
-        .snapshots();
+        .collection(idFriend).doc(idFriend).get()
+        ;
+    return documentSnapshot;
   }
   void updateUserInfo(UserModel user){
     FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL

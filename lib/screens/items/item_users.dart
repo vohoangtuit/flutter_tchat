@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_io/generated/i18n.dart';
 import 'package:tchat_app/models/user_model.dart';
-import 'package:tchat_app/screens/friends/normal_user_profile_screen.dart';
+import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/widget.dart';
 
@@ -66,7 +66,7 @@ Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userMo
                         child: Container(
                          width: 30,height: 30,
                           alignment: Alignment.center,
-                          child: Image.asset('images/icons/phone_white.png',width: 22,height: 22,color: Colors.blue,),
+                          child: Image.asset('images/icons/phone_white.png',width: 21,height: 21,color: Colors.blue,),
                         ),
                         onTap: (){
                           print('audio call');
@@ -76,7 +76,7 @@ Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userMo
                         child: Container(
                           width: 30,height: 30,
                           alignment: Alignment.center,
-                          child: Image.asset('images/icons/camera_white.png',width: 24,height: 24,color: Colors.blue,),
+                          child: Image.asset('images/icons/camera_white.png',width: 22,height: 22,color: Colors.blue,),
                         ),
                         onTap: (){
                           print('video call');
@@ -93,7 +93,7 @@ Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userMo
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => profile?NormalUserProfileScreen(myProfile:userModel,user: friend,):ChatScreen(friend)));
+                  builder: (context) => profile?UserProfileScreen(myProfile:userModel,user: friend,):ChatScreen(friend)));
         },
 
       ),
