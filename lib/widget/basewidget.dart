@@ -11,7 +11,7 @@ Widget materialApp(BuildContext context, String title) {
 
 Widget appBarWithTitle(BuildContext context, String title) {
   return AppBar(
-    title: Text(title, style: titleTextWhite()),
+    title: Text(title, style: textWhiteTitle()),
     centerTitle: true,
   );
 }

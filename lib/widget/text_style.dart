@@ -17,66 +17,66 @@ TextStyle textBlueMediumBold(){
 TextStyle textBlueLarge(){
   return TextStyle(color: Colors.blue, fontSize: 18);
 }
-TextStyle smallTextBlack() {
+TextStyle textBlackSmall() {
   return TextStyle(color: Colors.black, fontSize: 12);
 }
-TextStyle normalTextBlack() {
+TextStyle textBlackNormal() {
   return TextStyle(color: Colors.black, fontSize: 14);
 }
-TextStyle mediumTextBlack() {
+TextStyle textBlackMedium() {
   return TextStyle(color: Colors.black, fontSize: 16);
 }
-TextStyle largeTextBlack() {
+TextStyle textBlackLarge() {
   return TextStyle(color: Colors.black, fontSize: 18);
 }
-TextStyle smallTextGray() {
+TextStyle textGraysSmall() {
   return TextStyle(color: Colors.grey, fontSize: 12);
 }
-TextStyle smallerTextGray() {
+TextStyle textGraySmaller() {
   return TextStyle(color: Colors.grey, fontSize: 11);
 }
-TextStyle normalTextGray() {
+TextStyle textGrayNormal() {
   return TextStyle(color: Colors.grey, fontSize: 14);
 }
-TextStyle mediumTextGray() {
+TextStyle textGrayMedium() {
   return TextStyle(color: Colors.grey, fontSize: 16);
 }
 TextStyle textWhiteButtonDefault(){
   return TextStyle(color: Colors.white, fontSize: 16);
 }
 
-TextStyle smallTextWhite() {
+TextStyle textWhiteSmall() {
   return TextStyle(color: Colors.white, fontSize: 12);
 }
-TextStyle normalTextWhite() {
+TextStyle textWhiteNormal() {
   return TextStyle(color: Colors.white, fontSize: 14);
 }
 
-TextStyle mediumTextWhite() {
+TextStyle textWhiteMedium() {
   return TextStyle(color: Colors.white, fontSize: 16);
 }
 TextStyle textHeaderBar() {
   return TextStyle(color: Colors.white70, fontSize: 17,decoration: TextDecoration.none);
 }
-TextStyle smallTextRed() {
+TextStyle textRedSmall() {
   return TextStyle(color: Colors.red, fontSize: 12);
 }
-TextStyle normalTextRed() {
+TextStyle textRedNormal() {
   return TextStyle(color: Colors.red, fontSize: 14);
 }
 
-TextStyle mediumTextRed() {
+TextStyle textRedMedium() {
   return TextStyle(color: Colors.red, fontSize: 16);
 }
-TextStyle mediumTextRedBold() {
+TextStyle textRedBoldMedium() {
   return TextStyle(color: Colors.red, fontSize: 16,fontWeight: FontWeight.bold);
 }
 
-TextStyle titleTextWhite() {
+TextStyle textWhiteTitle() {
   return TextStyle(color: Colors.white, fontSize: 16);
 }
 
-TextStyle normalTextStyleButton(Color color) {
+TextStyle textStyleButtonNormal(Color color) {
   return TextStyle(color: color, fontSize: 17);
 }
 TextStyle textMessage() {

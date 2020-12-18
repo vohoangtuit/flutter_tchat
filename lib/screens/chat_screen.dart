@@ -60,7 +60,7 @@ class _ChatScreenState extends AccountBaseState {
     return Scaffold(
       appBar: AppBar(
         centerTitle: false,
-        title: Text(toUser.fullName, style: mediumTextWhite()),
+        title: Text(toUser.fullName, style: textWhiteMedium()),
         actions: <Widget>[
           GestureDetector(
             child: Container(

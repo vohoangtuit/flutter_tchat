@@ -29,11 +29,11 @@ class BaseNotification extends BaseDialog {
         SizedBox(height: 20,),
         Text(this.title, style: textBlueMedium(),),
         SizedBox(height: 10,),
-        Text(this.description, style: mediumTextBlack()),
+        Text(this.description, style: textBlackMedium()),
         SizedBox(height: 10,),
         RaisedButton(
           color: Colors.lightBlue,
-          child: Text('OK', style: mediumTextWhite()),
+          child: Text('OK', style: textWhiteMedium()),
           onPressed: () {
            dismiss();
           },

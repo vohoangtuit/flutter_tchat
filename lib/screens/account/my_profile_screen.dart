@@ -106,8 +106,8 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                 userModel.fullName,
                                 textAlign: TextAlign.center,
                                 style: isShrink
-                                    ? mediumTextBlack()
-                                    : mediumTextWhite(),
+                                    ? textBlackMedium()
+                                    : textWhiteMedium(),
                               ),
                             ],
                           ),
@@ -172,7 +172,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                     children: [
                       Text(
                         'data',
-                        style: normalTextRed(),
+                        style: textRedNormal(),
                       ),
                     ],
                   ),

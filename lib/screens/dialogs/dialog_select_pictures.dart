@@ -28,7 +28,7 @@ class DialogSelectPictures extends BaseDialog{
           padding: EdgeInsets.only(left: 10,top:10,right: 10,bottom: 0),
           child:Column(
             children: [
-              Text(type==PICTURE_TYPE_AVATAR?'Avatar':'Cover',style: smallTextGray(),),
+              Text(type==PICTURE_TYPE_AVATAR?'Avatar':'Cover',style: textGraysSmall(),),
               SizedBox(height: 10,),
               Divider(height: 0.5,),
               InkWell (
@@ -40,7 +40,7 @@ class DialogSelectPictures extends BaseDialog{
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(type==PICTURE_TYPE_AVATAR?'View profile picture':'View full cover',style: mediumTextBlack(),),
+                        Text(type==PICTURE_TYPE_AVATAR?'View profile picture':'View full cover',style: textBlackMedium(),),
                       ],
                     )),
                   ],
@@ -61,7 +61,7 @@ class DialogSelectPictures extends BaseDialog{
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          Text('Take Photo',style: mediumTextBlack(),),
+                          Text('Take Photo',style: textBlackMedium(),),
                         ],
                       )),
                     ],
@@ -82,7 +82,7 @@ class DialogSelectPictures extends BaseDialog{
                     crossAxisAlignment: CrossAxisAlignment.center,
 
                     children: [
-                      Text('Choose From Photos',style: mediumTextBlack(),),
+                      Text('Choose From Photos',style: textBlackMedium(),),
                     ],
                   )),
                 ],

@@ -37,7 +37,7 @@ class CustomRowSetting extends StatelessWidget {
                         Expanded(
                             child: Text(
                           title,
-                          style: normalTextBlack(),
+                          style: textBlackNormal(),
                         )),
                         Container(
                           alignment: Alignment.centerRight,

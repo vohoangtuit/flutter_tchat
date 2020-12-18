@@ -245,7 +245,7 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(
           'TChat',
-          style: mediumTextWhite()
+          style: textWhiteMedium()
         ),
         centerTitle: true,
         actions: <Widget>[

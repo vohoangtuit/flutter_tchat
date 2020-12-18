@@ -75,9 +75,9 @@ class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAl
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(userModel.fullName,style: mediumTextBlack(), overflow: TextOverflow.ellipsis, maxLines: 1,),
+                      Text(userModel.fullName,style: textBlackMedium(), overflow: TextOverflow.ellipsis, maxLines: 1,),
                       SizedBox(height: 5,),
-                      Text('My Profile',style: smallTextGray(),),
+                      Text('My Profile',style: textGraysSmall(),),
                     ],
                   ),
                 ),

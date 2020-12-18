@@ -35,9 +35,9 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(message.nameReceiver,style: normalTextBlack(), overflow: TextOverflow.ellipsis, maxLines: 1,),
+                        Text(message.nameReceiver,style: textBlackNormal(), overflow: TextOverflow.ellipsis, maxLines: 1,),
                         SizedBox(height: 5,),
-                        Text(getContent(message),style: smallTextGray()),
+                        Text(getContent(message),style: textGraysSmall()),
                       ],
 
                     ),
@@ -47,7 +47,7 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
             ),
             Container(
               alignment: Alignment.centerRight,
-               child: (Text(TimeAgo().timeAgo(languageCode,TimeAgo().getDateTimeFromString(message.timestamp)),style: smallerTextGray())),
+               child: (Text(TimeAgo().timeAgo(languageCode,TimeAgo().getDateTimeFromString(message.timestamp)),style: textGraySmaller())),
               //child: (Text('Update: ',style: smallTextGray())),
             )
           ],

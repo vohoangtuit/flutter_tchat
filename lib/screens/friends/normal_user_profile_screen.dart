@@ -110,8 +110,8 @@ class _NormalUserProfileScreenState
                               user.fullName,
                               textAlign: TextAlign.center,
                               style: isShrink
-                                  ? mediumTextBlack()
-                                  : mediumTextWhite(),
+                                  ? textBlackMedium()
+                                  : textWhiteMedium(),
                             ),
                           ],
                         ),
@@ -250,7 +250,7 @@ class _NormalUserProfileScreenState
           children: [
             Text(
               'Make friend with ${user.fullName} and have cool\n and unforgettable conversations together!',
-              style: normalTextBlack(),
+              style: textBlackMedium(),
             ),
             SizedBox(
               height: 10,
@@ -268,11 +268,9 @@ class _NormalUserProfileScreenState
                   },
                 ),
                 CustomButtonWithTitle(
-                  title: statusRequest == FRIEND_NOT_REQUEST
-                      ? 'ADD FRIEND'
-                      : 'UNDO REQUEST',
-                  colorButton: Colors.blue,
-                  colorText: Colors.white,
+                  title: statusRequest == FRIEND_NOT_REQUEST ? 'ADD FRIEND' : 'UNDO REQUEST',
+                  colorButton: statusRequest == FRIEND_NOT_REQUEST?Colors.blue:Colors.blue[50],
+                  colorText: statusRequest == FRIEND_NOT_REQUEST?Colors.white:Colors.black45,
                   sizeText: 14.0,
                   onPressed: () {
                     if (statusRequest == FRIEND_NOT_REQUEST) {
@@ -290,10 +288,10 @@ class _NormalUserProfileScreenState
     );
   }
 
-  void requestAddFriend() async{
+  void requestAddFriend() async {
     //https://stackoverflow.com/questions/46618601/how-to-create-update-multiple-documents-at-once-in-firestore?noredirect=1&lq=1
     setState(() {
-      isLoading =true;
+      isLoading = true;
     });
     FriendModel meRequest = FriendModel(
         id: user.id,
@@ -307,42 +305,58 @@ class _NormalUserProfileScreenState
         statusRequest: FRIEND_WAITING_CONFIRM);
 
     WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id);// todo: lấy user id làm id trên firebase
+    DocumentReference from = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(myProfile.id)
+        .collection(user.id)
+        .doc(user.id); // todo: lấy user id làm id trên firebase
     //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc();todo id tự generate on firebase
-    DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id).doc(myProfile.id);// todo: lấy user id làm id trên firebase
-   // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id); todo id tự generate on firebase
-     writeBatch.set(from, meRequest.toJson());
-     writeBatch.set(to, receiveRequest.toJson());
+    DocumentReference to = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(user.id)
+        .collection(myProfile.id)
+        .doc(myProfile.id); // todo: lấy user id làm id trên firebase
+    // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id); todo id tự generate on firebase
+    writeBatch.set(from, meRequest.toJson());
+    writeBatch.set(to, receiveRequest.toJson());
     writeBatch.commit().then((value) {
       print('send request');
       setState(() {
         statusRequest = FRIEND_SEND_REQUEST;
-        isLoading =false;
+        isLoading = false;
       });
     }).catchError((onError) {
       setState(() {
-        isLoading =false;
+        isLoading = false;
       });
     });
   }
 
-  undoRequest() async{
+  undoRequest() async {
     print('undoRequest()');
 
     WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id);
-    DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id).doc(myProfile.id);
+    DocumentReference from = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(myProfile.id)
+        .collection(user.id)
+        .doc(user.id);
+    DocumentReference to = fireBaseStore
+        .collection(FIREBASE_FRIENDS)
+        .doc(user.id)
+        .collection(myProfile.id)
+        .doc(myProfile.id);
     writeBatch.delete(from);
     writeBatch.delete(to);
     writeBatch.commit().then((value) {
       print('deleted request');
       setState(() {
         statusRequest = FRIEND_NOT_REQUEST;
-        isLoading =false;
+        isLoading = false;
       });
     }).catchError((onError) {
       setState(() {
-        isLoading =false;
+        isLoading = false;
       });
     });
   }
