@@ -36,7 +36,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
   bool lastStatus = true;
 
   // bool isFriend = false;
-  int statusRequest = -1;
+  int statusRequest = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -435,6 +435,16 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
     });
     DocumentSnapshot variable =
         await firebaseDataService.checkUserIsFriend(myProfile.id, user.id);
+    // if(variable!=null){
+    //   print('variable. '+variable.toString());
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    // }else{
+    //   setState(() {
+    //     isLoading = false;
+    //   });
+    // }
     if (variable != null) {
       if (variable.data() != null) {
         print('variable ' + variable.data()['statusRequest'].toString());
@@ -475,17 +485,11 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
         statusRequest: FRIEND_WAITING_CONFIRM);
 
     WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(myProfile.id)
-        .collection(user.id)
-        .doc(user.id); // todo: lấy user id làm id trên firebase
+    DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(myProfile.id).doc(user.id); // todo: lấy user id làm id trên firebase
+   //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id); // todo: lấy user id làm id trên firebase
     //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc();todo id tự generate on firebase
-    DocumentReference to = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(user.id)
-        .collection(myProfile.id)
-        .doc(myProfile.id); // todo: lấy user id làm id trên firebase
+    DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(user.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
+   // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
     // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id); todo id tự generate on firebase
     writeBatch.set(from, meRequest.toJson());
     writeBatch.set(to, receiveRequest.toJson());

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/user_model.dart';
 
@@ -60,12 +61,13 @@ class FirebaseDataFunc{
         .orderBy(MESSAGE_TIMESTAMP, descending: true).snapshots();
   }
   Future<DocumentSnapshot> checkUserIsFriend(String idMe,String idFriend)async{
+
     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
-        .collection(FIREBASE_FRIENDS)
-        .doc(idMe)
-        .collection(idFriend).doc(idFriend).get()
-        ;
+        .collection(FIREBASE_FRIENDS).doc(idMe).collection(idMe).doc(idFriend).get();
     return documentSnapshot;
+  }
+  getAllFriends(String myId)async{
+     FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myId).collection(myId).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get();
   }
   void updateUserInfo(UserModel user){
     FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL

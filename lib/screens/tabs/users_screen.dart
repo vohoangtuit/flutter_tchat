@@ -6,27 +6,28 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'package:tchat_app/firebase_services/firebase_database.dart';
+import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
 
 import 'package:tchat_app/base/base_account_statefulwidget.dart';
-
 
 class UsersScreen extends StatefulWidget {
   @override
   State createState() => UsersScreenState();
 }
 
-class UsersScreenState extends AccountBaseState<UsersScreen>  {//with AutomaticKeepAliveClientMixin
+class UsersScreenState extends AccountBaseState<UsersScreen> {
+  //with AutomaticKeepAliveClientMixin
   bool isLoading = false;
   List<UserModel> listUser = List();
   Stream streamUsers;
-  Stream user;
+
+  List<FriendModel> friends =List();
   @override
   void initState() {
     super.initState();
     getData();
-
   }
 
   @override
@@ -49,37 +50,60 @@ class UsersScreenState extends AccountBaseState<UsersScreen>  {//with AutomaticK
       });
       hideLoading();
     });
-    //DocumentSnapshot variable = await firebaseDataService.checkUserIsFriend(userModel.id, user.id);
-
-    if(userModel==null){
+    if (userModel == null) {
       userModel = await getAccount();
-
     }
 
-    if(userModel!=null){
-      Stream<QuerySnapshot> stream = FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).snapshots();
-     // jsonObject = Customers(error: false, errorCode: 0, Items: List<Customers_items>());
-      stream.forEach((QuerySnapshot element) {
-        if (element == null){
-          print('null');
-        } else{
-          print('not null');
-          print(json.decode(stream.toString()).toString());
-          print(element.size.toString());
-          String data =element.toString();
-        }
+    if (userModel != null) {
+     setState(() {
+       isLoading =true;
+     });
+   await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(userModel.id).collection(userModel.id).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get().then((value) {
+       if(value.size>0){
+         List<FriendModel> data =List();
+             for(int i=0;i<value.size;i++ ){
+               QueryDocumentSnapshot doc =value.docs[i];
+               data.add(FriendModel.fromQuerySnapshot(doc));
+             }
+         setState(() {
+           friends =data;
+           print(' friends '+friends.length.toString());
+         });
+       }else{
+         print('no data ');
+       }
+       setState(() {
+         isLoading =false;
+       });
+     });
 
-        // setState(() {
-        //   jsonObject.Items = element.documents.map((e) => Customers_items.fromJson(e.data)).toList();
-        // });
-      });
-
-
+     // todo improve code
+     // await firebaseDataService.getAllFriends(userModel.id).then((value) {
+     //   if(value.size>0){
+     //     List<FriendModel> data =List();
+     //     for(int i=0;i<value.size;i++ ){
+     //       QueryDocumentSnapshot doc =value.docs[i];
+     //       data.add(FriendModel.fromQuerySnapshot(doc));
+     //     }
+     //     setState(() {
+     //       friends =data;
+     //       isLoading =false;
+     //       print(' friends '+friends.length.toString());
+     //     });
+     //   }else{
+     //     print('no data ');
+     //     setState(() {
+     //       isLoading =false;
+     //     });
+     //   }
+     //  }).catchError((onError){
+     //   print('onError  '+onError.toString());
+     //   setState(() {
+     //     isLoading =false;
+     //   });
+     // });
     }
-
   }
-
-
 
   Widget userList() {
     return StreamBuilder(
@@ -92,14 +116,14 @@ class UsersScreenState extends AccountBaseState<UsersScreen>  {//with AutomaticK
                 itemCount: snapshot.data.documents.length,
                 // snapshot.data.documents.length
                 itemBuilder: (context, index) => ItemUser(
-                    context, snapshot.data.documents[index], userModel,false),
+                    context, snapshot.data.documents[index], userModel, false),
               )
             : Container();
       },
     );
   }
+
   @override
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
-
 }

@@ -30,6 +30,13 @@ class FriendModel{
       photoURL: doc[FRIEND_PHOTO_URL],
       statusRequest: doc[FRIEND_STATUS_REQUEST]
   );
+  factory FriendModel.fromQuerySnapshot (QueryDocumentSnapshot doc) =>FriendModel(
+      id: doc[FRIEND_ID],
+      fullName: doc[FRIEND_FULLNAME],
+      photoURL: doc[FRIEND_PHOTO_URL],
+      statusRequest: doc[FRIEND_STATUS_REQUEST]
+  );
+
 
   @override
   String toString() {
