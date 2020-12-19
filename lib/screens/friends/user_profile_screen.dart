@@ -544,12 +544,12 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
     DocumentReference from = fireBaseStore
         .collection(FIREBASE_FRIENDS)
         .doc(myProfile.id)
-        .collection(user.id)
+        .collection(myProfile.id)
         .doc(user.id);
     DocumentReference to = fireBaseStore
         .collection(FIREBASE_FRIENDS)
         .doc(user.id)
-        .collection(myProfile.id)
+        .collection(user.id)
         .doc(myProfile.id);
     writeBatch.update(from, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
     writeBatch.update(to, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});

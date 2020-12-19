@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/setting_screen.dart';
+import 'package:tchat_app/screens/tabs/contacts_screen.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
@@ -56,8 +57,8 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
                   body:
                   TabBarView(
                     physics: NeverScrollableScrollPhysics(),// todo: disable swip
-                    // children: <Widget>[MessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
-                    children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                     children: <Widget>[LastMessageScreen(),ContactsScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
+                    //children: <Widget>[LastMessageScreen(),UsersScreen(), GroupScreen(), TimeLineScreen(), MoreScreen()],
                     // set the controller
                     controller: tabController,
                   ),
