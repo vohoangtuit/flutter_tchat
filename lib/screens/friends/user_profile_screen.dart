@@ -242,7 +242,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
       color: Colors.grey[50],
       child: Padding(
         padding:
-            const EdgeInsets.only(left: 40, top: 20, right: 40, bottom: 10),
+            const EdgeInsets.only(left: 30, top: 20, right: 30, bottom: 10),
         child: Column(
           children: [
             Text(
@@ -260,7 +260,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
                   title: 'MESSAGE',
                   colorButton: Colors.blue[100],
                   colorText: Colors.blue,
-                  sizeText: 14.0,
+                  sizeText: 13.0,
                   onPressed: () {
                     openScreen(ChatScreen(user));
                   },
@@ -275,7 +275,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
                   colorText: statusRequest == FRIEND_NOT_REQUEST
                       ? Colors.white
                       : Colors.black45,
-                  sizeText: 14.0,
+                  sizeText: 13.0,
                   onPressed: () {
                     if (statusRequest == FRIEND_NOT_REQUEST) {
                       requestAddFriend();
@@ -296,7 +296,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
     return Container(
       color: Colors.grey[50],
       child: Padding(
-        padding: EdgeInsets.only(left: 40, top: 20, right: 40, bottom: 10),
+        padding: EdgeInsets.only(left: 30, top: 20, right: 30, bottom: 10),
         child: Column(
           children: [
             Text(
@@ -314,7 +314,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
                   title: 'DECLINE',
                   colorButton: Colors.blue[100],
                   colorText: Colors.black,
-                  sizeText: 14.0,
+                  sizeText: 13.0,
                   onPressed: () {
                     // declineFriend();
                     undoRequest();
@@ -324,7 +324,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
                   title: 'ACCEPT',
                   colorButton: Colors.blue,
                   colorText: Colors.white,
-                  sizeText: 14.0,
+                  sizeText: 13.0,
                   onPressed: () {
                     acceptFriend();
                   },

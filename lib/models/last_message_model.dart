@@ -48,4 +48,9 @@ class LastMessageModel{
 
     return data;
   }
+
+  @override
+  String toString() {
+    return 'LastMessageModel{idDB: $idDB, uid: $uid, idReceiver: $idReceiver, nameReceiver: $nameReceiver, photoReceiver: $photoReceiver, timestamp: $timestamp, content: $content, type: $type, status: $status}';
+  }
 }

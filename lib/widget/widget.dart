@@ -147,3 +147,14 @@ Material loadFileMaterial(File file, double width, double height){
     clipBehavior: Clip.hardEdge,
   );
 }
+Container textBackGroundRadius(Color backgroundColor,String title,TextStyle textStyle){
+  return Container(
+      decoration: decorationButton(backgroundColor,40),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 10.0,top: 4.0,right: 10.0,bottom: 4.0),
+        child: Container(
+          child: Text(title,style: textStyle,),
+        ),
+      )
+  );
+}

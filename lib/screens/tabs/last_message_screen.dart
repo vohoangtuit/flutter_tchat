@@ -45,7 +45,8 @@ class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with
   Widget listView() {
     if(userModel==null){
       //print('last message user null');
-      return ListLoadingData();
+      //return ListLoadingData();
+      return Container();
     }else{
     //  print('last message user ${userModel.id}');
       return ListView.separated(
@@ -66,25 +67,33 @@ class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with
   }
   reloadData() {
     if(ProviderController(context).getReloadLastMessage()){
-      getListLastMessage();
+
       // todo: nếu gọi provider set Data in builder thì sẽ error cảnh báo :setState() or markNeedsBuild() called during build
       // todo dùng Future.delayed Zeo để xử lý
       Future.delayed(Duration.zero, () async {
+        getListLastMessage();
         ProviderController(context).setReloadLastMessage(false);
       });
     }
   }
 
   getListLastMessage() async{
-   await initDataBase();
-    lastMessageDao.getSingleLastMessage(userModel.id).then((value) {
-      listMessage.clear();
+    if(userModel==null){
+      await getAccount();
+    }
+    if(userModel!=null){
+      await initDataBase();
+      lastMessageDao.getSingleLastMessage(userModel.id).then((value) {
+        listMessage.clear();
+        //print('listMessage '+value.toString());
         Future.delayed(Duration.zero, () async {
           setState(() {
             listMessage.addAll(value);
           });
         });
-    });
+      });
+    }
+
 
   }
   @override

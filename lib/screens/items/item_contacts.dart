@@ -1,10 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_socket_io/generated/i18n.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
-import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/widget.dart';
 

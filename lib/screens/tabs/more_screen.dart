@@ -17,7 +17,6 @@ class MoreScreen extends StatefulWidget {
 }
 
 class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAliveClientMixin{
-
   var reload;
   @override
   Widget build(BuildContext context) {

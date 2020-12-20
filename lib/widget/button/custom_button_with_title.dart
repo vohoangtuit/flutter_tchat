@@ -14,7 +14,7 @@ class CustomButtonWithTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ButtonTheme(
-      height: 38,
+      height: 35,
       child: RaisedButton(
         onPressed: onPressed,
         color: colorButton,
@@ -23,7 +23,7 @@ class CustomButtonWithTitle extends StatelessWidget {
         child: Container(
         //  width: 200,
           child: Padding(
-            padding: const EdgeInsets.only(left: 15,right: 15),
+            padding: const EdgeInsets.only(left: 12,right: 12),
             child: Row(
               children: [
                 Text(

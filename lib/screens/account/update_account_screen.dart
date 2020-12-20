@@ -15,7 +15,7 @@ import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 
 import 'package:tchat_app/utils/utils.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/widget/button/base_button.dart';
+import 'package:tchat_app/widget/button/base_button.dart';
 import 'package:tchat_app/widget/widget.dart';
 import 'package:tchat_app/widget/loading.dart';
 

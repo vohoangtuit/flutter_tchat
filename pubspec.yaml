@@ -86,6 +86,7 @@ flutter:
     - images/mimi8.gif
     - images/mimi9.gif
     - images/logo.png
+    - images/cover.png
     - images/icons/camera_white.png
     - images/icons/phone_white.png
     - images/icons/ic_facebook.png
@@ -103,8 +104,9 @@ flutter:
     - images/icons/ic_avatar_not_available.png
     - images/icons/ic_friends_light_blue.png
     - images/icons/ic_user_yellow.png
-    - images/icons/ic_user_request.png
-    - images/cover.png
+    - images/icons/ic_user_unknown.png
+    - images/icons/ic_add_user_green.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
