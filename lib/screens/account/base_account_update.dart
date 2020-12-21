@@ -54,6 +54,7 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends AccountBaseS
   }
 
   void updateUserAccount(UserModel user){
+    user.lastUpdated =DateTime.now().millisecondsSinceEpoch.toString();
     FirebaseDataFunc(updateProfile).updateUserInfo(user);
   }
 }

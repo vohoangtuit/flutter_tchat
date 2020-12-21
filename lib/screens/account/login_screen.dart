@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
@@ -171,7 +169,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
     if (documents.length == 0) {
     // Update data to server if new user
       // todo insert data to firebase
-    user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',gender: 0,email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true,latitude: 0.0,longitude: 0.0);
+    user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',gender: 0,email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),lastUpdated: DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true,latitude: 0.0,longitude: 0.0);
     FirebaseFirestore.instance
         .collection(FIREBASE_USERS)
         .doc(firebaseUser.uid)
@@ -186,27 +184,14 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
     await SharedPre.saveBool(SharedPre.sharedPreIsLogin,true);
     await SharedPre.saveString(SharedPre.sharedPreID,documents[0].data()[USER_ID]);
 
-    // todo get data from firebase
-    user= UserModel.fromDocumentSnapshot(documents[0]);
-    // user = UserModel(
-    //     id:documents[0].data()[USER_ID],
-    //     userName:documents[0].data()[USER_USERNAME],
-    //     fullName:documents[0].data()[USER_FULLNAME],
-    //     birthday:documents[0].data()[USER_BIRTHDAY],
-    //     gender: documents[0].data()[USER_GENDER],
-    //     email:documents[0].data()[USER_EMAIL],
-    //     photoURL:documents[0].data()[USER_PHOTO_URL],
-    //     cover: documents[0].data()[USER_COVER],
-    //     statusAccount:documents[0].data()[USER_STATUS_ACCOUNT],
-    //     phoneNumber:documents[0].data()[USER_PHONE],
-    //     createdAt:documents[0].data()[USER_CREATED_AT],
-    //     pushToken:documents[0].data()[USER_PUST_TOKEN],
-    //     isLogin:true,
-    //     accountType: documents[0].data()[USER_ACCOUNT_TYPE],
-    //     allowSearch: documents[0].data()[USER_ALLOW_SEARCH],
-    //      latitude: 0.0,longitude: 0.0,
-    // );
+    //todo get data from firebase
+    Map<String, dynamic> json = documents[0].data();// todo: chuyển data sang json để check field exits, nếu ko thì document ko thể check field exits
+    user= UserModel.fromJson(json);
+    //user= UserModel.fromDocumentSnapshot(documents[0]);
+
+
     }
+
    // await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
     saveAccountToShared(user);
     this.setState(() {

@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/utils/const.dart';
-import 'package:tchat_app/widget/text/text_background_radius.dart';
+import 'package:tchat_app/utils/time_ago.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/widget.dart';
 
-Widget ItemMyFriendRequest(BuildContext context, FriendModel friendModel,UserModel userModel) {
+Widget ItemMyFriendRequest(BuildContext context, FriendModel friendModel,UserModel userModel,String languageCode,ValueChanged actionClick) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Row(
@@ -44,15 +44,16 @@ Widget ItemMyFriendRequest(BuildContext context, FriendModel friendModel,UserMod
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
                   ),
-                  Text('2 hours ago',style: textGraysSmall(),),
+                  Text(friendModel.timeRequest!=null?TimeAgo().timeAgo(languageCode,TimeAgo().getDateTimeFromString(friendModel.timeRequest)):'',style: textGraySmaller())
                 ],
               ),
             ),
             InkWell(
               child: textBackGroundRadius(Colors.grey[300],'UNDO',textBlackSmall()),
               onTap: (){
+                friendModel.actionConfirm =FRIEND_ACCTION_CLICK_DENNY;
                 print('UNDO');
-
+                actionClick(friendModel);
               },
             )
 

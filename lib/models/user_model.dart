@@ -15,6 +15,7 @@ final String USER_PHONE = 'phoneNumber';
 final String USER_BIRTHDAY = 'birthday';
 final String USER_GENDER = 'gender';
 final String USER_CREATED_AT = 'createdAt';
+final String USER_LAST_UPDATED = 'lastUpdated';
 final String USER_STATUS_ACCOUNT = 'statusAccount';
 final String USER_PUST_TOKEN = 'pushToken';
 final String USER_ISlOGIN = 'isLogin';
@@ -44,6 +45,7 @@ class UserModel {
   int statusAccount = 0;
   String phoneNumber = '';
   String createdAt = '';
+  String lastUpdated = '';
   String pushToken = '';
   bool isLogin;
   int accountType = 0;
@@ -64,6 +66,7 @@ class UserModel {
       this.statusAccount,
       this.phoneNumber,
       this.createdAt,
+      this.lastUpdated,
       this.pushToken,
       this.isLogin,
       this.accountType,
@@ -84,6 +87,7 @@ class UserModel {
     data[USER_STATUS_ACCOUNT] = this.statusAccount;
     data[USER_PHONE] = this.phoneNumber;
     data[USER_CREATED_AT] = this.createdAt;
+    data[USER_LAST_UPDATED] = this.lastUpdated;
     data[USER_PUST_TOKEN] = this.pushToken;
     data[USER_ISlOGIN] = this.isLogin;
     data[USER_ACCOUNT_TYPE] = this.accountType;
@@ -106,6 +110,7 @@ class UserModel {
       statusAccount: json[USER_STATUS_ACCOUNT],
       phoneNumber: json[USER_PHONE],
       createdAt: json[USER_CREATED_AT],
+      lastUpdated: json[USER_LAST_UPDATED]==null?'':json[USER_LAST_UPDATED],// todo check field exist
       pushToken: json[USER_PUST_TOKEN],
       isLogin: json[USER_ISlOGIN] as bool,
       accountType: json[USER_ACCOUNT_TYPE],
@@ -125,6 +130,7 @@ class UserModel {
       statusAccount: doc[USER_STATUS_ACCOUNT],
       phoneNumber: doc[USER_PHONE],
       createdAt: doc[USER_CREATED_AT],
+      lastUpdated: doc.get(USER_LAST_UPDATED)==null?'':doc[USER_LAST_UPDATED],// todo hiện tại ko ko thể check null
       pushToken: doc[USER_PUST_TOKEN],
       isLogin: doc[USER_ISlOGIN] as bool,
       accountType: doc[USER_ACCOUNT_TYPE],
@@ -135,6 +141,6 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';
+    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, lastUpdated: $lastUpdated, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';
   }
 }

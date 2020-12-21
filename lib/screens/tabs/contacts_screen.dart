@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:flutter/material.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 
-import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/friends/friends_request_screen.dart';
 import 'package:tchat_app/screens/items/item_contacts.dart';
 
@@ -16,13 +14,20 @@ import 'package:tchat_app/widget/list_loading_data.dart';
 
 class ContactsScreen extends StatefulWidget {
   @override
-  State createState() => ContactsScreenState();
+  State createState() => _ContactsScreenState();
 }
 
-class ContactsScreenState extends AccountBaseState<ContactsScreen> with AutomaticKeepAliveClientMixin{//
+class _ContactsScreenState extends AccountBaseState<ContactsScreen> with AutomaticKeepAliveClientMixin {//
   List<FriendModel> friends =List();
+  var load;
+  @override
+  bool get wantKeepAlive => true;
+
   @override
   Widget build(BuildContext context) {
+    if(ProviderController(context).getReloadContacts()){
+      load =reloadData();
+    }
     return Container(
       color: Colors.white,
       child: SingleChildScrollView(
@@ -78,61 +83,60 @@ class ContactsScreenState extends AccountBaseState<ContactsScreen> with Automati
     super.initState();
     getData();
   }
+  reloadData() {
+   // print('getReloadContacts '+ProviderController(context).getReloadContacts().toString());
+    if(ProviderController(context).getReloadContacts()){
+      // todo: nếu gọi provider set Data in builder thì sẽ error cảnh báo :setState() or markNeedsBuild() called during build
+      // todo dùng Future.delayed Zeo để xử lý
+      Future.delayed(Duration.zero, () async {
+        getData();
+        ProviderController(context).setReloadContacts(false);
+      });
+    }
+  }
   getData() async {
-
+   // print('getData ');
     if (userModel == null) {
       userModel = await getAccount();
     }
-
     if (userModel != null) {
       setState(() {
         isLoading =true;
       });
-      await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(userModel.id).collection(userModel.id).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get().then((value) {
+      await firebaseDataService.getFriendsWithType(userModel.id,FRIEND_SUCEESS).then((value) {
         if(value.size>0){
           List<FriendModel> data =List();
           for(int i=0;i<value.size;i++ ){
             QueryDocumentSnapshot doc =value.docs[i];
-            data.add(FriendModel.fromQuerySnapshot(doc));
-
+            Map<String, dynamic> json = doc.data();
+            data.add(FriendModel.fromJson(json));
+           // data.add(FriendModel.fromQuerySnapshot(doc));todo: get from QueryDocumentSnapshot  cannot check field exits
           }
           setState(() {
+            isLoading =false;
+            if(friends.length>0){
+              friends.clear();
+            }
+
             friends =data;
-            print(' friends '+friends.length.toString());
+           // print(' friends: '+friends.length.toString());
           });
         }else{
-          print('no data ');
+
+          setState(() {
+            isLoading =false;
+            if(friends.length>0){
+              friends.clear();
+            }
+          });
+         // print(' friends1 '+friends.length.toString());
         }
+       }).catchError((onError){
+        print('onError  '+onError.toString());
         setState(() {
           isLoading =false;
         });
       });
-
-      // todo improve code
-      // await firebaseDataService.getAllFriends(userModel.id).then((value) {
-      //   if(value.size>0){
-      //     List<FriendModel> data =List();
-      //     for(int i=0;i<value.size;i++ ){
-      //       QueryDocumentSnapshot doc =value.docs[i];
-      //       data.add(FriendModel.fromQuerySnapshot(doc));
-      //     }
-      //     setState(() {
-      //       friends =data;
-      //       isLoading =false;
-      //       print(' friends '+friends.length.toString());
-      //     });
-      //   }else{
-      //     print('no data ');
-      //     setState(() {
-      //       isLoading =false;
-      //     });
-      //   }
-      //  }).catchError((onError){
-      //   print('onError  '+onError.toString());
-      //   setState(() {
-      //     isLoading =false;
-      //   });
-      // });
     }
   }
 
@@ -145,6 +149,7 @@ class ContactsScreenState extends AccountBaseState<ContactsScreen> with Automati
       }
 
     }else{
+    //  print('rebuild list friends.length '+friends.length.toString());
       return ListView.builder(
         primary: false,
         shrinkWrap: true,
@@ -156,7 +161,5 @@ class ContactsScreenState extends AccountBaseState<ContactsScreen> with Automati
 
   }
 
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+
 }

@@ -23,7 +23,8 @@ class FirebaseUpload{
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({// todo update row document user
-            USER_PHOTO_URL: user.photoURL
+            USER_PHOTO_URL: user.photoURL,
+            USER_LAST_UPDATED: DateTime.now().millisecondsSinceEpoch.toString()
           }).then((data) async {
             user.photoURL = downloadUrl;
             callback(user,true);
@@ -55,7 +56,8 @@ class FirebaseUpload{
         storageTaskSnapshot = value;
         storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
           FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({// todo update row document user
-            USER_COVER: user.cover
+            USER_COVER: user.cover,
+            USER_LAST_UPDATED: DateTime.now().millisecondsSinceEpoch.toString()
           }).then((data) async {
             user.cover = downloadUrl;
             callback(user,true);

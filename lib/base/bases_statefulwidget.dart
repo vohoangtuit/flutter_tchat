@@ -61,9 +61,12 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
      userShared = jsonDecode(userStr) as Map<String, dynamic>;
    }
    if (userShared != null) {
-     setState(() {
-       userModel = UserModel.fromJson(userShared);
-     });
+     if(this.mounted){
+       setState(() {
+         userModel = UserModel.fromJson(userShared);
+         return userModel;
+       });
+     }
    }
    return userModel;
   }
@@ -94,9 +97,11 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
 
    // getUserAccount();
     await SharedPre.getStringKey(SharedPre.sharedPreLanguageCode).then((value) {
-      setState(() {
-        languageCode =value;
-      });
+      if(this.mounted){
+        setState(() {
+          languageCode =value;
+        });
+      }
     });
   }
   void getUserAccountDatabase()async{

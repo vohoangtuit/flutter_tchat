@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/utils/const.dart';
-import 'package:tchat_app/widget/text/text_background_radius.dart';
+import 'package:tchat_app/utils/time_ago.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/widget.dart';
 
-Widget ItemFriendRequest(BuildContext context, FriendModel friendModel,UserModel userModel) {
+Widget ItemUserRequest(BuildContext context, FriendModel friendModel,UserModel userModel,String languageCode,ValueChanged actionClick) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Row(
@@ -44,7 +44,8 @@ Widget ItemFriendRequest(BuildContext context, FriendModel friendModel,UserModel
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 5.0),
                   ),
-                  Text('2 hours ago',style: textGraysSmall(),),
+                  //Text('2 hours ago',style: textGraysSmall(),),
+                  Text(friendModel.timeRequest!=null?TimeAgo().timeAgo(languageCode,TimeAgo().getDateTimeFromString(friendModel.timeRequest)):'',style: textGraySmaller())
                 ],
               ),
             ),
@@ -52,7 +53,8 @@ Widget ItemFriendRequest(BuildContext context, FriendModel friendModel,UserModel
               child: textBackGroundRadius(Colors.lightBlue,'Accept',textBlackSmall()),
               onTap: (){
                 print('Accept');
-
+                friendModel.actionConfirm =FRIEND_ACCTION_CLICK_ACCEPT;
+                actionClick(friendModel);
               },
             ),
             SizedBox(width: 5,),
@@ -60,6 +62,8 @@ Widget ItemFriendRequest(BuildContext context, FriendModel friendModel,UserModel
               child: Icon(Icons.close,size: 20,),
               onTap: (){
                 print('DELETE');
+                friendModel.actionConfirm =FRIEND_ACCTION_CLICK_DENNY;
+                actionClick(friendModel);
               },
             ),
           ],

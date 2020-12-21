@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tchat_app/controller/bloc/reload_contacts.dart';
 
 import 'package:tchat_app/screens/splash_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -19,6 +20,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => AccountBloc()),
         ChangeNotifierProvider(create: (_) => ReloadMessage()),
+        ChangeNotifierProvider(create: (_) => ReloadContacts()),
       ],
       child: MyApp(),
     ),

@@ -13,7 +13,9 @@ Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userMo
   if (document.data()[USER_ID] ==  userModel.id) {
     return Container();
   } else {
-    UserModel friend =UserModel.fromDocumentSnapshot(document);
+    Map<String, dynamic> json =document.data();
+   // UserModel friend =UserModel.fromDocumentSnapshot(document);
+    UserModel friend =UserModel.fromJson(json);
     return Container(
       child: FlatButton(
         color: greyColor2,

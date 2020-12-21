@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
@@ -144,40 +145,7 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
                               }),
                     ),
                   ),
-                  // SliverPersistentHeader(
-                  //   // todo using to keep when scroll to top
-                  //   delegate: SliverAppBarDelegate(
-                  //     TabBar(
-                  //       labelColor: Colors.black87,
-                  //       unselectedLabelColor: Colors.grey,
-                  //       indicatorSize: TabBarIndicatorSize.tab,
-                  //       tabs: [
-                  //         Tab(
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: [
-                  //               Icon(Icons.wysiwyg),
-                  //               SizedBox(width: 10,),
-                  //               Text("Logs"),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //         Tab(
-                  //           child: Row(
-                  //             mainAxisAlignment: MainAxisAlignment.center,
-                  //             children: [
-                  //               Icon(Icons.photo),
-                  //               SizedBox(width: 10,),
-                  //               Text("Photos"),
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   ),
-                  //   pinned: true,
-                  //  // children: <Widget>[ProfileTimeLine(), ProfilePhotos()],
-                  // ),
+
                 ];
               },
               body: Container(
@@ -435,19 +403,9 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
     });
     DocumentSnapshot variable =
         await firebaseDataService.checkUserIsFriend(myProfile.id, user.id);
-    // if(variable!=null){
-    //   print('variable. '+variable.toString());
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }else{
-    //   setState(() {
-    //     isLoading = false;
-    //   });
-    // }
     if (variable != null) {
       if (variable.data() != null) {
-        print('variable ' + variable.data()['statusRequest'].toString());
+      //  print('variable ' + variable.data()['statusRequest'].toString());
         setState(() {
           statusRequest = variable.data()[FRIEND_STATUS_REQUEST];
           isLoading = false;
@@ -457,14 +415,14 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
           statusRequest = FRIEND_NOT_REQUEST;
           isLoading = false;
         });
-        print('222222');
+     //   print('222222');
       }
     } else {
       setState(() {
         isLoading = false;
         statusRequest = FRIEND_NOT_REQUEST;
       });
-      print('3333');
+    //  print('3333');
     }
   }
 
@@ -473,98 +431,55 @@ class _UserProfileScreenState extends AccountBaseState<UserProfileScreen> {
     setState(() {
       isLoading = true;
     });
-    FriendModel meRequest = FriendModel(
+    FriendModel fromRequest = FriendModel(
         id: user.id,
         fullName: user.fullName,
         photoURL: user.photoURL,
+        timeRequest: DateTime.now().millisecondsSinceEpoch.toString(),
         statusRequest: FRIEND_SEND_REQUEST);
-    FriendModel receiveRequest = FriendModel(
+    FriendModel toRequest = FriendModel(
         id: myProfile.id,
         fullName: myProfile.fullName,
         photoURL: myProfile.photoURL,
+        timeRequest: DateTime.now().millisecondsSinceEpoch.toString(),
         statusRequest: FRIEND_WAITING_CONFIRM);
 
-    WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(myProfile.id).doc(user.id); // todo: lấy user id làm id trên firebase
-   //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id); // todo: lấy user id làm id trên firebase
-    //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc();todo id tự generate on firebase
-    DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(user.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
-   // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
-    // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id); todo id tự generate on firebase
-    writeBatch.set(from, meRequest.toJson());
-    writeBatch.set(to, receiveRequest.toJson());
-    writeBatch.commit().then((value) {
-      print('send request');
+    await firebaseDataService.requestAddFriend(myProfile,user,fromRequest,toRequest).then((value){
       setState(() {
+        print('request success');
         statusRequest = FRIEND_SEND_REQUEST;
         isLoading = false;
       });
-    }).catchError((onError) {
-      setState(() {
-        isLoading = false;
-      });
     });
+
+
   }
 
   undoRequest() async {
     print('undoRequest()');
 
-    WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(myProfile.id)
-        .collection(user.id)
-        .doc(user.id);
-    DocumentReference to = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(user.id)
-        .collection(myProfile.id)
-        .doc(myProfile.id);
-    writeBatch.delete(from);
-    writeBatch.delete(to);
-    writeBatch.commit().then((value) {
-      print('deleted request');
+    await firebaseDataService.removeFriend(userModel.id, user.id).then((value){
       setState(() {
+        print('ok:222222222:');
+        isLoading =false;
         statusRequest = FRIEND_NOT_REQUEST;
-        isLoading = false;
-      });
-    }).catchError((onError) {
-      setState(() {
-        isLoading = false;
+        ProviderController(context).setReloadContacts(true);
       });
     });
   }
 
-  acceptFriend() {
+  acceptFriend() async{
     // https://stackoverflow.com/questions/46618601/how-to-create-update-multiple-documents-at-once-in-firestore?noredirect=1&lq=1
     setState(() {
       isLoading = true;
     });
-    WriteBatch writeBatch = fireBaseStore.batch();
-    DocumentReference from = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(myProfile.id)
-        .collection(myProfile.id)
-        .doc(user.id);
-    DocumentReference to = fireBaseStore
-        .collection(FIREBASE_FRIENDS)
-        .doc(user.id)
-        .collection(user.id)
-        .doc(myProfile.id);
-    writeBatch.update(from, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
-    writeBatch.update(to, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
-
-    writeBatch.commit().then((value) {
+    await firebaseDataService.acceptFriend(userModel.id, user.id).then((value){
       setState(() {
+        print('ok:::::::::::::');
+        isLoading =false;
         statusRequest = FRIEND_SUCEESS;
-        isLoading = false;
-      });
-    }).catchError((onError) {
-      setState(() {
-        isLoading = false;
+        ProviderController(context).setReloadContacts(true);
       });
     });
   }
-
-  declineFriend() {}
 }

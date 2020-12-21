@@ -18,7 +18,6 @@ class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with
  bool get wantKeepAlive => true;
   List<LastMessageModel> listMessage = List();
   bool reloadMessage =false;
- // UserModel user;
 
   var load;
   @override

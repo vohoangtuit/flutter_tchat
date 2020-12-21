@@ -46,12 +46,7 @@ class FirebaseDataFunc{
             .limit(20)
             .snapshots();
   }
-  getFriend(String id)async{
-    return await FirebaseFirestore.instance
-        .collection(FIREBASE_FRIENDS)
-        .doc( id)
-        .snapshots();
-  }
+
   getLastMessage(String idSender, String idReceiver)async{
     FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
@@ -66,11 +61,57 @@ class FirebaseDataFunc{
         .collection(FIREBASE_FRIENDS).doc(idMe).collection(idMe).doc(idFriend).get();
     return documentSnapshot;
   }
-  getAllFriends(String myId)async{
-     FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myId).collection(myId).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get();
+  getFriendsWithType(String myId,int type)async{
+    return await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myId).collection(myId).where(FRIEND_STATUS_REQUEST,isEqualTo: type).get();
+  }
+  requestAddFriend(UserModel myProfile,UserModel user,FriendModel fromRequest,FriendModel toRequest){
+    WriteBatch writeBatch =  FirebaseFirestore.instance.batch();
+    DocumentReference from = FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(myProfile.id).doc(user.id); // todo: lấy user id làm id trên firebase
+    //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id); // todo: lấy user id làm id trên firebase
+    //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc();todo id tự generate on firebase
+    DocumentReference to = FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(user.id).collection(user.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
+    // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id).doc(myProfile.id); // todo: lấy user id làm id trên firebase
+    // DocumentReference to = fireBaseStore.collection(FIREBASE_FRIENDS).doc(user.id).collection(myProfile.id); todo id tự generate on firebase
+    writeBatch.set(from, fromRequest.toJson());
+    writeBatch.set(to, toRequest.toJson());
+    return  writeBatch.commit();
+  }
+  acceptFriend(String myID, String userID)async{
+    WriteBatch writeBatch = FirebaseFirestore.instance.batch();
+    DocumentReference from = FirebaseFirestore.instance
+        .collection(FIREBASE_FRIENDS)
+        .doc(myID)
+        .collection(myID)
+        .doc(userID);
+    DocumentReference to = FirebaseFirestore.instance
+        .collection(FIREBASE_FRIENDS)
+        .doc(userID)
+        .collection(userID)
+        .doc(myID);
+    writeBatch.update(from, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
+    writeBatch.update(to, {FRIEND_STATUS_REQUEST: FRIEND_SUCEESS});
+    //return await writeBatch.commit();
+    return  writeBatch.commit();
+  }
+  removeFriend(String myID, String userID)async{
+    WriteBatch writeBatch = FirebaseFirestore.instance.batch();
+    DocumentReference from = FirebaseFirestore.instance
+        .collection(FIREBASE_FRIENDS)
+        .doc(myID)
+        .collection(myID)
+        .doc(userID);
+    DocumentReference to = FirebaseFirestore.instance
+        .collection(FIREBASE_FRIENDS)
+        .doc(userID)
+        .collection(userID)
+        .doc(myID);
+    writeBatch.delete(from);
+    writeBatch.delete(to);
+    return  writeBatch.commit();
+   // return  writeBatch;
   }
   void updateUserInfo(UserModel user){
-    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday, USER_PHOTO_URL: user.photoURL
+    FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday,USER_LAST_UPDATED: user.lastUpdated
     }).then((data) async {
       FBCallBack(user,true);
       Fluttertoast.showToast(msg: "Update info success");
