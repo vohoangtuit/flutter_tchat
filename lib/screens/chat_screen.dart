@@ -6,6 +6,7 @@ import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_socket_io/flutter_socket_io.dart';
 import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,6 +18,7 @@ import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -34,7 +36,7 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends AccountBaseState {
-  final UserModel toUser;
+   UserModel toUser;
   _ChatScreenState(this.toUser);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
@@ -53,14 +55,29 @@ class _ChatScreenState extends AccountBaseState {
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
   Stream chatStream;
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-        centerTitle: false,
-        title: Text(toUser.fullName, style: textWhiteMedium()),
+        titleSpacing:-10,
+       // automaticallyImplyLeading: false,// todo hide icon back
+       // title: Text(toUser.fullName, style: textWhiteMedium()), // todo title default
+        title: Container(// todo custom title
+          height: 54,
+          child: InkWell(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(toUser.fullName, style: textWhiteMedium()),
+                Text('last seen 10 minutes ago',style: TextStyle(color: Colors.grey[200], fontSize: 12)),
+              ],
+            ),
+            onTap: (){
+              openScreen(UserProfileScreen(myProfile: userModel,user: toUser,));
+            },
+          ),
+        ),
         actions: <Widget>[
           GestureDetector(
             child: Container(
@@ -119,13 +136,12 @@ class _ChatScreenState extends AccountBaseState {
       ),
     );
   }
-
   @override
   void initState() {
     super.initState();
     initData();
+    getUserProfile();
   }
-
   callVideo() async {
     print('call video');
     await _handleCameraAndMic();
@@ -138,7 +154,6 @@ class _ChatScreenState extends AccountBaseState {
   audioVideo() {
     print('audio call');
   }
-
   Future<void> _handleCameraAndMic() async {
     print("permission");
     await PermissionHandler().requestPermissions(
@@ -164,10 +179,9 @@ class _ChatScreenState extends AccountBaseState {
       });
     }
   }
-
   initData() async {
     //showLoading();
-    await Future.delayed(const Duration(seconds: 2), () {
+    await Future.delayed(const Duration(seconds: 0), () {
     });
    // hideLoading();
     focusNode.addListener(onFocusChange);
@@ -191,10 +205,8 @@ class _ChatScreenState extends AccountBaseState {
     });
     listenerData();
   }
-
   @override
   void dispose() {
-    textEditingController.dispose();
     super.dispose();
     // socketIO.sendMessage(// todo send message to server socket
     //     //   'unsubscribe',
@@ -207,17 +219,10 @@ class _ChatScreenState extends AccountBaseState {
 
   }
   void listenerData() async{
-    var userQuery=  FirebaseFirestore.instance
-        .collection(FIREBASE_MESSAGES)
-        .doc(userModel.id)
-        .collection(toUser.id)
-        .limit(1)
-        .orderBy(MESSAGE_TIMESTAMP, descending: true);
-
-
+    var userQuery=  firebaseDataService.chatListenerData(userModel.id, toUser.id);
     userQuery.snapshots().listen((data) {
      // print("data size: "+data.size.toString());
-      //print("data doc: "+data.docs.toString());
+      //print("data document: "+data.docs.toString());
       LastMessageModel message = LastMessageModel();
       message.uid =userModel.id;
       data.docs.forEach((change) {
@@ -229,9 +234,9 @@ class _ChatScreenState extends AccountBaseState {
           message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
         }else{
          //print('message not me');
-          message.idReceiver =change.data()[MESSAGE_ID_SENDER];
-          message.nameReceiver =change.data()[MESSAGE_NAME_SENDER];
-          message.photoReceiver =change.data()[MESSAGE_PHOTO_SENDER];
+          message.idReceiver =toUser.id;
+          message.nameReceiver =toUser.fullName;
+          message.photoReceiver =toUser.photoURL;
         }
         message.timestamp =change.data()[MESSAGE_TIMESTAMP];
         message.content =change.data()[MESSAGE_CONTENT];
@@ -242,18 +247,30 @@ class _ChatScreenState extends AccountBaseState {
       ProviderController(context).setReloadLastMessage(true);
     });
   }
-
   void getMessage() {
     firebaseDataService
         .getMessageChat(userModel.id, toUser.id)
         .then((data) {
-      setState(() {
-        chatStream =data;
-       // if(data.)
-      });
+          if(this.mounted){
+            setState(() {
+              chatStream =data;
+            });
+          }
     });
   }
-
+  void getUserProfile()async{
+    firebaseDataService.getInfoUserProfile(toUser.id).then((value){
+      if(value.data()!=null){
+        Map<String, dynamic> json =value.data();
+        UserModel userModel =UserModel.fromJson(json);
+        setState(() {
+          toUser =userModel;
+        });
+      }else{
+        print('getUserProfile() null');
+      }
+    });
+}
   void onFocusChange() {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
@@ -262,7 +279,6 @@ class _ChatScreenState extends AccountBaseState {
       });
     }
   }
-
   Future getImage() async {
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
@@ -277,7 +293,6 @@ class _ChatScreenState extends AccountBaseState {
       uploadFile();
     }
   }
-
   void getSticker() {
     // Hide keyboard when sticker appear
     focusNode.unfocus();
@@ -285,7 +300,6 @@ class _ChatScreenState extends AccountBaseState {
       isShowSticker = !isShowSticker;
     });
   }
-
   Future uploadFile() async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
@@ -304,7 +318,6 @@ class _ChatScreenState extends AccountBaseState {
       Fluttertoast.showToast(msg: 'This file is not an image');
     });
   }
-
   void onSendMessage(String content, int type) async {
     // type: 0 = text, 1 = image, 2 = sticker
     if (content.trim() != '') {
@@ -351,7 +364,6 @@ class _ChatScreenState extends AccountBaseState {
           textColor: Colors.red);
     }
   }
-
   Future<bool> onBackPress() {
     if (isShowSticker) {
       setState(() {
@@ -363,7 +375,6 @@ class _ChatScreenState extends AccountBaseState {
 
     return Future.value(false);
   }
-
   Widget buildSticker() {
     return Container(
       child: Column(
@@ -474,13 +485,11 @@ class _ChatScreenState extends AccountBaseState {
       height: 180.0,
     );
   }
-
   Widget buildLoading() {
     return Positioned(
       child: isLoading ? const LoadingCircle() : Container(),
     );
   }
-
   Widget buildInput() {
     return Container(
       alignment: Alignment.bottomCenter,
@@ -551,47 +560,7 @@ class _ChatScreenState extends AccountBaseState {
           color: Colors.white),
     );
   }
-
-  Widget buildListMessage() {
-
-    return Flexible(
-      child: StreamBuilder(
-              stream: fireBaseStore
-                  .collection(FIREBASE_MESSAGES)
-                  .doc(userModel.id)
-                  .collection(toUser.id)
-                  .orderBy('timestamp', descending: true)
-                  .limit(_limit)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  print("cannot get data");
-                  return Center(
-                      child: CircularProgressIndicator(
-                          //  valueColor: AlwaysStoppedAnimation<Color>(themeColor)
-                          ));
-                } else {
-                  listMessage.addAll(snapshot.data.documents);
-                  return ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) => ItemChatMessage(
-                        context,
-                        userModel.id,
-                        index,
-                        snapshot.data.documents[index],
-                        listMessage,
-                        toUser.photoURL),
-                    itemCount: snapshot.data.documents.length,
-                    reverse: true,
-                    controller: listScrollController,
-                  );
-                }
-              },
-            ),
-    );
-  }
-
-   listChat() {
+  listChat() {
 
     return Flexible(
       child: StreamBuilder(
@@ -623,8 +592,6 @@ class _ChatScreenState extends AccountBaseState {
     }),
     );
   }
-
-
   Widget buildTyping() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -639,7 +606,16 @@ class _ChatScreenState extends AccountBaseState {
       ],
     );
   }
+   @override
+   void uploadAvatarCover(UserModel user, bool success) {
+     // TODO: implement uploadAvatarCover
+   }
+   @override
+   void callBackCamera(File file, type) {
+     // TODO: implement callBackCamera
+   }
 
+   // todo SOCKET
   initSocket() async {
     await SharedPre.getStringKey(SharedPre.sharedPreFullName)
         .then((value) => {toUser.fullName = value});
@@ -667,11 +643,9 @@ class _ChatScreenState extends AccountBaseState {
     //     //Connect to the socket
     socketIO.connect();
   }
-
   _socketStatus(dynamic data) {
     print("Socket status: " + data);
   }
-
   void userTyping(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
@@ -681,7 +655,6 @@ class _ChatScreenState extends AccountBaseState {
       typing = true;
     });
   }
-
   void stopTyping(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
@@ -691,21 +664,18 @@ class _ChatScreenState extends AccountBaseState {
       typing = false;
     });
   }
-
   void userJoined(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
     print("userJoined -------------------- $map");
   }
-
   void userLeft(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
     print("userLeft -------------------- $map");
   }
-
   void receiveMessage(dynamic data) {
     print("receiveMessage " + data);
     Map<String, dynamic> map = new Map<String, dynamic>();
@@ -714,16 +684,6 @@ class _ChatScreenState extends AccountBaseState {
     setState(() {
       typing = false;
     });
-  }
-
-  @override
-  void uploadAvatarCover(UserModel user, bool success) {
-    // TODO: implement uploadAvatarCover
-  }
-
-  @override
-  void callBackCamera(File file, type) {
-    // TODO: implement callBackCamera
   }
 
 }

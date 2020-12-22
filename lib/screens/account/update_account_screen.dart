@@ -1,7 +1,4 @@
-import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
@@ -33,6 +30,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   File avatarImageFile;
 
   DateTime selectedDate = DateTime.now();
+  DateTime currentDate = DateTime.now();
 
   final FocusNode focusNodeFullName = FocusNode();
   final FocusNode focusNodeAboutMe = FocusNode();
@@ -156,6 +154,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
                                           value: 1,
                                           groupValue: _genderValue,
                                           onChanged: _handleRadioValueChange,
+                                          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                         ),
                                         Text('Male'),
                                         Radio(
@@ -231,14 +230,14 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
     }
     controllerFullName = TextEditingController(text: user.fullName);
      if(user.birthday.isNotEmpty){
-       
        setState(() {
          birthday =Utils().formatTimesnapToDate(int.parse(user.birthday));
+         selectedDate =DateTime.fromMillisecondsSinceEpoch(int.parse(user.birthday));
        });
 
      }else{
        setState(() {
-         birthday ='1/1/1990';
+         birthday ='1/1/1970';
        });
      }
 
@@ -259,7 +258,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(1960),
-      lastDate: DateTime(2021),
+      lastDate: currentDate,
     );
     if (picked != null && picked != selectedDate)
       setState(() {

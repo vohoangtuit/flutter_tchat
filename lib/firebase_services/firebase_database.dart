@@ -46,7 +46,14 @@ class FirebaseDataFunc{
             .limit(20)
             .snapshots();
   }
-
+chatListenerData(String myID,String toID){
+    return FirebaseFirestore.instance
+        .collection(FIREBASE_MESSAGES)
+        .doc(myID)
+        .collection(toID)
+        .limit(1)
+        .orderBy(MESSAGE_TIMESTAMP, descending: true);
+}
   getLastMessage(String idSender, String idReceiver)async{
     FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
@@ -55,8 +62,11 @@ class FirebaseDataFunc{
         .limit(1)
         .orderBy(MESSAGE_TIMESTAMP, descending: true).snapshots();
   }
+  Future<DocumentSnapshot> getInfoUserProfile(String id)async{
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(id).get();
+    return documentSnapshot;
+  }
   Future<DocumentSnapshot> checkUserIsFriend(String idMe,String idFriend)async{
-
     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
         .collection(FIREBASE_FRIENDS).doc(idMe).collection(idMe).doc(idFriend).get();
     return documentSnapshot;

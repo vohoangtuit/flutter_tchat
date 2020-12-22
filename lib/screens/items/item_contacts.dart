@@ -7,7 +7,7 @@ import 'package:tchat_app/widget/widget.dart';
 
 import '../chat_screen.dart';
 
-Widget ItemContact(BuildContext context, FriendModel friendModel,UserModel userModel) {
+Widget ItemContact(BuildContext context, UserModel friendModel,UserModel userModel) {
   if (friendModel.id ==  userModel.id) {
     return Container();
   } else {

@@ -111,7 +111,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
       });
-
       await userDao.findUserById(id).then((value) {
         if(value!=null){
           setState(() {
@@ -125,7 +124,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   }
   void updateLastMessageByID(LastMessageModel message) async{
    await lastMessageDao.getLastMessageById(message.idReceiver).then((value){
-     // print("value "+value.toString());
       if(value!=null){
         message.idDB =value.idDB;
         lastMessageDao.updateLastMessageById(message).then((value) {
@@ -136,7 +134,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
           });
       }
     });
- //  ProviderController(context).setReloadLastMessage(true);
   }
 
   void showLoading() {
