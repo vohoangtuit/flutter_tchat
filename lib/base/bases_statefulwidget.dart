@@ -32,7 +32,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   LastMessageDao lastMessageDao;
 
   String languageCode ='';
-
   @override
   Widget build(BuildContext context) {
     //print('base BuildContext ');

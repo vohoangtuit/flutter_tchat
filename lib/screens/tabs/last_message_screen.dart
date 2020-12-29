@@ -7,11 +7,12 @@ import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/screens/items/item_last_message.dart';
 import 'package:tchat_app/widget/list_loading_data.dart';
 
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 class LastMessageScreen extends StatefulWidget  {
   @override
   _LastMessageScreenState createState() => _LastMessageScreenState();
 }
-class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with AutomaticKeepAliveClientMixin<LastMessageScreen>  {
+class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> with AutomaticKeepAliveClientMixin  {
   //
   @override
 //  TODO: implement wantKeepAlive
@@ -66,7 +67,6 @@ class _LastMessageScreenState extends BaseStatefulWidget<LastMessageScreen> with
   }
   reloadData() {
     if(ProviderController(context).getReloadLastMessage()){
-
       // todo: nếu gọi provider set Data in builder thì sẽ error cảnh báo :setState() or markNeedsBuild() called during build
       // todo dùng Future.delayed Zeo để xử lý
       Future.delayed(Duration.zero, () async {

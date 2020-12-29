@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
@@ -13,7 +13,7 @@ class SettingScreen extends StatefulWidget {
   _SettingScreenState createState() => _SettingScreenState();
 }
 
-class _SettingScreenState extends AccountBaseState<SettingScreen> {
+class _SettingScreenState extends GenericAccountState<SettingScreen> {
   bool isLoading = false;
   @override
   Widget build(BuildContext context) {

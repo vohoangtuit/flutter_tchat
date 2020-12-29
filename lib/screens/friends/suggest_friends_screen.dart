@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
 import 'package:tchat_app/widget/widget.dart';
@@ -10,7 +10,7 @@ class SuggestFriendsScreen extends StatefulWidget {
   _SuggestFriendsScreenState createState() => _SuggestFriendsScreenState();
 }
 
-class _SuggestFriendsScreenState extends AccountBaseState<SuggestFriendsScreen> {
+class _SuggestFriendsScreenState extends GenericAccountState<SuggestFriendsScreen> {
   bool isLoading = false;
   List<UserModel> listUser = List();
   Stream streamUsers;

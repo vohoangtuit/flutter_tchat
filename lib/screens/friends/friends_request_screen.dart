@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/screens/tabs/request/my_request_screen.dart';
 import 'package:tchat_app/screens/tabs/request/user_request_screen.dart';
 import 'package:tchat_app/widget/basewidget.dart';
@@ -9,7 +9,7 @@ class FriendsRequestScreen extends StatefulWidget {
   _FriendsRequestScreenState createState() => _FriendsRequestScreenState();
 }
 
-class _FriendsRequestScreenState extends AccountBaseState<FriendsRequestScreen>
+class _FriendsRequestScreenState extends GenericAccountState<FriendsRequestScreen>
     with TickerProviderStateMixin {
   TabController _tabController;
 

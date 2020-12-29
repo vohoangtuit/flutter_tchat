@@ -5,6 +5,8 @@ import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/user_model.dart';
 
 final String FIREBASE_ID ='id';
+
+final String FIREBASE_NOTIFICATIONS ='notifications';
 final String FIREBASE_USERS ='users';
 final String FIREBASE_MESSAGES ='messages';
 final String FIREBASE_GROUP ='groups';

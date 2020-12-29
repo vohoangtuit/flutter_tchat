@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/user_model.dart';
@@ -13,7 +13,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/camera_library_open.dart';
 import 'package:tchat_app/utils/const.dart';
 
-abstract class BaseAccountUpdate <T extends StatefulWidget> extends AccountBaseState {
+abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccountState {
  // TODO: this class using for screen update account implement more function
   var reload;
   void callBackCamera(File file, type);

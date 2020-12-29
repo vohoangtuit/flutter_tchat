@@ -10,14 +10,14 @@ import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
 
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 
 class UsersScreen extends StatefulWidget {
   @override
   State createState() => UsersScreenState();
 }
 
-class UsersScreenState extends AccountBaseState<UsersScreen> {
+class UsersScreenState extends GenericAccountState<UsersScreen> {
   //with AutomaticKeepAliveClientMixin
   bool isLoading = false;
   List<UserModel> listUser = List();

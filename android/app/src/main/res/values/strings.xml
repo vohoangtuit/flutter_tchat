@@ -3,4 +3,6 @@
     <string name="app_name">TChat</string>
     <string name="facebook_app_id">757901591612156</string>
     <string name="fb_login_protocol_scheme">fb757901591612156</string>
+
+    <string name="default_notification_channel_id" translatable="false">tChat_default_channel</string>
 </resources>

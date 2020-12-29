@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
@@ -11,7 +11,7 @@ class UserRequestScreen extends StatefulWidget {
   _UserRequestScreenState createState() => _UserRequestScreenState();
 }
 
-class _UserRequestScreenState extends AccountBaseState<UserRequestScreen>with AutomaticKeepAliveClientMixin {
+class _UserRequestScreenState extends GenericAccountState<UserRequestScreen>with AutomaticKeepAliveClientMixin {
   List<FriendModel> listFriend =List();
 
   @override

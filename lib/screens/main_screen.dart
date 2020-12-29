@@ -15,12 +15,10 @@ import 'package:tchat_app/screens/tabs/group_screen.dart';
 import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
 import 'package:tchat_app/screens/tabs/time_line_screen.dart';
-import 'package:tchat_app/screens/tabs/users_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
 
-import 'dialogs/dialog_base_notify.dart';
 import 'dialogs/dialog_controller.dart';
 class MainScreen extends StatefulWidget {
    bool synData;
@@ -31,8 +29,7 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerProviderStateMixin {
   TabController tabController;
-  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
   int positionTab=0;
   ValueChanged data;
   @override
@@ -195,69 +192,4 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
         ],)),
     ];
   }
-
-  void registerNotification() {
-    firebaseMessaging.requestNotificationPermissions();
-
-    firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
-      print('onMessage: $message');
-      Platform.isAndroid
-          ? showNotification(message['notification'])
-          : showNotification(message['aps']['alert']);
-      return;
-    }, onResume: (Map<String, dynamic> message) {
-      print('onResume: $message');
-      return;
-    }, onLaunch: (Map<String, dynamic> message) {
-      print('onLaunch: $message');
-      return;
-    });
-    firebaseMessaging.getToken().then((token) {
-      print('token: $token');
-      fireBaseStore.collection(FIREBASE_USERS)
-          .doc( userModel.id)
-          .update({USER_PUST_TOKEN: token});
-    }).catchError((err) {
-      Fluttertoast.showToast(msg: err.message.toString());
-    });
-  }
-
-  void configLocalNotification() {
-    var initializationSettingsAndroid =
-    new AndroidInitializationSettings('app_icon');
-    var initializationSettingsIOS = new IOSInitializationSettings();
-    var initializationSettings = new InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-  void showNotification(message) async {
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-      Platform.isAndroid
-          ? 'com.dfa.flutterchatdemo'
-          : 'com.duytq.flutterchatdemo',
-      'Flutter chat demo',
-      'your channel description',
-      playSound: true,
-      enableVibration: true,
-      importance: Importance.Max,
-      priority: Priority.High,
-    );
-    var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-
-    print(message);
-//    print(message['body'].toString());
-//    print(json.encode(message));
-
-    await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
-        message['body'].toString(), platformChannelSpecifics,
-        payload: json.encode(message));
-
-//    await flutterLocalNotificationsPlugin.show(
-//        0, 'plain title', 'plain body', platformChannelSpecifics,
-//        payload: 'item x');
-  }
-
-
 }

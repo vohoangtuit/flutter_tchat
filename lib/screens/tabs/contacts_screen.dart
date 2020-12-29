@@ -11,7 +11,7 @@ import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/friends/friends_request_screen.dart';
 import 'package:tchat_app/screens/items/item_contacts.dart';
 
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/widget/list_loading_data.dart';
 
 class ContactsScreen extends StatefulWidget {
@@ -19,7 +19,7 @@ class ContactsScreen extends StatefulWidget {
   State createState() => _ContactsScreenState();
 }
 
-class _ContactsScreenState extends AccountBaseState<ContactsScreen>  {//with AutomaticKeepAliveClientMixin
+class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with AutomaticKeepAliveClientMixin
   List<FriendModel> friends = List();
   var load;
   List<UserModel> listFriend =List();
@@ -68,9 +68,6 @@ class _ContactsScreenState extends AccountBaseState<ContactsScreen>  {//with Aut
                   color: Colors.white,
                   padding: EdgeInsets.only(
                       left: 5.0, top: 5.0, right: 8.0, bottom: 5.0),
-                  onPressed: () {
-                    print('ontap');
-                  },
                   child: Row(
                     children: [
                       Image.asset(
@@ -96,65 +93,16 @@ class _ContactsScreenState extends AccountBaseState<ContactsScreen>  {//with Aut
   @override
   void initState() {
     super.initState();
-    getData();
     syncListFriend();
   }
-
   reloadData() {
     // print('getReloadContacts '+ProviderController(context).getReloadContacts().toString());
     if (ProviderController(context).getReloadContacts()) {
       // todo: nếu gọi provider set Data in builder thì sẽ error cảnh báo :setState() or markNeedsBuild() called during build
       // todo dùng Future.delayed Zeo để xử lý
       Future.delayed(Duration.zero, () async {
-        getData();
+        syncListFriend();
         ProviderController(context).setReloadContacts(false);
-      });
-    }
-  }
-
-  getData() async {
-    // print('getData ');
-    if (userModel == null) {
-      userModel = await getAccount();
-    }
-    if (userModel != null) {
-      setState(() {
-        isLoading = true;
-      });
-      await firebaseDataService
-          .getFriendsWithType(userModel.id, FRIEND_SUCEESS)
-          .then((value) {
-        if (value.size > 0) {
-          List<FriendModel> data = List();
-          for (int i = 0; i < value.size; i++) {
-            QueryDocumentSnapshot doc = value.docs[i];
-            Map<String, dynamic> json = doc.data();
-            data.add(FriendModel.fromJson(json));
-            // data.add(FriendModel.fromQuerySnapshot(doc));todo: get from QueryDocumentSnapshot  cannot check field exits
-          }
-          setState(() {
-            isLoading = false;
-            if (friends.length > 0) {
-              friends.clear();
-            }
-
-            friends = data;
-            // print(' friends: '+friends.length.toString());
-          });
-        } else {
-          setState(() {
-            isLoading = false;
-            if (friends.length > 0) {
-              friends.clear();
-            }
-          });
-          // print(' friends1 '+friends.length.toString());
-        }
-      }).catchError((onError) {
-        print('onError  ' + onError.toString());
-        setState(() {
-          isLoading = false;
-        });
       });
     }
   }
@@ -209,10 +157,10 @@ class _ContactsScreenState extends AccountBaseState<ContactsScreen>  {//with Aut
                   setState(() {
                     listFriend.add(UserModel.fromJson(json));
                     isLoading =false;
-                    print('listFriend '+listFriend.length.toString());
+                 //   print('listFriend '+listFriend.length.toString());
                   });
                 }
-                print('listFriend : '+data.length.toString());
+               // print('listFriend : '+data.length.toString());
 
               }).catchError((onError){
                 catchError(onError);

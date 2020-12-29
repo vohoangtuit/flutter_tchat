@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/screens/friends/suggest_friends_screen.dart';
 import 'package:tchat_app/utils/const.dart';
@@ -16,7 +16,7 @@ class MoreScreen extends StatefulWidget {
   _MoreScreenState createState() => _MoreScreenState();
 }
 
-class _MoreScreenState extends AccountBaseState<MoreScreen> with AutomaticKeepAliveClientMixin{
+class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKeepAliveClientMixin{
   var reload;
   @override
   Widget build(BuildContext context) {

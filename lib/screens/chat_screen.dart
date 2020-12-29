@@ -12,7 +12,7 @@ import 'package:flutter_socket_io/socket_io_manager.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tchat_app/base/base_account_statefulwidget.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
@@ -35,7 +35,7 @@ class ChatScreen extends StatefulWidget {
   _ChatScreenState createState() => _ChatScreenState(toUser);
 }
 
-class _ChatScreenState extends AccountBaseState {
+class _ChatScreenState extends GenericAccountState {
    UserModel toUser;
   _ChatScreenState(this.toUser);
   ClientRole role = ClientRole.Broadcaster;
@@ -140,7 +140,7 @@ class _ChatScreenState extends AccountBaseState {
   void initState() {
     super.initState();
     initData();
-    getUserProfile();
+
   }
   callVideo() async {
     print('call video');
@@ -180,6 +180,7 @@ class _ChatScreenState extends AccountBaseState {
     }
   }
   initData() async {
+
     //showLoading();
     await Future.delayed(const Duration(seconds: 0), () {
     });
@@ -203,6 +204,14 @@ class _ChatScreenState extends AccountBaseState {
         // socketIO.sendMessage(Const().SOCKET_STOP_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
       }
     });
+
+    UserModel friend =await getUserProfile(toUser.id);
+    if(friend!=null){
+      setState(() {
+        toUser  = friend;
+      });
+    }
+
     listenerData();
   }
   @override
@@ -258,19 +267,7 @@ class _ChatScreenState extends AccountBaseState {
           }
     });
   }
-  void getUserProfile()async{
-    firebaseDataService.getInfoUserProfile(toUser.id).then((value){
-      if(value.data()!=null){
-        Map<String, dynamic> json =value.data();
-        UserModel userModel =UserModel.fromJson(json);
-        setState(() {
-          toUser =userModel;
-        });
-      }else{
-        print('getUserProfile() null');
-      }
-    });
-}
+
   void onFocusChange() {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
@@ -354,7 +351,7 @@ class _ChatScreenState extends AccountBaseState {
       });
       //  print('message insert '+messages.toString());
       await messageDao.insertMessage(messages);
-
+      senNotificationNewMessage(toUser.id,userModel.fullName,userModel.id,content);
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
