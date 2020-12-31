@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert' as JSON;
 import 'dart:convert';
 import 'dart:io';
 
@@ -9,14 +11,12 @@ import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
-import 'package:tchat_app/models/notification/response/response_data.dart';
+import 'package:tchat_app/models/notification/data_model.dart';
+import 'package:tchat_app/models/notification/notification_model.dart';
 import 'package:tchat_app/models/notification/response/notification_response.dart';
-import 'package:tchat_app/models/notification/response/notification.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/models/notification/sent/data_sent.dart';
-import 'file:///C:/TU/Develop/Demo/flutter_tchat/lib/models/notification/sent/sent_notification.dart';
+import 'package:tchat_app/models/notification/sent/notification_sent.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
-import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 
@@ -32,12 +32,12 @@ abstract class GenericAccountState<T extends StatefulWidget>
   final facebookLogin = FacebookLogin();
   FirebaseDataFunc firebaseDataService = new FirebaseDataFunc(null);
 
+  UserModel userProfile;
+
   @override
   void initState() {
     super.initState();
-
     initNotification();
-    //  _subscribeToNamelessCoder();
   }
   initNotification(){
     var initializationSettingsAndroid =
@@ -59,13 +59,13 @@ abstract class GenericAccountState<T extends StatefulWidget>
           print("Called onLaunch");
           print("onLaunch $message");
           NotificationResponse pushNotification = NotificationResponse.fromJson(message);
-          DataResponse data;
+          DataModel data;
           if(Platform.isIOS){
-            data = DataResponse.fromJsonIOS(message);
+            data = DataModel.fromJsonIOS(message);
           }else{
-            data = DataResponse.dataFromJson(message);
+            data = DataModel.dataFromJson(message);
           }
-          ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
+
           gotoDetailScreen(data);
         });
       },
@@ -73,30 +73,29 @@ abstract class GenericAccountState<T extends StatefulWidget>
       onResume: (Map<String, dynamic> message)async{
         print("onResume $message");
         NotificationResponse pushNotification = NotificationResponse.fromJson(message);
-
-        DataResponse data;
+        NotificationResponse notification =NotificationResponse.fromJson(message);
+        DataModel data;
         if(Platform.isIOS){
-          data = DataResponse.fromJsonIOS(message);
+          data = DataModel.fromJsonIOS(message);
         }else{
-          data = DataResponse.dataFromJson(message);
+          data = DataModel.dataFromJson(message);
         }
-        ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
         gotoDetailScreen(data);
       },
-      onMessage: (Map<String, dynamic> message)async{
+      onMessage: (Map<String, dynamic> message)async{// todo: new notify handle show banner
         setState(() {
-          print("onMessage "+message.toString());
-          NotificationResponse pushNotification = NotificationResponse.fromJson(message);
-          // print("PushNotification 1: "+pushNotification.title);
-          DataResponse data;
+          print("onMessage : : "+message.toString());
+          //NotificationModel pushNotification = NotificationModel.fromJson(message);
+          NotificationResponse notification =NotificationResponse.fromJson(message);
+        //  print("notification 1: "+notification.toString());
+          DataModel dataModel;
           if(Platform.isIOS){
-            data = DataResponse.fromJsonIOS(message);
+            dataModel = DataModel.fromJsonIOS(message);
           }else{
-            data = DataResponse.dataFromJson(message);
+            dataModel = DataModel.dataFromJson(message);
           }
-          ResponseNotification responseNotification =  ResponseNotification(notification:pushNotification,dataNotification:data);
-          _showNotification(responseNotification);
-
+          NotificationModel notificationModel =  NotificationModel(notification: notification,data: dataModel);
+          showBannerNotification(notificationModel);
         });
       },
     );
@@ -104,64 +103,77 @@ abstract class GenericAccountState<T extends StatefulWidget>
     registerFBToken();
   }
   Future<String> registerFBToken()async{
-    if (userModel == null) {
+    if (myAccount == null) {
       await getAccount();
-      // if(userModel.pushToken.isEmpty){
+     //if  if(userModel.pushToken.isEmpty){
       firebaseMessaging.getToken().then((token) {
         print('token: $token');
-        userModel.pushToken = token;
-        updateUserDatabase(userModel);
+        myAccount.pushToken = token;
+        updateUserDatabase(myAccount);
         fireBaseStore
             .collection(FIREBASE_USERS)
-            .doc(userModel.id)
+            .doc(myAccount.id)
             .update({USER_PUST_TOKEN: token});
       }).catchError((err) {
         print('Error Token');
       });
-      //  }
-    }
+        }
+   // }
   }
-  Future _showNotification(ResponseNotification responseNotification) async {/// todo: khi app opening thì sẽ vào đây
- //   print("_showNotification :  "+responseNotification.toString());
+  Future showBannerNotification(NotificationModel notification) async {/// todo: khi app opening thì sẽ vào đây
+    print("showBannerNotification :  "+notification.toString());
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max, priority: Priority.High,autoCancel: true);
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    DataResponse data = responseNotification.dataNotification;
     await flutterLocalNotificationsPlugin.show(
-        5, responseNotification.notification.title, responseNotification.notification.body, platformChannelSpecifics,
-        payload: responseNotification.dataNotification.toString());
+        5, notification.notification.title, notification.notification.body, platformChannelSpecifics,
+        payload: notification.data.toString());
    // print('data '+data.toString());
   }
-  Future onSelectNotification(String payload) async {//todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
-    DataResponse dataNotification;
+  Future onSelectNotification(dynamic payload) async {//todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
     if (payload != null) {
-      print(' payload: ' + payload);
-      var jsonData = json.decode(payload).toString();
-      print(' jsonData: ' + jsonData.toString());
-       dataNotification =DataResponse.fromJson(jsonData);
-      print(' dataNotification: ' + dataNotification.title);
+      handlePayload(payload);
+
     }
-    // await Navigator.pushAndRemoveUntil(context,
-    //     MaterialPageRoute(builder: (context) => new DetailPage(payload)),ModalRoute.withName('/'));
-    await gotoDetailScreen(dataNotification);
   }
-  gotoDetailScreen(DataResponse data)async{
-    print('data detail'+data.toString());
+   handlePayload(String payload) async{
+    print('payload '+payload);
+    var _json = json.decode(payload) as Map;
+    DataModel  data = DataModel(uid: _json['uid'].toString(),type: _json['type'] as int,title: _json['title'].toString(),content: _json['content'].toString(),click_action: _json['content']);
+    gotoDetailScreen(data);
+
+  }
+   gotoDetailScreen(DataModel data)async{
+    print('data:'+data.toString());
     if(data==null){
       return;
     }
-
+    // if(data.type==1){
+    //   print('case 1');
+    //   Future.delayed(Duration.zero, () async {
+    //     await getUserProfile(data.uid);
+    //     if(toUser!=null){
+    //       openScreen(ChatScreen(toUser));
+    //       return;
+    //     }
+    //   });
+    //
+    // }else if(data.type==2){
+    //   print('case 2');
+    // }
     switch (data.type) {
       case 1:
-        UserModel user =await getUserProfile(data.uid);
-        openScreen(ChatScreen(user));
+        print('case 1');
+        Future.delayed(Duration.zero, () async {
+          openScreen(ChatScreen(data.uid));
+        });
         break;
       case 2:
-        UserModel user =await getUserProfile(data.uid);
-        openScreen(UserProfileScreen(myProfile:userModel,user: user));
+       // UserModel user =await getUserProfile(data.uid);
+       // openScreen(UserProfileScreen(myProfile:userModel,user: user));
         break;
       default:
         break;
@@ -187,9 +199,9 @@ abstract class GenericAccountState<T extends StatefulWidget>
 
   checkAccountForLogout() async {
     // print('Logout ${userModel.accountType}');
-    if (userModel.accountType == USER_ACCOUNT_FACEBOOK) {
+    if (myAccount.accountType == USER_ACCOUNT_FACEBOOK) {
       logOutFacebook();
-    } else if (userModel.accountType == USER_ACCOUNT_GMAIL) {
+    } else if (myAccount.accountType == USER_ACCOUNT_GMAIL) {
       logoutGoogle();
     } else {
       print('unknow type');
@@ -208,7 +220,7 @@ abstract class GenericAccountState<T extends StatefulWidget>
 
     this.setState(() {
       isLoading = false;
-      userModel = null;
+      myAccount = null;
     });
 
     openMyAppAndRemoveAll();
@@ -228,16 +240,8 @@ abstract class GenericAccountState<T extends StatefulWidget>
 
   sentNotificationRequestAddFriend(
       String toUid, String nameRequest, String formId) {
-    DataSent dataNotification = DataSent(
-        uid: formId,
-        type: NOTIFICATION_TYPE_SEND_ADD_FRIEND,
-        title: '',
-        content: '');
-    SentNotificationModel sent = SentNotificationModel(
-        uid: toUid,
-        title: nameRequest,
-        body: 'Send you request add friend',
-        data: dataNotification.toJson());
+    DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_SEND_ADD_FRIEND, title: '', content: '');
+    NotificationSent sent = NotificationSent(toUId: toUid, title: nameRequest, body: 'Send you request add friend', data: data.toJson());
     fireBaseStore
         .collection(FIREBASE_NOTIFICATIONS)
         .doc(toUid)
@@ -246,18 +250,13 @@ abstract class GenericAccountState<T extends StatefulWidget>
         .then((value) {});
   }
 
-  senNotificationNewMessage(
-      String toUid, String nameRequest, String formId, String content) {
-    DataSent dataNotification = DataSent(
-        uid: formId,
-        type: NOTIFICATION_TYPE_NEW_MESSAGE,
-        title: '',
-        content: content);
-    SentNotificationModel sent = SentNotificationModel(
-        uid: toUid,
+  senNotificationNewMessage(String toUid, String nameRequest, String formId, String content) {
+    DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_NEW_MESSAGE, title: '', content: content,click_action: 'FLUTTER_NOTIFICATION_CLICK');
+    NotificationSent sent = NotificationSent(
+        toUId: toUid,
         title: nameRequest,
         body: 'you have got a new message',
-        data: dataNotification.toJson());
+        data: data.toJson());
     fireBaseStore
         .collection(FIREBASE_NOTIFICATIONS)
         .doc(toUid)
@@ -265,117 +264,7 @@ abstract class GenericAccountState<T extends StatefulWidget>
         .add(sent.toJson())
         .then((value) {});
   }
-
-  // registerNotification() async {
-  //   if (userModel == null) {
-  //     await getAccount();
-  //     // if(userModel.pushToken.isEmpty){
-  //     firebaseMessaging.getToken().then((token) {
-  //       print('token: $token');
-  //       userModel.pushToken = token;
-  //       updateUserDatabase(userModel);
-  //       fireBaseStore
-  //           .collection(FIREBASE_USERS)
-  //           .doc(userModel.id)
-  //           .update({USER_PUST_TOKEN: token});
-  //     }).catchError((err) {
-  //       print('Error Token');
-  //     });
-  //     //  }
-  //   }
-  //   firebaseMessaging.requestNotificationPermissions();
-  //   firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
-  //     //print('onMessage: $message');
-  //     Platform.isAndroid
-  //         ? showNotification(message)
-  //         : showNotification(message);
-  //     handleNotifications(message);
-  //     return;
-  //   }, onResume: (Map<String, dynamic> message) {
-  //     // print('onResume: $message');
-  //     handleNotifications(message);
-  //     return;
-  //   }, onLaunch: (Map<String, dynamic> message) {
-  //     //   print('onLaunch: $message');
-  //     handleNotifications(message);
-  //     return;
-  //   });
-  // }
-  //
-  // void configLocalNotification() {
-  //   var initializationSettingsAndroid =
-  //       new AndroidInitializationSettings('@mipmap/ic_launcher');
-  //   var initializationSettingsIOS = new IOSInitializationSettings();
-  //   var initializationSettings = new InitializationSettings(
-  //       initializationSettingsAndroid, initializationSettingsIOS);
-  //   flutterLocalNotificationsPlugin.initialize(initializationSettings,
-  //       onSelectNotification: onSelectNotification);
-  // }
-  //
-  // Future _showNotification(SentNotificationModel responseNotification) async {
-  //   /// todo: khi app opening thì sẽ vào đây
-  //   //print("responseNotification:  "+responseNotification.toJson().toString());
-  //   DataNotification data =
-  //       DataNotification.dataFromJson(responseNotification.data);
-  //
-  //   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-  //       'your channel id', 'your channel name', 'your channel description',
-  //       importance: Importance.Max, priority: Priority.High, autoCancel: true);
-  //   var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-  //   var platformChannelSpecifics = NotificationDetails(
-  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-  //
-  //   await flutterLocalNotificationsPlugin.show(5, responseNotification.title,
-  //       responseNotification.body, platformChannelSpecifics,
-  //       payload: responseNotification.data['']);
-  // }
-  //
-  // Future showNotification(Map<String, dynamic> message) async {
-  //   var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-  //     Platform.isAndroid ? 'vht.tchat.com' : 'vht.tchatapp.com',
-  //     'Flutter chat demo',
-  //     'your channel description',
-  //     playSound: true,
-  //     enableVibration: true,
-  //     importance: Importance.Max,
-  //     priority: Priority.High,
-  //   );
-  //   var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-  //   var platformChannelSpecifics = new NotificationDetails(
-  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-  //   //print('message $message');
-  //   await flutterLocalNotificationsPlugin.show(
-  //       5,
-  //       message['notification']['title'].toString(),
-  //       message['notification']['body'].toString(),
-  //       platformChannelSpecifics,
-  //       payload: json.encode(message));
-  // }
-  //
-  // handleNotifications(Map<String, dynamic> message) async {
-  //
-  // }
-  //
-  // Future onSelectNotification(String payload) async {
-  //   //todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
-  //   if (payload != null) {
-  //     print('notification payload: ' + payload);
-  //   }
-  //   // DataNotification data =DataNotification.dataFromJson(message);
-  //   // print('notificationModel ${data.uid}');
-  //   // if(data.type==1){
-  //   //   UserModel user =await getUserProfile(data.uid);
-  //   //   openScreen(ChatScreen(user));
-  //   //   //  Navigator.push(, MaterialPageRoute(builder: (context)=>screen));
-  //   // }else if(data.type==2){
-  //   //   UserModel user =await getUserProfile(data.uid);
-  //   //   openScreen(UserProfileScreen(myProfile:userModel,user: user));
-  //   // }
-  //   // await Navigator.pushAndRemoveUntil(context,
-  //   //     MaterialPageRoute(builder: (context) => new DetailPage(payload)),ModalRoute.withName('/'));
-  // }
-
-  Future<UserModel> getUserProfile(String uid) async {
+  getUserProfile(String uid) async {
     setState(() {
       isLoading = true;
     });
@@ -385,11 +274,12 @@ abstract class GenericAccountState<T extends StatefulWidget>
         UserModel userModel = UserModel.fromJson(json);
         setState(() {
           isLoading = false;
+          userProfile =userModel;
         });
-        return userModel;
       } else {
         setState(() {
           isLoading = false;
+          userProfile =null;
         });
         return null;
       }

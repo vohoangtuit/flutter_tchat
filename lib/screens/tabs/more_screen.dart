@@ -23,7 +23,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
    if(ProviderController(context).getUserUpdated()){
      reload =getAccount();// todo call back when user update info from other screen
    }
-    if(userModel==null){
+    if(myAccount==null){
       return Container();
     }else{
       return Container(
@@ -62,7 +62,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
               Container(
                 child:  CircleAvatar(
                   radius: 30.0,
-                  backgroundImage: userModel.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(userModel.photoURL),
+                  backgroundImage: myAccount.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(myAccount.photoURL),
                   backgroundColor: Colors.transparent,
                 ),
                 width: 45,height: 45,
@@ -74,7 +74,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(userModel.fullName,style: textBlackMedium(), overflow: TextOverflow.ellipsis, maxLines: 1,),
+                      Text(myAccount.fullName,style: textBlackMedium(), overflow: TextOverflow.ellipsis, maxLines: 1,),
                       SizedBox(height: 5,),
                       Text('My Profile',style: textGraysSmall(),),
                     ],
@@ -96,7 +96,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
       children: [
         CustomRowSetting(
           onPressed: () {
-            openScreen(UpdateAccountScreen(userModel));
+            openScreen(UpdateAccountScreen(myAccount));
           },
           title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
         ),

@@ -7,4 +7,9 @@ class NotificationResponse{
     title: json['notification']['title'],
     body: json['notification']['body']
   );
+
+  @override
+  String toString() {
+    return '{"title": "$title", "body": "$body"}';
+  }
 }

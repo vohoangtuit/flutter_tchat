@@ -230,7 +230,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                   colorText: Colors.blue,
                   sizeText: 13.0,
                   onPressed: () {
-                    openScreen(ChatScreen(user));
+                    openScreen(ChatScreen(user.id));
                   },
                 ),
                 CustomButtonWithTitle(
@@ -313,7 +313,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
         child: ButtonTheme(
           child: RaisedButton(
             onPressed: () {
-              openScreen(ChatScreen(user));
+              openScreen(ChatScreen(user.id));
             },
             color: Colors.white,
             shape: RoundedRectangleBorder(
@@ -459,7 +459,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
   undoRequest() async {
     print('undoRequest()');
 
-    await firebaseDataService.removeFriend(userModel.id, user.id).then((value){
+    await firebaseDataService.removeFriend(myAccount.id, user.id).then((value){
       setState(() {
         print('ok:222222222:');
         isLoading =false;
@@ -474,7 +474,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
     setState(() {
       isLoading = true;
     });
-    await firebaseDataService.acceptFriend(userModel.id, user.id).then((value){
+    await firebaseDataService.acceptFriend(myAccount.id, user.id).then((value){
       setState(() {
         print('ok:::::::::::::');
         isLoading =false;

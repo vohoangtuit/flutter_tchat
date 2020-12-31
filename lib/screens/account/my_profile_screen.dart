@@ -35,7 +35,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
     if (ProviderController(context).getUserUpdated()) {
       reload = getAccount(); // todo call back when user update info from other screen
     }
-    if (userModel == null) {
+    if (myAccount == null) {
       return Container();
     } else {
       return Scaffold(
@@ -71,7 +71,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             icon: Icon(Icons.more_horiz,
                                 color: isShrink ? Colors.black : Colors.white),
                             onPressed: () {
-                              openScreen(UpdateAccountScreen(userModel));
+                              openScreen(UpdateAccountScreen(myAccount));
                             })
                       ],
                       flexibleSpace: FlexibleSpaceBar(
@@ -91,7 +91,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                   height: 36.0,
                                   child: CircleAvatar(
                                     radius: 30.0,
-                                    backgroundImage:  userModel.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(userModel.photoURL),
+                                    backgroundImage:  myAccount.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(myAccount.photoURL),
                                     backgroundColor: Colors.transparent,
                                   ),
                                 ),
@@ -103,7 +103,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                 width: 10,
                               ),
                               Text(
-                                userModel.fullName,
+                                myAccount.fullName,
                                 textAlign: TextAlign.center,
                                 style: isShrink
                                     ? textBlackMedium()
@@ -112,7 +112,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             ],
                           ),
                         ),
-                        background: userModel.cover.isEmpty
+                        background: myAccount.cover.isEmpty
                             ? InkWell(
                                 child: Image.asset(
                                   PATH_COVER_NOT_AVAILABLE,
@@ -125,7 +125,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             : InkWell(
                                 child:
                                 //CachedNetworkImageProvider(userModel.cover),
-                                Image.network(userModel.cover, fit: BoxFit.cover,),
+                                Image.network(myAccount.cover, fit: BoxFit.cover,),
                                 onTap: () {
                                   DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_COVER, viewDialogPicture);
                                 }),
@@ -234,10 +234,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
       });
       if(type ==PICTURE_TYPE_AVATAR){
         FirebaseUpload(updateProfile)
-            .uploadFileAvatar(userModel, file);
+            .uploadFileAvatar(myAccount, file);
       }else{
         FirebaseUpload(updateProfile)
-            .uploadFileCover(userModel, file);
+            .uploadFileCover(myAccount, file);
       }
     }
   }
@@ -252,9 +252,9 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
         isLoading =true;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(updateProfile).uploadFileAvatar(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(myAccount, file);
       }else{
-        FirebaseUpload(updateProfile).uploadFileCover(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileCover(myAccount, file);
       }
     }
   }

@@ -28,16 +28,16 @@ import 'package:tchat_app/widget/text_style.dart';
 import 'items/item_chat.dart';
 
 class ChatScreen extends StatefulWidget {
-  final UserModel toUser;
-  ChatScreen(this.toUser);
+  final String uId;
+  ChatScreen(this.uId);
 
   @override
-  _ChatScreenState createState() => _ChatScreenState(toUser);
+  _ChatScreenState createState() => _ChatScreenState(uId);
 }
 
 class _ChatScreenState extends GenericAccountState {
-   UserModel toUser;
-  _ChatScreenState(this.toUser);
+   String uId;
+  _ChatScreenState(this.uId);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
   int _limit = 20;
@@ -51,6 +51,7 @@ class _ChatScreenState extends GenericAccountState {
 
   String groupChatId = "";
 
+
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
@@ -61,7 +62,7 @@ class _ChatScreenState extends GenericAccountState {
       appBar: AppBar(
         titleSpacing:-10,
        // automaticallyImplyLeading: false,// todo hide icon back
-       // title: Text(toUser.fullName, style: textWhiteMedium()), // todo title default
+       // title: Text(userProfile.fullName, style: textWhiteMedium()), // todo title default
         title: Container(// todo custom title
           height: 54,
           child: InkWell(
@@ -69,12 +70,14 @@ class _ChatScreenState extends GenericAccountState {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(toUser.fullName, style: textWhiteMedium()),
+                Text(userProfile==null?'':userProfile.fullName, style: textWhiteMedium()),
                 Text('last seen 10 minutes ago',style: TextStyle(color: Colors.grey[200], fontSize: 12)),
               ],
             ),
             onTap: (){
-              openScreen(UserProfileScreen(myProfile: userModel,user: toUser,));
+              openScreen(userProfile!=null?UserProfileScreen(myProfile: myAccount,user: userProfile,):(){
+
+              });
             },
           ),
         ),
@@ -139,8 +142,14 @@ class _ChatScreenState extends GenericAccountState {
   @override
   void initState() {
     super.initState();
-    initData();
+    getInfoUser();
+    if(userProfile!=null){
+      initData();
+    }
+  }
+  getInfoUser()async{
 
+     await getUserProfile(uId);
   }
   callVideo() async {
     print('call video');
@@ -180,7 +189,14 @@ class _ChatScreenState extends GenericAccountState {
     }
   }
   initData() async {
-
+    print("initData()>>>>>>>>>>>>");
+    await getUserProfile(uId).then((friend) {
+      if(friend!=null){
+        setState(() {
+          userProfile  = friend;
+        });
+      }
+    });
     //showLoading();
     await Future.delayed(const Duration(seconds: 0), () {
     });
@@ -190,7 +206,7 @@ class _ChatScreenState extends GenericAccountState {
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    groupChatId = userModel.id + '-' + toUser.id;
+    groupChatId = myAccount.id + '-' + userProfile.id;
     getMessage();
     //initSocket();
     textEditingController.addListener(() {
@@ -205,12 +221,6 @@ class _ChatScreenState extends GenericAccountState {
       }
     });
 
-    UserModel friend =await getUserProfile(toUser.id);
-    if(friend!=null){
-      setState(() {
-        toUser  = friend;
-      });
-    }
 
     listenerData();
   }
@@ -228,24 +238,24 @@ class _ChatScreenState extends GenericAccountState {
 
   }
   void listenerData() async{
-    var userQuery=  firebaseDataService.chatListenerData(userModel.id, toUser.id);
+    var userQuery=  firebaseDataService.chatListenerData(myAccount.id, userProfile.id);
     userQuery.snapshots().listen((data) {
      // print("data size: "+data.size.toString());
       //print("data document: "+data.docs.toString());
       LastMessageModel message = LastMessageModel();
-      message.uid =userModel.id;
+      message.uid =myAccount.id;
       data.docs.forEach((change) {
       //  print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
-        if(userModel.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
+        if(myAccount.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
         //  print('message is me');
           message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
           message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
           message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
         }else{
          //print('message not me');
-          message.idReceiver =toUser.id;
-          message.nameReceiver =toUser.fullName;
-          message.photoReceiver =toUser.photoURL;
+          message.idReceiver =userProfile.id;
+          message.nameReceiver =userProfile.fullName;
+          message.photoReceiver =userProfile.photoURL;
         }
         message.timestamp =change.data()[MESSAGE_TIMESTAMP];
         message.content =change.data()[MESSAGE_CONTENT];
@@ -258,7 +268,7 @@ class _ChatScreenState extends GenericAccountState {
   }
   void getMessage() {
     firebaseDataService
-        .getMessageChat(userModel.id, toUser.id)
+        .getMessageChat(myAccount.id, userProfile.id)
         .then((data) {
           if(this.mounted){
             setState(() {
@@ -320,25 +330,25 @@ class _ChatScreenState extends GenericAccountState {
     if (content.trim() != '') {
       textEditingController.clear();
       MessageModel messages = MessageModel(
-          idSender: userModel.id,
-          nameSender: userModel.fullName,
-          photoSender: userModel.photoURL,
-          idReceiver:toUser.id,
-          nameReceiver:toUser.fullName,
-          photoReceiver: toUser.photoURL,
+          idSender: myAccount.id,
+          nameSender: myAccount.fullName,
+          photoSender: myAccount.photoURL,
+          idReceiver:userProfile.id,
+          nameReceiver:userProfile.fullName,
+          photoReceiver: userProfile.photoURL,
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
           content: content,
           type: type,
           status: 0);
       var from = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(userModel.id)
-          .collection(toUser.id)
+          .doc(myAccount.id)
+          .collection(userProfile.id)
           .doc(); // end doc can use timestamp
       var to = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(toUser.id)
-          .collection(userModel.id)
+          .doc(userProfile.id)
+          .collection(myAccount.id)
           .doc(); // end doc can use timestamp
       WriteBatch writeBatch = fireBaseStore.batch();
       writeBatch.set(from, messages.toJson());
@@ -351,7 +361,7 @@ class _ChatScreenState extends GenericAccountState {
       });
       //  print('message insert '+messages.toString());
       await messageDao.insertMessage(messages);
-      senNotificationNewMessage(toUser.id,userModel.fullName,userModel.id,content);
+      senNotificationNewMessage(userProfile.id,myAccount.fullName,myAccount.id,content);
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
@@ -558,7 +568,6 @@ class _ChatScreenState extends GenericAccountState {
     );
   }
   listChat() {
-
     return Flexible(
       child: StreamBuilder(
         stream: chatStream,
@@ -569,11 +578,11 @@ class _ChatScreenState extends GenericAccountState {
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) => ItemChatMessage(
                   context,
-                  userModel.id,
+                  myAccount.id,
                   index,
                   snapshot.data.documents[index],
                   listMessage,
-                  toUser.photoURL),
+                  userProfile.photoURL),
               itemCount: snapshot.data.documents.length,
               reverse: true,
               controller: listScrollController,
@@ -615,7 +624,7 @@ class _ChatScreenState extends GenericAccountState {
    // todo SOCKET
   initSocket() async {
     await SharedPre.getStringKey(SharedPre.sharedPreFullName)
-        .then((value) => {toUser.fullName = value});
+        .then((value) => {userProfile.fullName = value});
 
     //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
     socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",

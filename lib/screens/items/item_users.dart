@@ -95,7 +95,7 @@ Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userMo
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => profile?UserProfileScreen(myProfile:userModel,user: friend,):ChatScreen(friend)));
+                  builder: (context) => profile?UserProfileScreen(myProfile:userModel,user: friend,):ChatScreen(friend.id)));
         },
 
       ),

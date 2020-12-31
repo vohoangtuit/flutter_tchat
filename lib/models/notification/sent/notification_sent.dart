@@ -1,4 +1,4 @@
-import 'data_sent.dart';
+import '../data_model.dart';
 
 final String NOTIFICATION_ID='id';
 final String NOTIFICATION_TYPE='type';
@@ -13,26 +13,24 @@ final int NOTIFICATION_TYPE_ACCEPT_ADD_FRIEND =3;
 
 final String NOTIFICATION_MESSAGE='messages';
 final String NOTIFICATION_ADD_FRIEND='add_friend';
-class SentNotificationModel{
-  String uid;
+class NotificationSent{
+  String toUId;
   String title;
   String body;
   //DataNotification data;
   Map<String,dynamic> data;
-  SentNotificationModel({this.uid,this.title,this.body,this.data});
+  NotificationSent({this.toUId,this.title,this.body,this.data});
 
-  SentNotificationModel.fromJson(Map<String, dynamic> json){
-    uid = json[NOTIFICATION_UID];
+  NotificationSent.fromJson(Map<String, dynamic> json){
+    toUId = json[NOTIFICATION_UID];
     title = json[NOTIFICATION_TITLE];
     body = json[NOTIFICATION_BODY];
     data = json[NOTIFICATION_DATA];
   }
-  factory SentNotificationModel.dataFromJson(Map<String, dynamic> json)=> SentNotificationModel(
-      data : json[NOTIFICATION_DATA]
-  );
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data[NOTIFICATION_UID] = this.uid;
+    data[NOTIFICATION_UID] = this.toUId;
     data[NOTIFICATION_TITLE] = this.title;
     data[NOTIFICATION_BODY] = this.body;
     data[NOTIFICATION_DATA] = this.data;
@@ -41,6 +39,6 @@ class SentNotificationModel{
 
   @override
   String toString() {
-    return 'SentNotificationModel{uid: $uid, title: $title, content: $body, data: $data}';
+    return '{"uid": "$toUId", "title": "$title", "content": "$body", "data": "$data"}';
   }
 }

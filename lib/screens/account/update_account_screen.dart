@@ -44,7 +44,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
     if (ProviderController(context).getUserUpdated()) {
       reload = getAccount(); // todo call back when user update info from other screen
     }
-    return userModel==null?Container():Scaffold(
+    return myAccount==null?Container():Scaffold(
         appBar: appBarWithTitleCenter(context, 'Profile Information'),
         //  body: UpdateScreen(),
         body: Stack(
@@ -291,10 +291,10 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
       });
       if(type ==PICTURE_TYPE_AVATAR){
         FirebaseUpload(updateProfile)
-            .uploadFileAvatar(userModel, file);
+            .uploadFileAvatar(myAccount, file);
       }else{
         FirebaseUpload(updateProfile)
-            .uploadFileCover(userModel, file);
+            .uploadFileCover(myAccount, file);
       }
     }
   }
@@ -310,9 +310,9 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
         avatarImageFile =file;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(updateProfile).uploadFileAvatar(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(myAccount, file);
       }else{
-        FirebaseUpload(updateProfile).uploadFileCover(userModel, file);
+        FirebaseUpload(updateProfile).uploadFileCover(myAccount, file);
       }
     }
   }

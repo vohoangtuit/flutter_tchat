@@ -48,7 +48,7 @@ class _SuggestFriendsScreenState extends GenericAccountState<SuggestFriendsScree
           itemCount: snapshot.data.documents.length,
           // snapshot.data.documents.length
           itemBuilder: (context, index) => ItemUser(
-              context, snapshot.data.documents[index], userModel,true),
+              context, snapshot.data.documents[index], myAccount,true),
         )
             : Container();
       },

@@ -32,7 +32,7 @@ class _UserRequestScreenState extends GenericAccountState<UserRequestScreen>with
       padding: EdgeInsets.all(0.0),
       itemCount: listFriend.length,
       itemBuilder: (context,index){
-        return ItemUserRequest(context, listFriend[index], userModel,languageCode,(friend){
+        return ItemUserRequest(context, listFriend[index], myAccount,languageCode,(friend){
 
           handleActionClick(friend);
           },
@@ -46,13 +46,13 @@ class _UserRequestScreenState extends GenericAccountState<UserRequestScreen>with
     );
   }
   getData()async{
-    if(userModel==null){
-      userModel = await getAccount();
+    if(myAccount==null){
+      myAccount = await getAccount();
     }
     setState(() {
       isLoading =true;
     });
-    await firebaseDataService.getFriendsWithType(userModel.id,FRIEND_WAITING_CONFIRM).then((value) {
+    await firebaseDataService.getFriendsWithType(myAccount.id,FRIEND_WAITING_CONFIRM).then((value) {
 
       if(value.size>0){
         List<FriendModel> data =List();
@@ -95,7 +95,7 @@ class _UserRequestScreenState extends GenericAccountState<UserRequestScreen>with
         isLoading =true;
       });
       if(friendModel.actionConfirm==FRIEND_ACCTION_CLICK_ACCEPT){
-       await firebaseDataService.acceptFriend(userModel.id, friendModel.id).then((value){
+       await firebaseDataService.acceptFriend(myAccount.id, friendModel.id).then((value){
          setState(() {
            isLoading =false;
            getData();
@@ -103,7 +103,7 @@ class _UserRequestScreenState extends GenericAccountState<UserRequestScreen>with
          });
        });
       }else{
-        await firebaseDataService.removeFriend(userModel.id, friendModel.id).the((value){
+        await firebaseDataService.removeFriend(myAccount.id, friendModel.id).the((value){
           setState(() {
             isLoading =false;
             getData();

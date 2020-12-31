@@ -43,7 +43,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
     getListLastMessage();
   }
   Widget listView() {
-    if(userModel==null){
+    if(myAccount==null){
       //print('last message user null');
       //return ListLoadingData();
       return Container();
@@ -52,7 +52,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
       return ListView.separated(
         padding: EdgeInsets.only(left: 0.0,top: 0.0,right: 0.0,bottom: 8.0),
         itemBuilder: (context, index) =>
-            buildItemLastMessage(context,userModel, listMessage[index],languageCode),
+            buildItemLastMessage(context,myAccount, listMessage[index],languageCode),
         itemCount: listMessage.length == 0 ? 0 : listMessage.length,
         separatorBuilder: (context, index) {
           return Divider(
@@ -77,12 +77,12 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
   }
 
   getListLastMessage() async{
-    if(userModel==null){
+    if(myAccount==null){
       await getAccount();
     }
-    if(userModel!=null){
+    if(myAccount!=null){
       await initDataBase();
-      lastMessageDao.getSingleLastMessage(userModel.id).then((value) {
+      lastMessageDao.getSingleLastMessage(myAccount.id).then((value) {
         listMessage.clear();
         //print('listMessage '+value.toString());
         Future.delayed(Duration.zero, () async {

@@ -30,7 +30,7 @@ Widget initUI(){
         children: [
           CustomRowSetting(
             onPressed: (){
-              openScreen(UpdateAccountScreen(userModel));
+              openScreen(UpdateAccountScreen(myAccount));
             },
             title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
           ),

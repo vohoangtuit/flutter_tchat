@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
-import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/screens/items/item_my_request_friend.dart';
 
@@ -35,7 +34,7 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
       padding: EdgeInsets.all(0.0),
       itemCount: listFriend.length,
       itemBuilder: (context, index) => ItemMyFriendRequest(
-          context, listFriend[index], userModel,languageCode, (friend) {
+          context, listFriend[index], myAccount,languageCode, (friend) {
             handleActionCick(friend);
       }),
       separatorBuilder: (context, index) => Divider(
@@ -47,14 +46,14 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
   }
 
   getData() async {
-    if (userModel == null) {
-      userModel = await getAccount();
+    if (myAccount == null) {
+      myAccount = await getAccount();
     }
     setState(() {
       isLoading = true;
     });
     await firebaseDataService
-        .getFriendsWithType(userModel.id, FRIEND_SEND_REQUEST)
+        .getFriendsWithType(myAccount.id, FRIEND_SEND_REQUEST)
         .then((value) {
       if (value.size > 0) {
         List<FriendModel> data = List();
@@ -93,7 +92,7 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
     if (friend.actionConfirm != null) {
       if (friend.actionConfirm == FRIEND_ACCTION_CLICK_DENNY) {
         await firebaseDataService
-            .acceptFriend(userModel.id, friend.id)
+            .acceptFriend(myAccount.id, friend.id)
             .then((value) {
           setState(() {
             isLoading = false;

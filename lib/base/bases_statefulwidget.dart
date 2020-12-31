@@ -27,7 +27,7 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   bool isLoading=false;
   TChatAppDatabase tChatAppDatabase;
   UserDao userDao;
-  UserModel userModel;
+  UserModel myAccount;
   MessageDao messageDao;
   LastMessageDao lastMessageDao;
 
@@ -62,12 +62,12 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
    if (userShared != null) {
      if(this.mounted){
        setState(() {
-         userModel = UserModel.fromJson(userShared);
-         return userModel;
+         myAccount = UserModel.fromJson(userShared);
+         return myAccount;
        });
      }
    }
-   return userModel;
+   return myAccount;
   }
   void initConfig()async{
     //print('base initConfig');
@@ -106,17 +106,17 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   void getUserAccountDatabase()async{
     print('get user');
     String id='';
-    if(userModel==null){
+    if(myAccount==null){
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
       });
       await userDao.findUserById(id).then((value) {
         if(value!=null){
           setState(() {
-            userModel =value;
+            myAccount =value;
             onStart =true;
           });
-          ProviderController(context).setAccount(userModel);
+          ProviderController(context).setAccount(myAccount);
         }
       });
     }
@@ -157,7 +157,7 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
     if(userDao!=null){
       userDao.updateUser(user);
       setState(() {
-        userModel =user;
+        myAccount =user;
       });
     }
   }

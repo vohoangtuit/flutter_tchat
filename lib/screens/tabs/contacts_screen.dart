@@ -122,14 +122,14 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
         padding: EdgeInsets.all(0.0),
         itemCount: listFriend.length,
         itemBuilder: (context, index) =>
-            ItemContact(context, listFriend[index], userModel),
+            ItemContact(context, listFriend[index], myAccount),
       );
     }
   }
 
   syncListFriend() async{
-    if (userModel == null) {
-      userModel = await getAccount();
+    if (myAccount == null) {
+      myAccount = await getAccount();
     }
     setState(() {
       isLoading =true;
@@ -137,8 +137,8 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
     List<UserModel> data =List();
     await FirebaseFirestore.instance
         .collection(FIREBASE_FRIENDS)
-        .doc(userModel.id)
-        .collection(userModel.id)
+        .doc(myAccount.id)
+        .collection(myAccount.id)
         .where(FRIEND_STATUS_REQUEST, isEqualTo: FRIEND_SUCEESS)
         .get()
         .then((value) {
