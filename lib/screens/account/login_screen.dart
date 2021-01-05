@@ -48,13 +48,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
 
     isLoggedIn = await googleSignIn.isSignedIn();
     if (isLoggedIn) {
-      String id = await SharedPre.getStringKey(SharedPre.sharedPreID);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                MainScreen(false)),
-      );
+      openMainScreen(true);
     }
 
     this.setState(() {

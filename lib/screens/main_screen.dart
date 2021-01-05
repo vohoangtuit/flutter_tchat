@@ -1,13 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
+import 'package:tchat_app/models/notification/data_model.dart';
+import 'package:tchat_app/models/notification/notification_model.dart';
+import 'package:tchat_app/models/notification/response/notification_response.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/setting_screen.dart';
 import 'package:tchat_app/screens/tabs/contacts_screen.dart';
@@ -18,8 +19,9 @@ import 'package:tchat_app/screens/tabs/time_line_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
-
+import '../my_router.dart';
 import 'dialogs/dialog_controller.dart';
+import 'friends/user_profile_screen.dart';
 class MainScreen extends StatefulWidget {
    bool synData;
   MainScreen( this.synData);
@@ -27,13 +29,19 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerProviderStateMixin {
+class _MainScreenState extends BaseStatefulWidget<MainScreen>  with SingleTickerProviderStateMixin {
   TabController tabController;
 
   int positionTab=0;
   ValueChanged data;
+  FirebaseDataFunc firebaseDataService = new FirebaseDataFunc(null);
+  final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
   @override
   Widget build(BuildContext context) {
+
       return Container(
         margin: const EdgeInsets.only(top: 0.0),
         color: Colors.lightBlue,
@@ -88,22 +96,22 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
   @override
   void initState() {
     super.initState();
+
   //  print('main screen initState()');
     tabController = TabController(length: 5, vsync: this);
     tabController.addListener(handleTabSelection);
-    if(widget.synData){
 
-    }
+    initNotification();
   }
   void handleTabSelection() {
     setState(() {
       positionTab =tabController.index;
     });
-    //print("Selected Index: " + tabController.index.toString());
+
   }
   handleClick(int click){
     if(click==MAIN_CLICK_SETTING_TAB_MORE){
-      openScreen(SettingScreen());
+      openScreenWithName(SettingScreen());
     }
     if(click==MAIN_CLICK_EDIT_TAB_TIME_LINE){
       //showBaseDialog('Edit','tab timeline',);
@@ -117,42 +125,9 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
   }
   void handleSyncData(){
-
-    // StreamBuilder(
-    //   stream: fireBaseStore
-    //       .collection(FIREBASE_MESSAGES)
-    //       .doc( userModel.id)
-    //       .snapshots(),
-    //   builder: (context, snapshot) {
-    //     if (!snapshot.hasData) {
-    //       print("cannot get data");
-    //     } else {
-    //       listMessage.addAll(snapshot.data.documents);
-    //       return ListView.builder(
-    //         padding: EdgeInsets.all(10.0),
-    //         itemBuilder: (context, index) =>
-    //             ItemChatMessage(context, userModel.id,index,snapshot.data.documents[index],listMessage,widget.photoUrl),
-    //         itemCount: snapshot.data.documents.length,
-    //         reverse: true,
-    //         controller: listScrollController,
-    //       );
-    //     }
-    //   },
-    // ),
-    // fireBaseStore.collection(FIREBASE_MESSAGES).doc(userModel.id).snapshots().listen((event) {
-    //   if(event)
-    // });
-    // fireBaseStore
-    //     .collection(FIREBASE_MESSAGES)
-    //     .doc( userModel.id)
-    //     .collection("widget.toId")
-    //     .orderBy('timestamp', descending: true)
-    //     .limit(10)
-    //     .snapshots().listen((event) {
-    //
-    // });
   }
 
   @override
@@ -161,7 +136,6 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
     tabController.dispose();
     super.dispose();
   }
-
   List<Tab> listTab(){
     return <Tab>[
       // todo: custom view tabs
@@ -192,4 +166,162 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen> with SingleTickerP
         ],)),
     ];
   }
+
+  initNotification(){// todo: bị loop khi để run ở initState() here
+
+    var initializationSettingsAndroid =
+    AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+    firebaseMessaging.requestNotificationPermissions(const IosNotificationSettings(sound: true, alert: true, badge: true));
+    firebaseMessaging.onIosSettingsRegistered.listen((IosNotificationSettings setting) {
+      print('IOS Setting Registed');
+    });
+    firebaseMessaging.configure(
+      onLaunch: (Map<String, dynamic> message) async{
+        setState(() {
+          print("Called onLaunch");
+          print("onLaunch $message");
+          NotificationResponse pushNotification = NotificationResponse.fromJson(message);
+          DataModel data;
+          if(Platform.isIOS){
+            data = DataModel.fromJsonIOS(message);
+          }else{
+            data = DataModel.dataFromJson(message);
+          }
+
+          gotoDetailScreen(data);
+        });
+      },
+
+      onResume: (Map<String, dynamic> message)async{
+        print("onResume $message");
+        NotificationResponse pushNotification = NotificationResponse.fromJson(message);
+        NotificationResponse notification =NotificationResponse.fromJson(message);
+        DataModel data;
+        if(Platform.isIOS){
+          data = DataModel.fromJsonIOS(message);
+        }else{
+          data = DataModel.dataFromJson(message);
+        }
+        gotoDetailScreen(data);
+      },
+      onMessage: (Map<String, dynamic> message)async{// todo: new notify handle show banner
+        setState(() {
+          print("onMessage : : "+message.toString());
+          //NotificationModel pushNotification = NotificationModel.fromJson(message);
+          NotificationResponse notification =NotificationResponse.fromJson(message);
+          //  print("notification 1: "+notification.toString());
+          DataModel dataModel;
+          if(Platform.isIOS){
+            dataModel = DataModel.fromJsonIOS(message);
+          }else{
+            dataModel = DataModel.dataFromJson(message);
+          }
+          NotificationModel notificationModel =  NotificationModel(notification: notification,data: dataModel);
+
+          showBannerNotification(notificationModel);
+        });
+      },
+    );
+
+    registerFBToken();
+  }
+  Future<String> registerFBToken()async{
+    myAccount =await getAccount();
+    if(myAccount!=null){
+      // if(myAccount.pushToken.isEmpty){
+      firebaseMessaging.getToken().then((token) {
+        print('token: $token');
+        myAccount.pushToken = token;
+        updateUserDatabase(myAccount);
+        fireBaseStore
+            .collection(FIREBASE_USERS)
+            .doc(myAccount.id)
+            .update({USER_PUST_TOKEN: token});
+      }).catchError((err) {
+        print('Error Token');
+      });
+      //}
+    }
+  }
+  Future showBannerNotification(NotificationModel notification) async {/// todo: khi app opening thì sẽ vào đây
+    print("showBannerNotification :  "+notification.toString());
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High,autoCancel: true);
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        5, notification.notification.title, notification.notification.body, platformChannelSpecifics,
+        payload: notification.data.toString());
+    // print('data '+data.toString());
+  }
+  Future onSelectNotification(dynamic payload) async {//todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
+
+    if (payload != null) {
+      print('payload... '+payload.toString());
+      handlePayload(payload);
+
+    }
+
+  }
+  handlePayload(String payload) async{
+    print('payload '+payload);
+    var _json = json.decode(payload) as Map;
+    DataModel  data = DataModel(uid: _json['uid'].toString(),type: _json['type'] as int,title: _json['title'].toString(),content: _json['content'].toString(),click_action: _json['content']);
+    gotoDetailScreen(data);
+
+  }
+  gotoDetailScreen(DataModel data)async{
+    if(data==null){
+      return;
+    }
+    String current =ModalRoute.of(context).settings.name;
+    print('current screen $current');
+    switch (data.type) {
+      case 1:
+      if(Navigator.canPop(context)){
+        Navigator.popUntil(context,
+          ModalRoute.withName(TAG_MAIN_SCREEN),
+        );
+      }
+      Navigator.pushNamed(context, TAG_CHAT_SCREEN,arguments:data.uid);
+        break;
+      case 2:
+        print('case 2');
+
+        // openScreen(UserProfileScreen(myProfile:userModel,user: user));
+        if(Navigator.canPop(context)){
+          Navigator.popUntil(context,
+            ModalRoute.withName(TAG_MAIN_SCREEN),
+          );
+        }
+        setState(() {
+          isLoading = true;
+        });
+        firebaseDataService.getInfoUserProfile(data.uid).then((value) {
+          if (value.data() != null) {
+            Map<String, dynamic> json = value.data();
+            UserModel userModel = UserModel.fromJson(json);
+            setState(() {
+              isLoading = false;
+            });
+            Navigator.push(context, MaterialPageRoute(builder: (context) =>  UserProfileScreen(myProfile:myAccount,user: userModel)));
+          } else {
+            setState(() {
+              isLoading = false;
+            });
+          }
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
 }

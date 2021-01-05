@@ -14,6 +14,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/progressbar.dart';
 
 import '../main.dart';
+import '../my_router.dart';
 import 'base_dialog.dart';
 abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   BaseDialog  dialog;
@@ -30,8 +31,8 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   UserModel myAccount;
   MessageDao messageDao;
   LastMessageDao lastMessageDao;
-
   String languageCode ='';
+  int routeOpening=0;
   @override
   Widget build(BuildContext context) {
     //print('base BuildContext ');
@@ -53,6 +54,15 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
     super.didChangeDependencies();
   }
 
+  void updateRouteOpening(int route){
+    if(mounted){
+      setState(() {
+        routeOpening =route;
+
+      });
+    }
+
+  }
   Future<UserModel>getAccount() async{
    Map<String, dynamic> userShared;
    final String userStr = await SharedPre.getStringKey(SharedPre.sharedPreUSer);
@@ -150,7 +160,7 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   void baseMethod() {
     // Parent method
   }
-  void openScreen(Widget screen){
+  void openScreenWithName(Widget screen){
     Navigator.push(context, MaterialPageRoute(builder: (context)=>screen));
   }
  updateUserDatabase(UserModel user){
@@ -166,14 +176,8 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
         MaterialPageRoute(builder: (context) => MyApp()),
             (Route<dynamic> route) => false);
   }
-  openMainScreen(bool removeAll){
-    if(removeAll){
-      Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => MainScreen(false)),
-              (Route<dynamic> route) => false);
-    }else{
-      Navigator.push(context, MaterialPageRoute(builder: (context)=>MainScreen(false)));
-    }
+  openMainScreen(bool synData){
+    Navigator.pushNamedAndRemoveUntil(context, TAG_MAIN_SCREEN, (route) => false,arguments: synData);
   }
 }
 

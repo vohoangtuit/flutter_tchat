@@ -45,7 +45,7 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
                   padding: EdgeInsets.only(
                       left: 5.0, top: 5.0, right: 8.0, bottom: 5.0),
                   onPressed: () {
-                    openScreen(FriendsRequestScreen());
+                    openScreenWithName(FriendsRequestScreen());
                   },
                   child: Row(
                     children: [

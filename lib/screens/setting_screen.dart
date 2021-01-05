@@ -6,6 +6,7 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
 
+import '../my_router.dart';
 import 'account/update_account_screen.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -30,7 +31,8 @@ Widget initUI(){
         children: [
           CustomRowSetting(
             onPressed: (){
-              openScreen(UpdateAccountScreen(myAccount));
+             // openScreenWithName(UpdateAccountScreen(myAccount));
+              Navigator.pushNamed(context, TAG_UPDATE_ACCOUNT,arguments: myAccount);
             },
             title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
           ),

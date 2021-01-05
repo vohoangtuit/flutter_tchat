@@ -71,7 +71,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             icon: Icon(Icons.more_horiz,
                                 color: isShrink ? Colors.black : Colors.white),
                             onPressed: () {
-                              openScreen(UpdateAccountScreen(myAccount));
+                              openScreenWithName(UpdateAccountScreen(myAccount));
                             })
                       ],
                       flexibleSpace: FlexibleSpaceBar(

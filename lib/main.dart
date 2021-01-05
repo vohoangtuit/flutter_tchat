@@ -2,12 +2,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/controller/bloc/reload_contacts.dart';
+import 'package:tchat_app/screens/chat_screen.dart';
+import 'package:tchat_app/screens/home_screen.dart';
 
 import 'package:tchat_app/screens/splash_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 
 import 'controller/bloc/account_bloc.dart';
 import 'controller/bloc/reload_messsage_bloc.dart';
+import 'my_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +31,7 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  final String screens ='screens';
   @override
   Widget build(BuildContext context) {
     Locale myLocale;
@@ -37,7 +41,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-   //   home: LoginScreen(title: 'VHT TChat'),
+        onGenerateRoute: MyRouter.generateRoute,
       home: SplashScreen(),
       debugShowCheckedModeBanner: false,
         // ignore: missing_return

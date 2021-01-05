@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
-import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/user_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
@@ -230,7 +229,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                   colorText: Colors.blue,
                   sizeText: 13.0,
                   onPressed: () {
-                    openScreen(ChatScreen(user.id));
+                    openScreenWithName(ChatScreen(user.id));
                   },
                 ),
                 CustomButtonWithTitle(
@@ -313,7 +312,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
         child: ButtonTheme(
           child: RaisedButton(
             onPressed: () {
-              openScreen(ChatScreen(user.id));
+              openScreenWithName(ChatScreen(user.id));
             },
             color: Colors.white,
             shape: RoundedRectangleBorder(

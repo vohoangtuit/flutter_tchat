@@ -41,6 +41,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
   void initState() {
     super.initState();
     getListLastMessage();
+  //  initNotification();
   }
   Widget listView() {
     if(myAccount==null){

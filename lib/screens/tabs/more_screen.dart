@@ -8,6 +8,7 @@ import 'package:tchat_app/screens/friends/suggest_friends_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
 import 'package:tchat_app/widget/text_style.dart';
+import '../../my_router.dart';
 import '../account/my_profile_screen.dart';
 import '../account/update_account_screen.dart';
 
@@ -86,7 +87,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
         ),
       ),
       onTap: (){
-        openScreen(MyProfileScreen());
+        openScreenWithName(MyProfileScreen());
       },
     );
   }
@@ -96,13 +97,13 @@ class _MoreScreenState extends GenericAccountState<MoreScreen> with AutomaticKee
       children: [
         CustomRowSetting(
           onPressed: () {
-            openScreen(UpdateAccountScreen(myAccount));
+            Navigator.pushNamed(context, TAG_UPDATE_ACCOUNT,arguments:myAccount );
           },
           title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
         ),
         CustomRowSetting(
           onPressed: () {
-            openScreen(SuggestFriendsScreen());
+            openScreenWithName(SuggestFriendsScreen());
           },
           title: 'Suggest Friends', icon: 'images/icons/ic_friends_light_blue.png',
         ),

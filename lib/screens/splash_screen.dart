@@ -3,6 +3,7 @@ import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
+import '../my_router.dart';
 import 'account/login_screen.dart';
 import 'main_screen.dart';
 class SplashScreen extends StatefulWidget {
@@ -32,16 +33,15 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     checkLogin();
+
   }
   checkLogin()async{
-    String id = await SharedPre.getStringKey(SharedPre.sharedPreID);
     await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
       Future.delayed(Duration(seconds: 3),()async{
-       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
        if(value!=null){
          if(value){
-           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(false)));
-         //  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>HomeScreen(currentUserId: id,)));
+           //Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>MainScreen(true)));
+           Navigator.of(context).pushReplacementNamed(TAG_MAIN_SCREEN);
          }else{
            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
          }

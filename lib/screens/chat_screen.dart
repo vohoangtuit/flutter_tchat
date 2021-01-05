@@ -60,7 +60,7 @@ class _ChatScreenState extends GenericAccountState {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        titleSpacing:-10,
+       //titleSpacing:-10,
        // automaticallyImplyLeading: false,// todo hide icon back
        // title: Text(userProfile.fullName, style: textWhiteMedium()), // todo title default
         title: Container(// todo custom title
@@ -75,7 +75,7 @@ class _ChatScreenState extends GenericAccountState {
               ],
             ),
             onTap: (){
-              openScreen(userProfile!=null?UserProfileScreen(myProfile: myAccount,user: userProfile,):(){
+              openScreenWithName(userProfile!=null?UserProfileScreen(myProfile: myAccount,user: userProfile,):(){
 
               });
             },
@@ -197,10 +197,6 @@ class _ChatScreenState extends GenericAccountState {
         });
       }
     });
-    //showLoading();
-    await Future.delayed(const Duration(seconds: 0), () {
-    });
-   // hideLoading();
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
     isLoading = false;

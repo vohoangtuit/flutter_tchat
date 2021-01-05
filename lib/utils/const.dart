@@ -41,3 +41,9 @@ final int CHOOSE_PICTURE_VIEW_PICTURE =3;
 //
 final String PATH_AVATAR_NOT_AVAILABLE ='images/avatar_not_available.png';
 final String PATH_COVER_NOT_AVAILABLE ='images/cover.png';
+
+
+// todo route screen opening, using for notification
+final int ROUTE_DEFAULT =0;
+final int ROUTE_CHAT_SCREEN =1;
+final int ROUTE_USER_PROFILE_SCREEN =2;
