@@ -6,10 +6,12 @@ final whiteColor = Color(0xFFFFFFFF);
 final greyColor = Color(0xffaeaeae);
 final greyColor2 = Color(0xffE8E8E8);
 
-final String SOCKET_URL ="http://192.168.29.111:5000";
+final String SOCKET_URL ="http://192.168.29.147:5000";
 //final String SOCKET_URL ="https://chatsocket2008.herokuapp.com";
 
 // todo Socket IO
+final String SOCKET_SUBSCRIBE ='subscribe';
+final String SOCKET_UNSUBSCRIBE ='unsubscribe';
 final String SOCKET_TYPING ='typing';
 final String SOCKET_STOP_TYPING ='stop_typing';
 final String SOCKET_QUERY_ID_CHAT ='idChat';
@@ -19,6 +21,7 @@ final String SOCKET_GROUP_CHAT_ID ='groupChatId';
 final String SOCKET_DISCONNECT ='disconnect';
 final String SOCKET_USER_JOINED ='user_joined';
 final String SOCKET_USER_LEFT ='user_left';
+final String SOCKET_USER_ID ='user_id';
 
 //---------todo MAIN SCREEN ACTION CLICK TABBAR------------
 final int MAIN_CLICK_SEARCH =1;

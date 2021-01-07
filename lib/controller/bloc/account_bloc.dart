@@ -2,20 +2,26 @@ import 'package:flutter/cupertino.dart';
 import 'package:tchat_app/models/user_model.dart';
 
 class AccountBloc with ChangeNotifier {
-  UserModel user ;
+  UserModel myProfile ;
+  UserModel userOtherProfile ;
 
   bool userUpdated =false;
 
-  getAccount() => user;
+  getMyAccount() => myProfile;
+  getOtherAccount() => userOtherProfile;
 
   getUserUpdated()=>userUpdated;
 
-  setAccount(UserModel userModel){
-    this.user =userModel;
+  setMyAccount(UserModel userModel){
+    this.myProfile =userModel;
+    print('my accou notifyListeners');
+    notifyListeners();
+  }
+  setOtherAccount(UserModel userModel){
+    this.userOtherProfile =userModel;
     notifyListeners();
   }
   setUserUpdated(bool update){
-    print('AccountBloc user changed');
     this.userUpdated =update;
   }
 }

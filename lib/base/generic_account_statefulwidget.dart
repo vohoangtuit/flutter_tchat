@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/notification/data_model.dart';
 import 'package:tchat_app/models/notification/notification_model.dart';
@@ -29,8 +30,9 @@ abstract class GenericAccountState<T extends StatefulWidget>
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final facebookLogin = FacebookLogin();
   FirebaseDataFunc firebaseDataService = new FirebaseDataFunc(null);
-
-  UserModel userProfile;
+  var reload;
+  //bool loadOtherUser =false;
+  //UserModel userProfile;
 
   @override
   void initState() {
@@ -78,18 +80,6 @@ abstract class GenericAccountState<T extends StatefulWidget>
     openMyAppAndRemoveAll();
   }
 
-  sentNotificationRequestAddFriend(
-      String toUid, String nameRequest, String formId) {
-    DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_SEND_ADD_FRIEND, title: '', content: '');
-    NotificationSent sent = NotificationSent(toUId: toUid, title: nameRequest, body: 'Send you request add friend', data: data.toJson());
-    fireBaseStore
-        .collection(FIREBASE_NOTIFICATIONS)
-        .doc(toUid)
-        .collection(NOTIFICATION_ADD_FRIEND)
-        .add(sent.toJson())
-        .then((value) {});
-  }
-
   senNotificationNewMessage(String toUid, String nameRequest, String formId, String content) {
     DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_NEW_MESSAGE, title: '', content: content,click_action: 'FLUTTER_NOTIFICATION_CLICK');
     NotificationSent sent = NotificationSent(
@@ -104,22 +94,33 @@ abstract class GenericAccountState<T extends StatefulWidget>
         .add(sent.toJson())
         .then((value) {});
   }
+  sentNotificationRequestAddFriend(String toUid, String nameRequest, String formId) {
+    DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_SEND_ADD_FRIEND, title: '', content: '',click_action: 'FLUTTER_NOTIFICATION_CLICK');
+    NotificationSent sent = NotificationSent(toUId: toUid, title: nameRequest, body: 'Send you request add friend', data: data.toJson());
+    fireBaseStore
+        .collection(FIREBASE_NOTIFICATIONS)
+        .doc(toUid)
+        .collection(NOTIFICATION_ADD_FRIEND)
+        .add(sent.toJson())
+        .then((value) {});
+  }
   getUserProfile(String uid) async {
     setState(() {
       isLoading = true;
     });
-    firebaseDataService.getInfoUserProfile(uid).then((value) {
+   await firebaseDataService.getInfoUserProfile(uid).then((value) {
       if (value.data() != null) {
         Map<String, dynamic> json = value.data();
         UserModel userModel = UserModel.fromJson(json);
+        print('userModel $userModel');
         setState(() {
           isLoading = false;
-            userProfile =userModel;
+           // userProfile =userModel;
         });
+        ProviderController(context).setOtherAccount(userModel);
       } else {
         setState(() {
           isLoading = false;
-          userProfile =null;
         });
         return null;
       }

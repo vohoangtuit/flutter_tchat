@@ -97,7 +97,7 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
   }
 
 
-  void initDataBase()async{
+   initDataBase()async{
     //-- todo: database change  reRunning rebuild
     tChatAppDatabase = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
     userDao = tChatAppDatabase.userDao;
@@ -113,20 +113,23 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
       }
     });
   }
-  void getUserAccountDatabase()async{
-    print('get user');
+   getUserAccountDatabase()async{
     String id='';
     if(myAccount==null){
       await SharedPre.getStringKey(SharedPre.sharedPreID).then((value){
         id =value;
       });
+      if(userDao==null){
+        print('userDao null');
+        await  initDataBase();
+      }
       await userDao.findUserById(id).then((value) {
         if(value!=null){
           setState(() {
             myAccount =value;
             onStart =true;
           });
-          ProviderController(context).setAccount(myAccount);
+          ProviderController(context).setMyAccount(myAccount);
         }
       });
     }
@@ -137,7 +140,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
         message.idDB =value.idDB;
         lastMessageDao.updateLastMessageById(message).then((value) {
         });
-
       }else{
           lastMessageDao.insertMessage(message).then((value) => {
           });

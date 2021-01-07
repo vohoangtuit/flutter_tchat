@@ -40,6 +40,7 @@ class FirebaseDataFunc{
         .snapshots();
   }
   getMessageChat(String idSender, String idReceiver)async{
+    print('idSender $idSender idReceiver $idReceiver');
     return await FirebaseFirestore.instance
         .collection(FIREBASE_MESSAGES)
             .doc( idSender)

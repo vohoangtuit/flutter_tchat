@@ -28,16 +28,14 @@ import 'package:tchat_app/widget/text_style.dart';
 import 'items/item_chat.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String uId;
-  ChatScreen(this.uId);
-
+  final UserModel toUser;
+  ChatScreen(this.toUser);
   @override
-  _ChatScreenState createState() => _ChatScreenState(uId);
+  _ChatScreenState createState() => _ChatScreenState(toUser);
 }
-
 class _ChatScreenState extends GenericAccountState {
-   String uId;
-  _ChatScreenState(this.uId);
+  UserModel toUser;
+  _ChatScreenState(this.toUser);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
   int _limit = 20;
@@ -49,18 +47,18 @@ class _ChatScreenState extends GenericAccountState {
   SocketIO socketIO;
   bool typing = false;
 
-  String groupChatId = "";
-
+  String groupChatId = '';
 
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
   Stream chatStream;
+  //UserModel userProfile;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-       //titleSpacing:-10,
+       titleSpacing:-8.0,
        // automaticallyImplyLeading: false,// todo hide icon back
        // title: Text(userProfile.fullName, style: textWhiteMedium()), // todo title default
         title: Container(// todo custom title
@@ -70,12 +68,13 @@ class _ChatScreenState extends GenericAccountState {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(userProfile==null?'':userProfile.fullName, style: textWhiteMedium()),
-                Text('last seen 10 minutes ago',style: TextStyle(color: Colors.grey[200], fontSize: 12)),
+               // userProfile==null?Container():Text(userProfile.fullName),
+                Text(toUser==null? " ":toUser.fullName, style: textWhiteMedium()),
+                //Text('last seen 10 minutes ago',style: TextStyle(color: Colors.grey[200], fontSize: 12)),
               ],
             ),
             onTap: (){
-              openScreenWithName(userProfile!=null?UserProfileScreen(myProfile: myAccount,user: userProfile,):(){
+              openScreenWithName(toUser!=null?UserProfileScreen(myProfile: myAccount,user: toUser,):(){
 
               });
             },
@@ -123,7 +122,7 @@ class _ChatScreenState extends GenericAccountState {
               listChat(),
 // Sticker
                   (isShowSticker ? buildSticker() : Container()),
-                //buildTyping(),
+                buildTyping(),
 
                 // Input content
                 buildInput(),
@@ -140,16 +139,28 @@ class _ChatScreenState extends GenericAccountState {
     );
   }
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+  }
+  @override
   void initState() {
     super.initState();
-    getInfoUser();
-    if(userProfile!=null){
-      initData();
-    }
+    getProfile();
   }
-  getInfoUser()async{
+  getProfile()async{
+    if(myAccount==null){
+      await  getAccount();
+    }
+    if(myAccount!=null&&toUser!=null){
+      if(groupChatId.length>0){
+        print('groupChatId:::::::::::::::::: $groupChatId');
+        checkSocket();
+      }
+      initData();
 
-     await getUserProfile(uId);
+
+    }
   }
   callVideo() async {
     print('call video');
@@ -190,81 +201,83 @@ class _ChatScreenState extends GenericAccountState {
   }
   initData() async {
     print("initData()>>>>>>>>>>>>");
-    await getUserProfile(uId).then((friend) {
-      if(friend!=null){
-        setState(() {
-          userProfile  = friend;
-        });
-      }
-    });
     focusNode.addListener(onFocusChange);
     listScrollController.addListener(_scrollListener);
     isLoading = false;
     isShowSticker = false;
     imageUrl = '';
-    groupChatId = myAccount.id + '-' + userProfile.id;
     getMessage();
     //initSocket();
     textEditingController.addListener(() {
       if (textEditingController.text.isNotEmpty) {
+        if(socketIO==null)
+          return;
         if (typing) return;
         typing = true;
-        //socketIO.sendMessage(Const().SOCKET_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
+        socketIO.sendMessage(SOCKET_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: myAccount.id}));
       } else {
+        if(socketIO==null)
+          return;
         if (!typing) return;
         typing = false;
-        // socketIO.sendMessage(Const().SOCKET_STOP_TYPING, json.encode({Const().SOCKET_GROUP_CHAT_ID: groupChatId,Const().SOCKET_SENDER_CHAT_ID: id}));
+        socketIO.sendMessage(SOCKET_STOP_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: myAccount.id}));
       }
     });
-
-
     listenerData();
   }
   @override
   void dispose() {
     super.dispose();
-    // socketIO.sendMessage(// todo send message to server socket
-    //     //   'unsubscribe',
-    //     //   json.encode({
-    //     //     'groupChatId': groupChatId, // todo re update
-    //     //   }),
-    //     // );
-    //     // socketIO.disconnect();
-
+    if(socketIO!=null){
+      socketIO.sendMessage(// todo send message to server socket
+        SOCKET_UNSUBSCRIBE,
+        json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),
+      );
+      socketIO.disconnect();
+    }
 
   }
   void listenerData() async{
-    var userQuery=  firebaseDataService.chatListenerData(myAccount.id, userProfile.id);
-    userQuery.snapshots().listen((data) {
-     // print("data size: "+data.size.toString());
-      //print("data document: "+data.docs.toString());
-      LastMessageModel message = LastMessageModel();
-      message.uid =myAccount.id;
-      data.docs.forEach((change) {
-      //  print('documentChanges ${change.data()[MESSAGE_CONTENT]}');
-        if(myAccount.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
-        //  print('message is me');
-          message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
-          message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
-          message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
-        }else{
-         //print('message not me');
-          message.idReceiver =userProfile.id;
-          message.nameReceiver =userProfile.fullName;
-          message.photoReceiver =userProfile.photoURL;
-        }
-        message.timestamp =change.data()[MESSAGE_TIMESTAMP];
-        message.content =change.data()[MESSAGE_CONTENT];
-        message.type =change.data()[MESSAGE_TYPE];
-        message.status =change.data()[MESSAGE_STATUS];
-      });
-      updateLastMessageByID(message);
-      ProviderController(context).setReloadLastMessage(true);
-    });
-  }
+     var userQuery=  firebaseDataService.chatListenerData(myAccount.id, toUser.id);
+     userQuery.snapshots().listen((data) {
+       // print("data size: "+data.size.toString());
+       //print("data document: "+data.docs.toString());
+       LastMessageModel message = LastMessageModel();
+       message.uid =myAccount.id;
+       data.docs.forEach((change) {
+           print('groupChatId $groupChatId');
+         if(groupChatId.length==0){
+           if(change.data()[MESSAGE_GROUP_ID]!=null){
+             setState(() {
+               groupChatId =change.data()[MESSAGE_GROUP_ID];
+             });
+           }
+           checkSocket();
+         }
+           print('groupChatId: $groupChatId');
+         if(myAccount.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
+           //  print('message is me');
+           message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
+           message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
+           message.photoReceiver =change.data()[MESSAGE_PHOTO_RECEIVER];
+         }else{
+           //print('message not me');
+           message.idReceiver =toUser.id;
+           message.nameReceiver =toUser.fullName;
+           message.photoReceiver =toUser.photoURL;
+         }
+         message.timestamp =change.data()[MESSAGE_TIMESTAMP];
+         message.content =change.data()[MESSAGE_CONTENT];
+         message.type =change.data()[MESSAGE_TYPE];
+         message.status =change.data()[MESSAGE_STATUS];
+       });
+       updateLastMessageByID(message);
+       ProviderController(context).setReloadLastMessage(true);
+     });
+   }
   void getMessage() {
     firebaseDataService
-        .getMessageChat(myAccount.id, userProfile.id)
+        .getMessageChat(myAccount.id, toUser.id)
         .then((data) {
           if(this.mounted){
             setState(() {
@@ -273,7 +286,6 @@ class _ChatScreenState extends GenericAccountState {
           }
     });
   }
-
   void onFocusChange() {
     if (focusNode.hasFocus) {
       // Hide sticker when keyboard appear
@@ -285,10 +297,8 @@ class _ChatScreenState extends GenericAccountState {
   Future getImage() async {
     ImagePicker imagePicker = ImagePicker();
     PickedFile pickedFile;
-
     pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
     imageFile = File(pickedFile.path);
-
     if (imageFile != null) {
       setState(() {
         isLoading = true;
@@ -325,25 +335,32 @@ class _ChatScreenState extends GenericAccountState {
     // type: 0 = text, 1 = image, 2 = sticker
     if (content.trim() != '') {
       textEditingController.clear();
+      if(groupChatId.length==0){
+        setState(() {
+          groupChatId =myAccount.id+'-'+DateTime.now().millisecondsSinceEpoch.toString();
+        });
+        checkSocket();
+      }
       MessageModel messages = MessageModel(
           idSender: myAccount.id,
           nameSender: myAccount.fullName,
           photoSender: myAccount.photoURL,
-          idReceiver:userProfile.id,
-          nameReceiver:userProfile.fullName,
-          photoReceiver: userProfile.photoURL,
+          idReceiver:toUser.id,
+          nameReceiver:toUser.fullName,
+          photoReceiver: toUser.photoURL,
           timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
           content: content,
           type: type,
-          status: 0);
+          status: 0,
+        groupId: groupChatId);
       var from = fireBaseStore
           .collection(FIREBASE_MESSAGES)
           .doc(myAccount.id)
-          .collection(userProfile.id)
+          .collection(toUser.id)
           .doc(); // end doc can use timestamp
       var to = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(userProfile.id)
+          .doc(toUser.id)
           .collection(myAccount.id)
           .doc(); // end doc can use timestamp
       WriteBatch writeBatch = fireBaseStore.batch();
@@ -357,7 +374,7 @@ class _ChatScreenState extends GenericAccountState {
       });
       //  print('message insert '+messages.toString());
       await messageDao.insertMessage(messages);
-      senNotificationNewMessage(userProfile.id,myAccount.fullName,myAccount.id,content);
+      senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
     } else {
@@ -578,7 +595,7 @@ class _ChatScreenState extends GenericAccountState {
                   index,
                   snapshot.data.documents[index],
                   listMessage,
-                  userProfile.photoURL),
+                  toUser.photoURL),
               itemCount: snapshot.data.documents.length,
               reverse: true,
               controller: listScrollController,
@@ -617,42 +634,40 @@ class _ChatScreenState extends GenericAccountState {
      // TODO: implement callBackCamera
    }
 
+   checkSocket(){
+    if(socketIO==null){
+      initSocket();
+    }
+   }
    // todo SOCKET
   initSocket() async {
-    await SharedPre.getStringKey(SharedPre.sharedPreFullName)
-        .then((value) => {userProfile.fullName = value});
+    print('initSocket() $groupChatId');
+   // socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/");
+   //   socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/", query: 'idChat=$groupChatId', socketStatusCallback: _socketStatus);
+      socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/", query: "idChat=$groupChatId", socketStatusCallback: _socketStatus);
 
-    //socketIO = SocketIOManager().createSocketIO(Const().SocketChat, "/");
-    socketIO = SocketIOManager().createSocketIO(SOCKET_URL, "/",
-        query: 'idChat=' '', socketStatusCallback: _socketStatus);
+      socketIO.init();
 
-    socketIO.init();
-    socketIO.sendMessage(
-      // todo send message to server socket
-      'subscribe',
-      json.encode({
-        'groupChatId': groupChatId,
-      }),
-    );
+      // todo: listener events from server socket
+      socketIO.subscribe(SOCKET_TYPING, userTyping);
+      socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
 
-    // todo: listener events from server socket
-    socketIO.subscribe(SOCKET_TYPING, userTyping);
-    socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
+      socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
+      socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
 
-    socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
-    socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
+      //     //Connect to the socket
+    await socketIO.connect();
+    await socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
 
-    //     //Connect to the socket
-    socketIO.connect();
   }
   _socketStatus(dynamic data) {
     print("Socket status: " + data);
   }
   void userTyping(dynamic data) {
-    print(data);
+    print("userTyping "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("typing -------------------- $map");
+    print("typing -------------------- ${map[SOCKET_USER_ID]}");
     setState(() {
       typing = true;
     });
@@ -670,13 +685,13 @@ class _ChatScreenState extends GenericAccountState {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("userJoined -------------------- $map");
+    print("userJoined -------------------- ${map[SOCKET_USER_ID]}");
   }
   void userLeft(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("userLeft -------------------- $map");
+    print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
   }
   void receiveMessage(dynamic data) {
     print("receiveMessage " + data);

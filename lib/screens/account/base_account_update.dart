@@ -15,7 +15,7 @@ import 'package:tchat_app/utils/const.dart';
 
 abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccountState {
  // TODO: this class using for screen update account implement more function
-  var reload;
+
   void callBackCamera(File file, type);
   void callBackLibrary(File file, type);
 

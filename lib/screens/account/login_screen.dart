@@ -191,7 +191,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
     this.setState(() {
     isLoading = false;
     });
-    ProviderController(context).setAccount(user);
+    ProviderController(context).setMyAccount(user);
     openMainScreen(true);
     }else{
     this.setState(() {

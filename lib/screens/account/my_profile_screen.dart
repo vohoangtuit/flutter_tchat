@@ -31,7 +31,6 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    //userModel =ProviderController(context).getAccount();
     if (ProviderController(context).getUserUpdated()) {
       reload = getAccount(); // todo call back when user update info from other screen
     }

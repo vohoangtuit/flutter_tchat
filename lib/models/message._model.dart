@@ -16,6 +16,7 @@ final String MESSAGE_TIMESTAMP ='timestamp';
 final String MESSAGE_CONTENT ='content';
 final String MESSAGE_TYPE ='type';
 final String MESSAGE_STATUS ='status';
+final String MESSAGE_GROUP_ID ='groupId';
 
 @entity
 class MessageModel{
@@ -31,8 +32,9 @@ class MessageModel{
   String content='';
   int type=0;//type: 0 = text, 1 = image, 2 = sticker
   int status=0;
+  String groupId='';
 
-  MessageModel({this.idDB,this.idSender,this.nameSender,this.photoSender, this.idReceiver,this.nameReceiver,this.photoReceiver, this.timestamp, this.content, this.type, this.status});
+  MessageModel({this.idDB,this.idSender,this.nameSender,this.photoSender, this.idReceiver,this.nameReceiver,this.photoReceiver, this.timestamp, this.content, this.type, this.status,this.groupId});
 
   MessageModel.fromJson(Map<String, dynamic> json) {
  //   id = json[MESSAGE_ID];
@@ -48,6 +50,7 @@ class MessageModel{
     content = json[MESSAGE_CONTENT];
     type = json[MESSAGE_TYPE];
     status = json[MESSAGE_STATUS];
+    groupId = json[MESSAGE_GROUP_ID];
   }
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
@@ -64,12 +67,13 @@ class MessageModel{
     data[MESSAGE_CONTENT] = this.content;
     data[MESSAGE_TYPE] = this.type;
     data[MESSAGE_STATUS] = this.status;
+    data[MESSAGE_GROUP_ID] = this.groupId;
 
     return data;
   }
 
   @override
   String toString() {
-    return 'MessageModel{idDB: $idDB, idSender: $idSender, nameSender: $nameSender, photoSender: $photoSender, idReceiver: $idReceiver, nameReceiver: $nameReceiver, photoReceiver: $photoReceiver, timestamp: $timestamp, content: $content, type: $type, status: $status}';
+    return 'MessageModel{idDB: $idDB, idSender: $idSender, nameSender: $nameSender, photoSender: $photoSender, idReceiver: $idReceiver, nameReceiver: $nameReceiver, photoReceiver: $photoReceiver, timestamp: $timestamp, content: $content, type: $type, status: $status, groupId: $groupId}';
   }
 }

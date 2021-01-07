@@ -11,7 +11,6 @@ import 'package:tchat_app/screens/tabs/profile/profile_timeline.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/button/custom_button_with_title.dart';
 import 'package:tchat_app/widget/loading.dart';
-import 'package:tchat_app/widget/sliver_appbar_delegate.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
 class UserProfileScreen extends StatefulWidget {
@@ -120,7 +119,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                           ],
                         ),
                       ),
-                      background: user.cover.isEmpty
+                      background: user.cover.length==0
                           ? InkWell(
                               child: Image.asset(
                                 PATH_COVER_NOT_AVAILABLE,
@@ -229,7 +228,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                   colorText: Colors.blue,
                   sizeText: 13.0,
                   onPressed: () {
-                    openScreenWithName(ChatScreen(user.id));
+                    openScreenWithName(ChatScreen(user));
                   },
                 ),
                 CustomButtonWithTitle(
@@ -312,7 +311,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
         child: ButtonTheme(
           child: RaisedButton(
             onPressed: () {
-              openScreenWithName(ChatScreen(user.id));
+              openScreenWithName(ChatScreen(user));
             },
             color: Colors.white,
             shape: RoundedRectangleBorder(

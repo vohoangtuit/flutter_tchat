@@ -91,7 +91,7 @@ Widget ItemContact(BuildContext context, UserModel friendModel,UserModel userMod
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatScreen(friend.id)));
+                  builder: (context) => ChatScreen(friend)));
         },
 
       ),

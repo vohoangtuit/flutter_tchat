@@ -61,7 +61,7 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ChatScreen(toUser.id)));
+                builder: (context) => ChatScreen(toUser)));
       },
     ),
   );

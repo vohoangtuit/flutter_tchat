@@ -26,11 +26,18 @@ class ProviderController{
     return  Provider.of<ReloadContacts>(context, listen: false).getReload();
 
   }
-  setAccount(UserModel account){
-    Provider.of<AccountBloc>(context,listen: false).setAccount(account);
+  setMyAccount(UserModel account){
+    Provider.of<AccountBloc>(context,listen: false).setMyAccount(account);
   }
-  UserModel getAccount(){
-    return Provider.of<AccountBloc>(context,listen: false).getAccount();
+  UserModel getMyAccount(){
+    return Provider.of<AccountBloc>(context,listen: false).getMyAccount();
+  }
+
+  setOtherAccount(UserModel account){
+    Provider.of<AccountBloc>(context,listen: false).setOtherAccount(account);
+  }
+  UserModel getOtherAccount(){
+    return Provider.of<AccountBloc>(context,listen: false).getOtherAccount();
   }
 
   setUserUpdated(bool update){
