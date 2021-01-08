@@ -6,8 +6,8 @@ final whiteColor = Color(0xFFFFFFFF);
 final greyColor = Color(0xffaeaeae);
 final greyColor2 = Color(0xffE8E8E8);
 
-final String SOCKET_URL ="http://192.168.29.147:5000";
-//final String SOCKET_URL ="https://chatsocket2008.herokuapp.com";
+//final String SOCKET_URL ="http://192.168.29.147:5000";
+final String SOCKET_URL ="https://chatsocket2008.herokuapp.com";
 
 // todo Socket IO
 final String SOCKET_SUBSCRIBE ='subscribe';

@@ -46,7 +46,6 @@ class _ChatScreenState extends GenericAccountState {
   String imageUrl;
   SocketIO socketIO;
   bool typing = false;
-
   String groupChatId = '';
 
   final TextEditingController textEditingController = TextEditingController();
@@ -331,59 +330,7 @@ class _ChatScreenState extends GenericAccountState {
       Fluttertoast.showToast(msg: 'This file is not an image');
     });
   }
-  void onSendMessage(String content, int type) async {
-    // type: 0 = text, 1 = image, 2 = sticker
-    if (content.trim() != '') {
-      textEditingController.clear();
-      if(groupChatId.length==0){
-        setState(() {
-          groupChatId =myAccount.id+'-'+DateTime.now().millisecondsSinceEpoch.toString();
-        });
-        checkSocket();
-      }
-      MessageModel messages = MessageModel(
-          idSender: myAccount.id,
-          nameSender: myAccount.fullName,
-          photoSender: myAccount.photoURL,
-          idReceiver:toUser.id,
-          nameReceiver:toUser.fullName,
-          photoReceiver: toUser.photoURL,
-          timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-          content: content,
-          type: type,
-          status: 0,
-        groupId: groupChatId);
-      var from = fireBaseStore
-          .collection(FIREBASE_MESSAGES)
-          .doc(myAccount.id)
-          .collection(toUser.id)
-          .doc(); // end doc can use timestamp
-      var to = fireBaseStore
-          .collection(FIREBASE_MESSAGES)
-          .doc(toUser.id)
-          .collection(myAccount.id)
-          .doc(); // end doc can use timestamp
-      WriteBatch writeBatch = fireBaseStore.batch();
-      writeBatch.set(from, messages.toJson());
-      writeBatch.set(to, messages.toJson());
-      writeBatch
-          .commit()
-          .then((value) => () => {print('Create message succree ')})
-          .catchError((onError) {
-        print(('create message error $onError'));
-      });
-      //  print('message insert '+messages.toString());
-      await messageDao.insertMessage(messages);
-      senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
-      listScrollController.animateTo(0.0,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-    } else {
-      Fluttertoast.showToast(
-          msg: 'Nothing to send',
-          backgroundColor: Colors.black,
-          textColor: Colors.red);
-    }
-  }
+
   Future<bool> onBackPress() {
     if (isShowSticker) {
       setState(() {
@@ -633,7 +580,61 @@ class _ChatScreenState extends GenericAccountState {
    void callBackCamera(File file, type) {
      // TODO: implement callBackCamera
    }
-
+  void onSendMessage(String content, int type) async {
+    // type: 0 = text, 1 = image, 2 = sticker
+    if (content.trim() != '') {
+      textEditingController.clear();
+      if(groupChatId.length==0){
+        setState(() {
+          groupChatId =myAccount.id+'-'+DateTime.now().millisecondsSinceEpoch.toString();
+        });
+        checkSocket();
+      }
+      MessageModel messages = MessageModel(
+          idSender: myAccount.id,
+          nameSender: myAccount.fullName,
+          photoSender: myAccount.photoURL,
+          idReceiver:toUser.id,
+          nameReceiver:toUser.fullName,
+          photoReceiver: toUser.photoURL,
+          timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+          content: content,
+          type: type,
+          status: 0,
+          groupId: groupChatId);
+      var from = fireBaseStore
+          .collection(FIREBASE_MESSAGES)
+          .doc(myAccount.id)
+          .collection(toUser.id)
+          .doc(); // end doc can use timestamp
+      var to = fireBaseStore
+          .collection(FIREBASE_MESSAGES)
+          .doc(toUser.id)
+          .collection(myAccount.id)
+          .doc(); // end doc can use timestamp
+      WriteBatch writeBatch = fireBaseStore.batch();
+      writeBatch.set(from, messages.toJson());
+      writeBatch.set(to, messages.toJson());
+      writeBatch
+          .commit()
+          .then((value) => () => {print('Create message succree ')})
+          .catchError((onError) {
+        print(('create message error $onError'));
+      });
+      //  print('message insert '+messages.toString());
+      await messageDao.insertMessage(messages);
+      if(!toUser.isOnlineChat){
+        senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
+      }
+      listScrollController.animateTo(0.0,
+          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+    } else {
+      Fluttertoast.showToast(
+          msg: 'Nothing to send',
+          backgroundColor: Colors.black,
+          textColor: Colors.red);
+    }
+  }
    checkSocket(){
     if(socketIO==null){
       initSocket();
@@ -657,17 +658,18 @@ class _ChatScreenState extends GenericAccountState {
 
       //     //Connect to the socket
     await socketIO.connect();
-    await socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
+    // socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
 
   }
   _socketStatus(dynamic data) {
     print("Socket status: " + data);
+    socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
   }
   void userTyping(dynamic data) {
-    print("userTyping "+data);
+   // print("userTyping "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("typing -------------------- ${map[SOCKET_USER_ID]}");
+  //  print("typing -------------------- ${map[SOCKET_USER_ID]}");
     setState(() {
       typing = true;
     });
@@ -676,28 +678,40 @@ class _ChatScreenState extends GenericAccountState {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("stopTyping -------------------- $map");
+  //  print("stopTyping -------------------- $map");
     setState(() {
       typing = false;
     });
   }
   void userJoined(dynamic data) {
-    print(data);
+   // print("userJoined :::  "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("userJoined -------------------- ${map[SOCKET_USER_ID]}");
+   // print("userJoined -------------------- ${map[SOCKET_USER_ID]}");
+    if(toUser.id.compareTo(map[SOCKET_USER_ID])==0){
+      setState(() {
+        toUser.isOnlineChat =true;
+      });
+      print("toUser :::  "+toUser.isOnlineChat.toString());
+    }
   }
   void userLeft(dynamic data) {
-    print(data);
+   // print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
+    //print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
+    if(toUser.id.compareTo(map[SOCKET_USER_ID])==0){
+      setState(() {
+        toUser.isOnlineChat =false;
+      });
+ //     print("toUser :::  "+toUser.isOnlineChat.toString());
+    }
   }
   void receiveMessage(dynamic data) {
-    print("receiveMessage " + data);
+  //  print("receiveMessage " + data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    print("receive_message -------------------- $map");
+   // print("receive_message -------------------- $map");
     setState(() {
       typing = false;
     });

@@ -19,6 +19,7 @@ final String USER_LAST_UPDATED = 'lastUpdated';
 final String USER_STATUS_ACCOUNT = 'statusAccount';
 final String USER_PUST_TOKEN = 'pushToken';
 final String USER_ISlOGIN = 'isLogin';
+final String USER_ISONLINE_CHAT = 'isOnlineChat';
 final String USER_ACCOUNT_TYPE = 'accountType';
 final String USER_ALLOW_SEARCH = 'allowSearch';
 final String USER_COVER = 'cover';
@@ -48,6 +49,7 @@ class UserModel {
   String lastUpdated = '';
   String pushToken = '';
   bool isLogin;
+  bool isOnlineChat;
   int accountType = 0;
   bool allowSearch = true;
   double latitude = 0.0;
@@ -69,6 +71,7 @@ class UserModel {
       this.lastUpdated,
       this.pushToken,
       this.isLogin,
+      this.isOnlineChat,
       this.accountType,
       this.allowSearch,
       this.latitude,
@@ -90,6 +93,7 @@ class UserModel {
     data[USER_LAST_UPDATED] = this.lastUpdated;
     data[USER_PUST_TOKEN] = this.pushToken;
     data[USER_ISlOGIN] = this.isLogin;
+    data[USER_ISONLINE_CHAT] = this.isOnlineChat;
     data[USER_ACCOUNT_TYPE] = this.accountType;
     data[USER_ALLOW_SEARCH] = this.allowSearch;
     data[USER_LOCATION_LAT] = this.latitude;
@@ -113,6 +117,7 @@ class UserModel {
       lastUpdated: json[USER_LAST_UPDATED]==null?'':json[USER_LAST_UPDATED],// todo check field exist
       pushToken: json[USER_PUST_TOKEN],
       isLogin: json[USER_ISlOGIN] as bool,
+      isOnlineChat: json[USER_ISONLINE_CHAT] as bool,
       accountType: json[USER_ACCOUNT_TYPE],
       allowSearch: json[USER_ALLOW_SEARCH] as bool,
       latitude: json[USER_LOCATION_LAT],
@@ -133,6 +138,7 @@ class UserModel {
       lastUpdated: doc.get(USER_LAST_UPDATED)==null?'':doc[USER_LAST_UPDATED],// todo hiện tại ko ko thể check null
       pushToken: doc[USER_PUST_TOKEN],
       isLogin: doc[USER_ISlOGIN] as bool,
+      isOnlineChat: doc[USER_ISONLINE_CHAT] as bool,
       accountType: doc[USER_ACCOUNT_TYPE],
       allowSearch: doc[USER_ALLOW_SEARCH] as bool,
       latitude: doc[USER_LOCATION_LAT],
@@ -141,6 +147,6 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, lastUpdated: $lastUpdated, pushToken: $pushToken, isLogin: $isLogin, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';
+    return 'UserModel{idDB: $idDB, id: $id, userName: $userName, fullName: $fullName, birthday: $birthday, gender: $gender, email: $email, photoURL: $photoURL, cover: $cover, statusAccount: $statusAccount, phoneNumber: $phoneNumber, createdAt: $createdAt, lastUpdated: $lastUpdated, pushToken: $pushToken, isLogin: $isLogin, isOnlineChat: $isOnlineChat, accountType: $accountType, allowSearch: $allowSearch, latitude: $latitude, longitude: $longitude}';
   }
 }
