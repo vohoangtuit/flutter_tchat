@@ -7,7 +7,7 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/friends/friends_request_screen.dart';
 import 'package:tchat_app/screens/items/item_contacts.dart';
 
@@ -22,7 +22,7 @@ class ContactsScreen extends StatefulWidget {
 class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with AutomaticKeepAliveClientMixin
   List<FriendModel> friends = List();
   var load;
-  List<UserModel> listFriend =List();
+  List<AccountModel> listFriend =List();
   @override
   bool get wantKeepAlive => true;
 
@@ -129,12 +129,12 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
 
   syncListFriend() async{
     if (myAccount == null) {
-      myAccount = await getAccount();
+      myAccount = await getAccountFromSharedPre();
     }
     setState(() {
       isLoading =true;
     });
-    List<UserModel> data =List();
+    List<AccountModel> data =List();
     await FirebaseFirestore.instance
         .collection(FIREBASE_FRIENDS)
         .doc(myAccount.id)
@@ -155,7 +155,7 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
                   Map<String,dynamic> json =value.data();
                  // data.add(UserModel.fromJson(json));
                   setState(() {
-                    listFriend.add(UserModel.fromJson(json));
+                    listFriend.add(AccountModel.fromJson(json));
                     isLoading =false;
                  //   print('listFriend '+listFriend.length.toString());
                   });
@@ -169,13 +169,14 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
           //  print('data '+data.length.toString());
 
           }else{
-            setState(() {
-              if(listFriend.length>0){
-                listFriend.clear();
-                isLoading =false;
-              }
-            });
-
+            if(this.mounted){
+              setState(() {
+                if(listFriend.length>0){
+                  listFriend.clear();
+                  isLoading =false;
+                }
+              });
+            }
           }
 
     }).catchError((onError){
@@ -184,8 +185,11 @@ class _ContactsScreenState extends GenericAccountState<ContactsScreen>  {//with 
   }
   void catchError(Object onError){
     print('get friend error: ${onError.toString()}');
-    setState(() {
-      isLoading =false;
-    });
+    if(this.mounted){
+      setState(() {
+        isLoading =false;
+      });
+    }
+
   }
 }

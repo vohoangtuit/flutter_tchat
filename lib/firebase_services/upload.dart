@@ -5,16 +5,16 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 
 import 'firebase_database.dart';
 
 //typedef Int2VoidFunc = void Function(UserModel userModel);
 class FirebaseUpload{
-  final void Function(UserModel userModel,bool success) callback;
+  final void Function(AccountModel userModel,bool success) callback;
 
   FirebaseUpload(this.callback);
-  Future uploadFileAvatar(UserModel user,File avatarImageFile) async {
+  Future uploadFileAvatar(AccountModel user,File avatarImageFile) async {
     StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDataFunc(null).getStringPathAvatar(user.id));
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;
@@ -47,7 +47,7 @@ class FirebaseUpload{
       Fluttertoast.showToast(msg: err.toString());
     });
   }
-  Future uploadFileCover(UserModel user,File avatarImageFile) async {
+  Future uploadFileCover(AccountModel user,File avatarImageFile) async {
     StorageReference reference = FirebaseStorage.instance.ref().child(FirebaseDataFunc(null).getStringPathCover(user.id));
     StorageUploadTask uploadTask = reference.putFile(avatarImageFile);
     StorageTaskSnapshot storageTaskSnapshot;

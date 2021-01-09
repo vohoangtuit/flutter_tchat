@@ -47,7 +47,7 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
 
   getData() async {
     if (myAccount == null) {
-      myAccount = await getAccount();
+      myAccount = await getAccountFromSharedPre();
     }
     setState(() {
       isLoading = true;

@@ -1,18 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
 import 'package:tchat_app/widget/widget.dart';
 
 class SuggestFriendsScreen extends StatefulWidget {
+  AccountModel accountModel;
+  SuggestFriendsScreen(this.accountModel);
   @override
-  _SuggestFriendsScreenState createState() => _SuggestFriendsScreenState();
+  _SuggestFriendsScreenState createState() => _SuggestFriendsScreenState(accountModel);
 }
 
 class _SuggestFriendsScreenState extends GenericAccountState<SuggestFriendsScreen> {
+  AccountModel accountModel;
+  _SuggestFriendsScreenState(this.accountModel);
   bool isLoading = false;
-  List<UserModel> listUser = List();
+  List<AccountModel> listUser = List();
   Stream streamUsers;
 
   @override
@@ -48,7 +52,7 @@ class _SuggestFriendsScreenState extends GenericAccountState<SuggestFriendsScree
           itemCount: snapshot.data.documents.length,
           // snapshot.data.documents.length
           itemBuilder: (context, index) => ItemUser(
-              context, snapshot.data.documents[index], myAccount,true),
+              context, snapshot.data.documents[index], accountModel,true),
         )
             : Container();
       },

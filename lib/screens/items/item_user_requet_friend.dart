@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/utils/time_ago.dart';
 import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/widget.dart';
 
-Widget ItemUserRequest(BuildContext context, FriendModel friendModel,UserModel userModel,String languageCode,ValueChanged actionClick) {
+Widget ItemUserRequest(BuildContext context, FriendModel friendModel,AccountModel userModel,String languageCode,ValueChanged actionClick) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Row(

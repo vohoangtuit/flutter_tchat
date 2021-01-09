@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/controller/bloc/reload_contacts.dart';
 
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 
 import '../bloc/account_bloc.dart';
 import '../bloc/reload_messsage_bloc.dart';
@@ -26,17 +26,17 @@ class ProviderController{
     return  Provider.of<ReloadContacts>(context, listen: false).getReload();
 
   }
-  setMyAccount(UserModel account){
+  setMyAccount(AccountModel account){
     Provider.of<AccountBloc>(context,listen: false).setMyAccount(account);
   }
-  UserModel getMyAccount(){
+  AccountModel getMyAccount(){
     return Provider.of<AccountBloc>(context,listen: false).getMyAccount();
   }
 
-  setOtherAccount(UserModel account){
+  setOtherAccount(AccountModel account){
     Provider.of<AccountBloc>(context,listen: false).setOtherAccount(account);
   }
-  UserModel getOtherAccount(){
+  AccountModel getOtherAccount(){
     return Provider.of<AccountBloc>(context,listen: false).getOtherAccount();
   }
 

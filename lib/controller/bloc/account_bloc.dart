@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 
 class AccountBloc with ChangeNotifier {
-  UserModel myProfile ;
-  UserModel userOtherProfile ;
+  AccountModel myProfile ;
+  AccountModel userOtherProfile ;
 
   bool userUpdated =false;
 
@@ -12,12 +12,12 @@ class AccountBloc with ChangeNotifier {
 
   getUserUpdated()=>userUpdated;
 
-  setMyAccount(UserModel userModel){
+  setMyAccount(AccountModel userModel){
     this.myProfile =userModel;
     print('my accou notifyListeners');
     notifyListeners();
   }
-  setOtherAccount(UserModel userModel){
+  setOtherAccount(AccountModel userModel){
     this.userOtherProfile =userModel;
     notifyListeners();
   }

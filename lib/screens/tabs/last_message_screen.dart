@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
+import 'package:tchat_app/main.dart';
 
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/screens/items/item_last_message.dart';
@@ -41,6 +42,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
   void initState() {
     super.initState();
     getListLastMessage();
+
   //  initNotification();
   }
   Widget listView() {
@@ -79,11 +81,11 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
 
   getListLastMessage() async{
     if(myAccount==null){
-      await getAccount();
+      myAccount =await getAccountFromFloorDB();
+    //  print('myAccount::: '+myAccount.toString());
     }
     if(myAccount!=null){
-      await initDataBase();
-      lastMessageDao.getSingleLastMessage(myAccount.id).then((value) {
+      floorDB.lastMessageDao.getSingleLastMessage(myAccount.id).then((value) {
         listMessage.clear();
         //print('listMessage '+value.toString());
         Future.delayed(Duration.zero, () async {
@@ -92,6 +94,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
           });
         });
       });
+
     }
 
 

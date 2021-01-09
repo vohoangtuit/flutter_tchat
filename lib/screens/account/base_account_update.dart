@@ -7,7 +7,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/main.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:tchat_app/utils/camera_library_open.dart';
@@ -19,12 +20,26 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccou
   void callBackCamera(File file, type);
   void callBackLibrary(File file, type);
 
-  void updateProfile(UserModel user,bool success);// todo create callback
+  void updateProfile(AccountModel user,bool success);// todo create callback
 
-  void saveAccountToShared(UserModel user)async{// todo create callback
+  void saveAccountToDB(AccountModel user)async{// todo create callback
     await SharedPre.saveString(SharedPre.sharedPreUSer, jsonEncode(user));
-    ProviderController(context).setUserUpdated(true);
-    getAccount();
+    print('saveAccountToShared');
+
+    await floorDB.getUserDao().findUserById(user.id).then((value)  {
+      if(value==null){
+        print('InsertUser');
+        floorDB.getUserDao().InsertUser(user);
+      }else{
+        print('updateUser');
+        floorDB.getUserDao().updateUser(user);
+      }
+    });
+    if(mounted){
+      ProviderController(context).setUserUpdated(true);
+    }
+   // getAccountFromSharedPre();
+    getAccountFromFloorDB();
   }
   viewDialogPicture(int type, int choose) async{// todo type: 1 avatar,2 cover || choose : 1 take picture,2 library
     if(type==PICTURE_TYPE_AVATAR){
@@ -53,7 +68,7 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccou
     }
   }
 
-  void updateUserAccount(UserModel user){
+  void updateUserAccount(AccountModel user){
     user.lastUpdated =DateTime.now().millisecondsSinceEpoch.toString();
     FirebaseDataFunc(updateProfile).updateUserInfo(user);
   }

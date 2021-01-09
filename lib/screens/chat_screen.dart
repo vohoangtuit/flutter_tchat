@@ -17,7 +17,7 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -25,16 +25,17 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
+import '../main.dart';
 import 'items/item_chat.dart';
 
 class ChatScreen extends StatefulWidget {
-  final UserModel toUser;
+  final AccountModel toUser;
   ChatScreen(this.toUser);
   @override
   _ChatScreenState createState() => _ChatScreenState(toUser);
 }
 class _ChatScreenState extends GenericAccountState {
-  UserModel toUser;
+  AccountModel toUser;
   _ChatScreenState(this.toUser);
   ClientRole role = ClientRole.Broadcaster;
   List<QueryDocumentSnapshot> listMessage = new List.from([]);
@@ -149,11 +150,11 @@ class _ChatScreenState extends GenericAccountState {
   }
   getProfile()async{
     if(myAccount==null){
-      await  getAccount();
+      await  getAccountFromSharedPre();
     }
     if(myAccount!=null&&toUser!=null){
       if(groupChatId.length>0){
-        print('groupChatId:::::::::::::::::: $groupChatId');
+      // print('groupChatId:::::::::::::::::: $groupChatId');
         checkSocket();
       }
       initData();
@@ -244,7 +245,7 @@ class _ChatScreenState extends GenericAccountState {
        LastMessageModel message = LastMessageModel();
        message.uid =myAccount.id;
        data.docs.forEach((change) {
-           print('groupChatId $groupChatId');
+          // print('groupChatId $groupChatId');
          if(groupChatId.length==0){
            if(change.data()[MESSAGE_GROUP_ID]!=null){
              setState(() {
@@ -253,7 +254,7 @@ class _ChatScreenState extends GenericAccountState {
            }
            checkSocket();
          }
-           print('groupChatId: $groupChatId');
+          // print('groupChatId: $groupChatId');
          if(myAccount.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
            //  print('message is me');
            message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
@@ -573,7 +574,7 @@ class _ChatScreenState extends GenericAccountState {
     );
   }
    @override
-   void uploadAvatarCover(UserModel user, bool success) {
+   void uploadAvatarCover(AccountModel user, bool success) {
      // TODO: implement uploadAvatarCover
    }
    @override
@@ -622,7 +623,7 @@ class _ChatScreenState extends GenericAccountState {
         print(('create message error $onError'));
       });
       //  print('message insert '+messages.toString());
-      await messageDao.insertMessage(messages);
+      await floorDB.messageDao.insertMessage(messages);
       if(!toUser.isOnlineChat){
         senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
       }
@@ -649,6 +650,7 @@ class _ChatScreenState extends GenericAccountState {
 
       socketIO.init();
 
+      socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
       // todo: listener events from server socket
       socketIO.subscribe(SOCKET_TYPING, userTyping);
       socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
@@ -658,7 +660,7 @@ class _ChatScreenState extends GenericAccountState {
 
       //     //Connect to the socket
     await socketIO.connect();
-    // socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
+
 
   }
   _socketStatus(dynamic data) {

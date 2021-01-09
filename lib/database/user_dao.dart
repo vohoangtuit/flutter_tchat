@@ -1,26 +1,26 @@
 import 'package:floor/floor.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 
 @dao
 abstract class UserDao {
 
-  @Query('SELECT * FROM UserModel')
-  Future<List<UserModel>> findAllUsers();
+  @Query('SELECT * FROM AccountModel')
+  Future<List<AccountModel>> findAllUsers();
 
-  @Query('SELECT * FROM UserModel WHERE id = :id LIMIT 1')
-  Future<UserModel> findUserById(String id);
+  @Query('SELECT * FROM AccountModel WHERE id = :id LIMIT 1')
+  Future<AccountModel> findUserById(String id);
 
-  @Query('SELECT * FROM UserModel LIMIT 1')
-  Future<UserModel> getSingleUser();
+  @Query('SELECT * FROM AccountModel LIMIT 1')
+  Future<AccountModel> getSingleUser();
 
   @insert
-  Future<void> InsertUser(UserModel user);
+  Future<void> InsertUser(AccountModel user);
 
-  @Query('DELETE * FROM UserModel')
+  @Query('DELETE FROM AccountModel')
   Future<void> deleteAllUsers();
 
   @update
-  Future<void> updateUser(UserModel user);
+  Future<void> updateUser(AccountModel user);
 
 
   // @transaction

@@ -10,7 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/main_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -159,11 +159,11 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
         .where(FIREBASE_ID, isEqualTo: firebaseUser.uid)
         .get();
     final List<DocumentSnapshot> documents = result.docs;
-    UserModel user;
+    AccountModel user;
     if (documents.length == 0) {
     // Update data to server if new user
       // todo insert data to firebase
-    user = UserModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',gender: 0,email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),lastUpdated: DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true,latitude: 0.0,longitude: 0.0);
+    user = AccountModel(id:firebaseUser.uid, userName:'', fullName:firebaseUser.displayName, birthday:'',gender: 0,email:firebaseUser.email, photoURL:firebaseUser.photoURL,cover: '', statusAccount:0, phoneNumber:'',createdAt:DateTime.now().millisecondsSinceEpoch.toString(),lastUpdated: DateTime.now().millisecondsSinceEpoch.toString(),pushToken:'',isLogin:true,accountType: accountType,allowSearch: true,latitude: 0.0,longitude: 0.0);
     FirebaseFirestore.instance
         .collection(FIREBASE_USERS)
         .doc(firebaseUser.uid)
@@ -180,17 +180,15 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
 
     //todo get data from firebase
     Map<String, dynamic> json = documents[0].data();// todo: chuyển data sang json để check field exits, nếu ko thì document ko thể check field exits
-    user= UserModel.fromJson(json);
+    user= AccountModel.fromJson(json);
     //user= UserModel.fromDocumentSnapshot(documents[0]);
 
-
     }
-
    // await SharedPre.saveInt(SharedPre.sharedPreAccountType, accountType);
-    saveAccountToShared(user);
     this.setState(() {
     isLoading = false;
     });
+    saveAccountToDB(user);
     ProviderController(context).setMyAccount(user);
     openMainScreen(true);
     }else{
@@ -207,7 +205,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
   }
 
   @override
-  void updateProfile(UserModel user, bool success) {
+  void updateProfile(AccountModel user, bool success) {
 
   }
 

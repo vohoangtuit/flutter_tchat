@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 import 'package:tchat_app/screens/tabs/profile/profile_photos.dart';
@@ -14,8 +14,8 @@ import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/text_style.dart';
 
 class UserProfileScreen extends StatefulWidget {
-  UserModel myProfile;
-  UserModel user;
+  AccountModel myProfile;
+  AccountModel user;
 
   UserProfileScreen({this.myProfile, this.user});
 
@@ -25,8 +25,8 @@ class UserProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
-  UserModel myProfile;
-  UserModel user;
+  AccountModel myProfile;
+  AccountModel user;
   TabController _tabController;
 
   _UserProfileScreenState(this.myProfile, this.user);
@@ -119,7 +119,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                           ],
                         ),
                       ),
-                      background: user.cover.length==0
+                      background: user.cover.isEmpty
                           ? InkWell(
                               child: Image.asset(
                                 PATH_COVER_NOT_AVAILABLE,

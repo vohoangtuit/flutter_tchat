@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/upload.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/account/update_account_screen.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 import 'package:tchat_app/utils/camera_library_open.dart';
@@ -28,11 +28,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
 
   File avatarImageFile;
   File coverImageFile;
-
   @override
   Widget build(BuildContext context) {
     if (ProviderController(context).getUserUpdated()) {
-      reload = getAccount(); // todo call back when user update info from other screen
+      reload = getAccountFromSharedPre(); // todo call back when user update info from other screen
     }
     if (myAccount == null) {
       return Container();
@@ -184,7 +183,6 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
       );
     }
   }
-
   @override
   void dispose() {
     _scrollController.removeListener(_scrollListener);
@@ -193,13 +191,20 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
 
   @override
   void initState() {
-
+    initData();
     //print('profile '+userModel.toString());
     _scrollController = ScrollController();
     _scrollController.addListener(_scrollListener);
     super.initState();
   }
-
+  initData() async {
+    myAccount = await getAccountFromFloorDB();
+    if(mounted){
+      setState(() {
+        this.myAccount =myAccount;
+      });
+    }
+  }
   bool get isShrink {
     return _scrollController.hasClients &&
         _scrollController.offset > (200 - kToolbarHeight);
@@ -213,12 +218,12 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
     }
   }
   @override
-  void updateProfile(UserModel user, bool success) {
+  void updateProfile(AccountModel user, bool success) {
     print('uploadCallBack');
     setState(() {
       isLoading = false;
       if (success) {
-        saveAccountToShared(user);
+        saveAccountToDB(user);
       }
     });
   }

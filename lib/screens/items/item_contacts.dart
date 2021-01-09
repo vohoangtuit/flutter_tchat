@@ -1,17 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/widget.dart';
 
 import '../chat_screen.dart';
 
-Widget ItemContact(BuildContext context, UserModel friendModel,UserModel userModel) {
+Widget ItemContact(BuildContext context, AccountModel friendModel,AccountModel userModel) {
   if (friendModel.id ==  userModel.id) {
     return Container();
   } else {
-    UserModel friend =UserModel(id: friendModel.id,fullName: friendModel.fullName,photoURL: friendModel.photoURL);
+    AccountModel friend =AccountModel(id: friendModel.id,fullName: friendModel.fullName,photoURL: friendModel.photoURL);
     return Container(
       child: FlatButton(
         color: Colors.white,
@@ -23,23 +23,17 @@ Widget ItemContact(BuildContext context, UserModel friendModel,UserModel userMod
             Material(
               child:friendModel.photoURL != null ? CachedNetworkImage(
                 placeholder: (context, url) => Container(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 1.0,
-                    valueColor:
-                    AlwaysStoppedAnimation<Color>(themeColor),
-                  ),
+                  child: CircularProgressIndicator(strokeWidth: 1.0, valueColor: AlwaysStoppedAnimation<Color>(themeColor),),
                   width: 45.0,
                   height: 45.0,
                   // padding: EdgeInsets.all(12.0),
-                ),
+                  ),
                 imageUrl: friendModel.photoURL, width: 45.0, height: 45.0, fit: BoxFit.cover,) : avatarNotAvailable(45.0),
               borderRadius: BorderRadius.all(Radius.circular(25.0)),
               clipBehavior: Clip.hardEdge,
             ),
             Expanded(
               child: Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SizedBox(width: 10,),
                   Flexible(

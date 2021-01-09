@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/utils/time_ago.dart';
 import 'package:tchat_app/widget/drawhorizontalline.dart';
@@ -11,7 +11,7 @@ import 'package:tchat_app/widget/widget.dart';
 
 import '../chat_screen.dart';
 
-Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessageModel message,String languageCode) {
+Widget buildItemLastMessage(BuildContext context,AccountModel userModel, LastMessageModel message,String languageCode) {
   return Container(
     child: FlatButton(
       padding: EdgeInsets.only(left: 10.0,top: 0.0,right: 5.0,bottom: 0.0),
@@ -23,9 +23,12 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  child:  CircleAvatar(radius: 30.0,
-                    backgroundImage: message.photoReceiver.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(message.photoReceiver),
-                    backgroundColor: Colors.transparent,
+                 // child:  CircleAvatar(radius: 30.0, backgroundImage: message.photoReceiver.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(message.photoReceiver), backgroundColor: Colors.transparent,),
+                  child: message.photoReceiver.isEmpty?CircleAvatar(radius: 30.0,backgroundImage:AssetImage(PATH_AVATAR_NOT_AVAILABLE)):Material(
+                    child: cachedImage(message.photoReceiver,45.0,45.0),
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(45.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
                   width: 45,height: 45,
                 ),
@@ -54,7 +57,7 @@ Widget buildItemLastMessage(BuildContext context,UserModel userModel, LastMessag
         ),
       ),
       onPressed: (){
-        UserModel toUser =UserModel();
+        AccountModel toUser =AccountModel();
         toUser.id =message.idReceiver;
         toUser.fullName =message.nameReceiver;
         toUser.photoURL =message.photoReceiver;

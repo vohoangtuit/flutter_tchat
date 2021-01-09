@@ -4,7 +4,7 @@ import 'package:floor/floor.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:location/location.dart';
 
-final String USER_MODEL = 'UserModel';
+final String USER_MODEL = 'AccountModel';
 final String USER_ID = 'id';
 final String USER_IDDB = 'idDB';
 final String USER_USERNAME = 'userName';
@@ -32,7 +32,7 @@ final int USER_ACCOUNT_PHONE = 3;
 final int USER_ACCOUNT_EMAIL = 4;
 
 @entity
-class UserModel {
+class AccountModel {
   @PrimaryKey(autoGenerate: true)
   int idDB;
   String id = '';
@@ -55,7 +55,7 @@ class UserModel {
   double latitude = 0.0;
   double longitude = 0.0;
 
-  UserModel(
+  AccountModel(
       {this.idDB,
       this.id,
       this.userName,
@@ -101,7 +101,7 @@ class UserModel {
     return data;
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+  factory AccountModel.fromJson(Map<String, dynamic> json) => AccountModel(
       //idDB = json['UserModel']['idDB'],
       id: json[USER_ID],
       userName: json[USER_USERNAME],
@@ -123,7 +123,7 @@ class UserModel {
       latitude: json[USER_LOCATION_LAT],
       longitude: json[USER_LOCATION_LONG]);
 
-  factory UserModel.fromDocumentSnapshot (DocumentSnapshot doc) =>UserModel(
+  factory AccountModel.fromDocumentSnapshot (DocumentSnapshot doc) =>AccountModel(
       id: doc[USER_ID],
       userName: doc[USER_USERNAME],
       fullName: doc[USER_FULLNAME],

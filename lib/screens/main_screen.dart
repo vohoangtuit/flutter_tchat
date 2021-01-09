@@ -5,11 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/notification/data_model.dart';
 import 'package:tchat_app/models/notification/notification_model.dart';
 import 'package:tchat_app/models/notification/response/notification_response.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/setting_screen.dart';
 import 'package:tchat_app/screens/tabs/contacts_screen.dart';
 import 'package:tchat_app/screens/tabs/group_screen.dart';
@@ -20,7 +21,7 @@ import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
-import '../my_router.dart';
+import '../controller/my_router.dart';
 import 'dialogs/dialog_controller.dart';
 import 'friends/user_profile_screen.dart';
 
@@ -33,7 +34,7 @@ class MainScreen extends StatefulWidget {
   _MainScreenState createState() => _MainScreenState();
 }
 
-class _MainScreenState extends BaseStatefulWidget<MainScreen>
+class _MainScreenState extends GenericAccountState<MainScreen>
     with SingleTickerProviderStateMixin {
   TabController tabController;
 
@@ -118,7 +119,6 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen>
   @override
   void initState() {
     super.initState();
-
     //  print('main screen initState()');
     tabController = TabController(length: 5, vsync: this);
     tabController.addListener(handleTabSelection);
@@ -273,7 +273,7 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen>
   }
 
   Future<String> registerFBToken() async {
-    myAccount = await getAccount();
+    myAccount = await getAccountFromSharedPre();
     if (myAccount != null) {
       // if(myAccount.pushToken.isEmpty){
       firebaseMessaging.getToken().then((token) {
@@ -356,7 +356,7 @@ class _MainScreenState extends BaseStatefulWidget<MainScreen>
     await firebaseDataService.getInfoUserProfile(userID).then((value) {
       if (value.data() != null) {
         Map<String, dynamic> json = value.data();
-        UserModel userModel = UserModel.fromJson(json);
+        AccountModel userModel = AccountModel.fromJson(json);
         if(Navigator.canPop(context)){
           Navigator.popUntil(context,
             ModalRoute.withName(TAG_MAIN_SCREEN),

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/friends_model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/items/item_users.dart';
 
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
@@ -20,7 +20,7 @@ class UsersScreen extends StatefulWidget {
 class UsersScreenState extends GenericAccountState<UsersScreen> {
   //with AutomaticKeepAliveClientMixin
   bool isLoading = false;
-  List<UserModel> listUser = List();
+  List<AccountModel> listUser = List();
   Stream streamUsers;
 
   List<FriendModel> friends =List();
@@ -51,7 +51,7 @@ class UsersScreenState extends GenericAccountState<UsersScreen> {
       hideLoading();
     });
     if (myAccount == null) {
-      myAccount = await getAccount();
+      myAccount = await getAccountFromSharedPre();
     }
 
     if (myAccount != null) {

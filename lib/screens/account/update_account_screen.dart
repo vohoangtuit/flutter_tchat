@@ -4,7 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 
 import 'package:tchat_app/firebase_services/upload.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/account/base_account_update.dart';
 import 'package:tchat_app/screens/dialogs/dialog_controller.dart';
 
@@ -16,14 +16,14 @@ import 'package:tchat_app/widget/loading.dart';
 import '../../utils/const.dart';
 
 class UpdateAccountScreen extends StatefulWidget {
-  UserModel user;
+  AccountModel user;
   UpdateAccountScreen(this.user);
   @override
   _UpdateAccountScreenState createState() => _UpdateAccountScreenState(user);
 }
 
 class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
-  final UserModel user;
+  final AccountModel user;
   TextEditingController controllerFullName = TextEditingController();
   SharedPreferences prefs;
 
@@ -42,9 +42,9 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     if (ProviderController(context).getUserUpdated()) {
-      reload = getAccount(); // todo call back when user update info from other screen
+      reload = getAccountFromFloorDB(); // todo call back when user update info from other screen
     }
-    return myAccount==null?Container():Scaffold(
+    return myAccount==null?Container(color: Colors.white,):Scaffold(
         appBar: appBarWithTitleCenter(context, 'Profile Information'),
         //  body: UpdateScreen(),
         body: Stack(
@@ -203,9 +203,17 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   @override
   void initState() {
     super.initState();
+    initData();
     readLocal();
   }
-
+  initData() async {
+    myAccount = await getAccountFromFloorDB();
+    if(mounted){
+      setState(() {
+        this.myAccount =myAccount;
+      });
+    }
+  }
   void _handleRadioValueChange(int value) {
     setState(() {
       _genderValue = value;
@@ -269,12 +277,12 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
   }
 
   @override
-  void updateProfile(UserModel user, bool success) {
+  void updateProfile(AccountModel user, bool success) {
     print('update callback');
     setState(() {
       isLoading =false;
       if(success){
-        saveAccountToShared(user);
+        saveAccountToDB(user);
       }
     });
   }

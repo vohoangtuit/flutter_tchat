@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/account/update_account_screen.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/friends/user_profile_screen.dart';
@@ -28,14 +28,14 @@ class MyRouter {
             settings: settings, builder: (_) => MainScreen(synData));
         break;
       case TAG_CHAT_SCREEN:
-        var user = settings.arguments as UserModel;
+        var user = settings.arguments as AccountModel;
         return MaterialPageRoute(
             settings: settings, builder: (_) => ChatScreen(user));
         break;
       case TAG_USER_PROFILE_SCREEN:
         Map args = settings.arguments;
-        var myProfile = args['myProfile'] as UserModel;
-        var userProfile = args['userProfile'] as UserModel;
+        var myProfile = args['myProfile'] as AccountModel;
+        var userProfile = args['userProfile'] as AccountModel;
         return MaterialPageRoute(
             settings: settings,
             builder: (_) =>
@@ -46,7 +46,7 @@ class MyRouter {
             settings: settings, builder: (_) => SettingScreen());
         break;
       case TAG_UPDATE_ACCOUNT:
-        var user = settings.arguments as UserModel;
+        var user = settings.arguments as AccountModel;
         return MaterialPageRoute(
             settings: settings, builder: (_) => UpdateAccountScreen(user));
         break;

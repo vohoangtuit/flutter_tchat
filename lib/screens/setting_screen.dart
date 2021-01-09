@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
@@ -6,7 +5,8 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/widget/basewidget.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
 
-import '../my_router.dart';
+import '../main.dart';
+import '../controller/my_router.dart';
 import 'account/update_account_screen.dart';
 
 class SettingScreen extends StatefulWidget {
@@ -38,8 +38,8 @@ Widget initUI(){
           ),
           CustomRowSetting(
             onPressed: (){
-              messageDao.deleteAllMessage();
-              lastMessageDao.deleteAllLastMessage();
+              floorDB.messageDao.deleteAllMessage();
+              floorDB.lastMessageDao.deleteAllLastMessage();
               // todo handle clear on firebase
               ProviderController(context).setReloadLastMessage(true);
             },

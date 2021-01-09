@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tchat_app/models/friends_model.dart';
 import 'package:tchat_app/models/message._model.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 
 final String FIREBASE_ID ='id';
 
@@ -17,7 +17,7 @@ final String FIREBASE_STORE_COVER='cover';
 final String FIREBASE_STORE_AVATAR='avatar';
 
 class FirebaseDataFunc{
-  final void Function(UserModel user,bool success) FBCallBack;
+  final void Function(AccountModel user,bool success) FBCallBack;
   FirebaseDataFunc(this.FBCallBack);
   String getStringPathAvatar(String uid){// user id
     //String fileName =DateTime.now().millisecondsSinceEpoch.toString();
@@ -77,7 +77,7 @@ chatListenerData(String myID,String toID){
   getFriendsWithType(String myId,int type)async{
     return await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myId).collection(myId).where(FRIEND_STATUS_REQUEST,isEqualTo: type).get();
   }
-  requestAddFriend(UserModel myProfile,UserModel user,FriendModel fromRequest,FriendModel toRequest){
+  requestAddFriend(AccountModel myProfile,AccountModel user,FriendModel fromRequest,FriendModel toRequest){
     WriteBatch writeBatch =  FirebaseFirestore.instance.batch();
     DocumentReference from = FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(myProfile.id).doc(user.id); // todo: lấy user id làm id trên firebase
     //DocumentReference from = fireBaseStore.collection(FIREBASE_FRIENDS).doc(myProfile.id).collection(user.id).doc(user.id); // todo: lấy user id làm id trên firebase
@@ -123,7 +123,7 @@ chatListenerData(String myID,String toID){
     return  writeBatch.commit();
    // return  writeBatch;
   }
-  void updateUserInfo(UserModel user){
+  void updateUserInfo(AccountModel user){
     FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(user.id).update({USER_FULLNAME:  user.fullName,USER_GENDER: user.gender,USER_BIRTHDAY:user.birthday,USER_LAST_UPDATED: user.lastUpdated
     }).then((data) async {
       FBCallBack(user,true);

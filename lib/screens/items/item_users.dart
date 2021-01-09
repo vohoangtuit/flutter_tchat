@@ -2,20 +2,20 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_socket_io/generated/i18n.dart';
-import 'package:tchat_app/models/user_model.dart';
+import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/widget.dart';
 
 import '../chat_screen.dart';
 
-Widget ItemUser(BuildContext context, DocumentSnapshot document,UserModel userModel, bool profile) {
+Widget ItemUser(BuildContext context, DocumentSnapshot document,AccountModel userModel, bool profile) {
   if (document.data()[USER_ID] ==  userModel.id) {
     return Container();
   } else {
     Map<String, dynamic> json =document.data();
    // UserModel friend =UserModel.fromDocumentSnapshot(document);
-    UserModel friend =UserModel.fromJson(json);
+    AccountModel friend =AccountModel.fromJson(json);
     return Container(
       child: FlatButton(
         color: greyColor2,
