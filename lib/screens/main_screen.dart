@@ -203,7 +203,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     // todo: bị loop khi để run ở initState() here
 
     var initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+    AndroidInitializationSettings('@drawable/ic_notification_system');
     var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(
         initializationSettingsAndroid, initializationSettingsIOS);
