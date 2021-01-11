@@ -84,7 +84,7 @@ class _$TChatAppDatabase extends TChatAppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `lastUpdated` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER, `latitude` REAL, `longitude` REAL)');
+            'CREATE TABLE IF NOT EXISTS `AccountModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `lastUpdated` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER, `latitude` REAL, `longitude` REAL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
         await database.execute(
@@ -118,8 +118,8 @@ class _$UserDao extends UserDao {
       : _queryAdapter = QueryAdapter(database),
         _userModelInsertionAdapter = InsertionAdapter(
             database,
-            'UserModel',
-            (UserModel item) => <String, dynamic>{
+            'AccountModel',
+            (AccountModel item) => <String, dynamic>{
                   'idDB': item.idDB,
                   'id': item.id,
                   'userName': item.userName,
@@ -145,9 +145,9 @@ class _$UserDao extends UserDao {
                 }),
         _userModelUpdateAdapter = UpdateAdapter(
             database,
-            'UserModel',
+            'AccountModel',
             ['idDB'],
-            (UserModel item) => <String, dynamic>{
+            (AccountModel item) => <String, dynamic>{
                   'idDB': item.idDB,
                   'id': item.id,
                   'userName': item.userName,
@@ -178,14 +178,14 @@ class _$UserDao extends UserDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<UserModel> _userModelInsertionAdapter;
+  final InsertionAdapter<AccountModel> _userModelInsertionAdapter;
 
-  final UpdateAdapter<UserModel> _userModelUpdateAdapter;
+  final UpdateAdapter<AccountModel> _userModelUpdateAdapter;
 
   @override
-  Future<List<UserModel>> findAllUsers() async {
-    return _queryAdapter.queryList('SELECT * FROM UserModel',
-        mapper: (Map<String, dynamic> row) => UserModel(
+  Future<List<AccountModel>> findAllUsers() async {
+    return _queryAdapter.queryList('SELECT * FROM AccountModel',
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -211,10 +211,10 @@ class _$UserDao extends UserDao {
   }
 
   @override
-  Future<UserModel> findUserById(String id) async {
-    return _queryAdapter.query('SELECT * FROM UserModel WHERE id = ? LIMIT 1',
+  Future<AccountModel> findUserById(String id) async {
+    return _queryAdapter.query('SELECT * FROM AccountModel WHERE id = ? LIMIT 1',
         arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) => UserModel(
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -240,9 +240,9 @@ class _$UserDao extends UserDao {
   }
 
   @override
-  Future<UserModel> getSingleUser() async {
-    return _queryAdapter.query('SELECT * FROM UserModel LIMIT 1',
-        mapper: (Map<String, dynamic> row) => UserModel(
+  Future<AccountModel> getSingleUser() async {
+    return _queryAdapter.query('SELECT * FROM AccountModel LIMIT 1',
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -269,16 +269,16 @@ class _$UserDao extends UserDao {
 
   @override
   Future<void> deleteAllUsers() async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM UserModel');
+    await _queryAdapter.queryNoReturn('DELETE * FROM AccountModel');
   }
 
   @override
-  Future<void> InsertUser(UserModel user) async {
+  Future<void> InsertUser(AccountModel user) async {
     await _userModelInsertionAdapter.insert(user, OnConflictStrategy.abort);
   }
 
   @override
-  Future<void> updateUser(UserModel user) async {
+  Future<void> updateUser(AccountModel user) async {
     await _userModelUpdateAdapter.update(user, OnConflictStrategy.abort);
   }
 }
