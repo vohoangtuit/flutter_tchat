@@ -84,9 +84,9 @@ class _$TChatAppDatabase extends TChatAppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `UserModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `lastUpdated` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER, `latitude` REAL, `longitude` REAL)');
+            'CREATE TABLE IF NOT EXISTS `AccountModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `id` TEXT, `userName` TEXT, `fullName` TEXT, `birthday` TEXT, `gender` INTEGER, `email` TEXT, `photoURL` TEXT, `cover` TEXT, `statusAccount` INTEGER, `phoneNumber` TEXT, `createdAt` TEXT, `lastUpdated` TEXT, `pushToken` TEXT, `isLogin` INTEGER, `isOnlineChat` INTEGER, `accountType` INTEGER, `allowSearch` INTEGER, `latitude` REAL, `longitude` REAL)');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
+            'CREATE TABLE IF NOT EXISTS `MessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `idSender` TEXT, `nameSender` TEXT, `photoSender` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER, `groupId` TEXT)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `LastMessageModel` (`idDB` INTEGER PRIMARY KEY AUTOINCREMENT, `uid` TEXT, `idReceiver` TEXT, `nameReceiver` TEXT, `photoReceiver` TEXT, `timestamp` TEXT, `content` TEXT, `type` INTEGER, `status` INTEGER)');
 
@@ -116,10 +116,10 @@ class _$TChatAppDatabase extends TChatAppDatabase {
 class _$UserDao extends UserDao {
   _$UserDao(this.database, this.changeListener)
       : _queryAdapter = QueryAdapter(database),
-        _userModelInsertionAdapter = InsertionAdapter(
+        _accountModelInsertionAdapter = InsertionAdapter(
             database,
-            'UserModel',
-            (UserModel item) => <String, dynamic>{
+            'AccountModel',
+            (AccountModel item) => <String, dynamic>{
                   'idDB': item.idDB,
                   'id': item.id,
                   'userName': item.userName,
@@ -136,6 +136,9 @@ class _$UserDao extends UserDao {
                   'pushToken': item.pushToken,
                   'isLogin':
                       item.isLogin == null ? null : (item.isLogin ? 1 : 0),
+                  'isOnlineChat': item.isOnlineChat == null
+                      ? null
+                      : (item.isOnlineChat ? 1 : 0),
                   'accountType': item.accountType,
                   'allowSearch': item.allowSearch == null
                       ? null
@@ -143,11 +146,11 @@ class _$UserDao extends UserDao {
                   'latitude': item.latitude,
                   'longitude': item.longitude
                 }),
-        _userModelUpdateAdapter = UpdateAdapter(
+        _accountModelUpdateAdapter = UpdateAdapter(
             database,
-            'UserModel',
+            'AccountModel',
             ['idDB'],
-            (UserModel item) => <String, dynamic>{
+            (AccountModel item) => <String, dynamic>{
                   'idDB': item.idDB,
                   'id': item.id,
                   'userName': item.userName,
@@ -164,6 +167,9 @@ class _$UserDao extends UserDao {
                   'pushToken': item.pushToken,
                   'isLogin':
                       item.isLogin == null ? null : (item.isLogin ? 1 : 0),
+                  'isOnlineChat': item.isOnlineChat == null
+                      ? null
+                      : (item.isOnlineChat ? 1 : 0),
                   'accountType': item.accountType,
                   'allowSearch': item.allowSearch == null
                       ? null
@@ -178,14 +184,14 @@ class _$UserDao extends UserDao {
 
   final QueryAdapter _queryAdapter;
 
-  final InsertionAdapter<UserModel> _userModelInsertionAdapter;
+  final InsertionAdapter<AccountModel> _accountModelInsertionAdapter;
 
-  final UpdateAdapter<UserModel> _userModelUpdateAdapter;
+  final UpdateAdapter<AccountModel> _accountModelUpdateAdapter;
 
   @override
-  Future<List<UserModel>> findAllUsers() async {
-    return _queryAdapter.queryList('SELECT * FROM UserModel',
-        mapper: (Map<String, dynamic> row) => UserModel(
+  Future<List<AccountModel>> findAllUsers() async {
+    return _queryAdapter.queryList('SELECT * FROM AccountModel',
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -202,6 +208,9 @@ class _$UserDao extends UserDao {
             pushToken: row['pushToken'] as String,
             isLogin:
                 row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            isOnlineChat: row['isOnlineChat'] == null
+                ? null
+                : (row['isOnlineChat'] as int) != 0,
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
@@ -211,10 +220,11 @@ class _$UserDao extends UserDao {
   }
 
   @override
-  Future<UserModel> findUserById(String id) async {
-    return _queryAdapter.query('SELECT * FROM UserModel WHERE id = ? LIMIT 1',
+  Future<AccountModel> findUserById(String id) async {
+    return _queryAdapter.query(
+        'SELECT * FROM AccountModel WHERE id = ? LIMIT 1',
         arguments: <dynamic>[id],
-        mapper: (Map<String, dynamic> row) => UserModel(
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -231,6 +241,9 @@ class _$UserDao extends UserDao {
             pushToken: row['pushToken'] as String,
             isLogin:
                 row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            isOnlineChat: row['isOnlineChat'] == null
+                ? null
+                : (row['isOnlineChat'] as int) != 0,
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
@@ -240,9 +253,9 @@ class _$UserDao extends UserDao {
   }
 
   @override
-  Future<UserModel> getSingleUser() async {
-    return _queryAdapter.query('SELECT * FROM UserModel LIMIT 1',
-        mapper: (Map<String, dynamic> row) => UserModel(
+  Future<AccountModel> getSingleUser() async {
+    return _queryAdapter.query('SELECT * FROM AccountModel LIMIT 1',
+        mapper: (Map<String, dynamic> row) => AccountModel(
             idDB: row['idDB'] as int,
             id: row['id'] as String,
             userName: row['userName'] as String,
@@ -259,6 +272,9 @@ class _$UserDao extends UserDao {
             pushToken: row['pushToken'] as String,
             isLogin:
                 row['isLogin'] == null ? null : (row['isLogin'] as int) != 0,
+            isOnlineChat: row['isOnlineChat'] == null
+                ? null
+                : (row['isOnlineChat'] as int) != 0,
             accountType: row['accountType'] as int,
             allowSearch: row['allowSearch'] == null
                 ? null
@@ -269,17 +285,17 @@ class _$UserDao extends UserDao {
 
   @override
   Future<void> deleteAllUsers() async {
-    await _queryAdapter.queryNoReturn('DELETE * FROM UserModel');
+    await _queryAdapter.queryNoReturn('DELETE FROM AccountModel');
   }
 
   @override
-  Future<void> InsertUser(UserModel user) async {
-    await _userModelInsertionAdapter.insert(user, OnConflictStrategy.abort);
+  Future<void> InsertUser(AccountModel user) async {
+    await _accountModelInsertionAdapter.insert(user, OnConflictStrategy.abort);
   }
 
   @override
-  Future<void> updateUser(UserModel user) async {
-    await _userModelUpdateAdapter.update(user, OnConflictStrategy.abort);
+  Future<void> updateUser(AccountModel user) async {
+    await _accountModelUpdateAdapter.update(user, OnConflictStrategy.abort);
   }
 }
 
@@ -300,7 +316,8 @@ class _$MessageDao extends MessageDao {
                   'timestamp': item.timestamp,
                   'content': item.content,
                   'type': item.type,
-                  'status': item.status
+                  'status': item.status,
+                  'groupId': item.groupId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -325,7 +342,8 @@ class _$MessageDao extends MessageDao {
             timestamp: row['timestamp'] as String,
             content: row['content'] as String,
             type: row['type'] as int,
-            status: row['status'] as int));
+            status: row['status'] as int,
+            groupId: row['groupId'] as String));
   }
 
   @override
@@ -344,7 +362,8 @@ class _$MessageDao extends MessageDao {
             timestamp: row['timestamp'] as String,
             content: row['content'] as String,
             type: row['type'] as int,
-            status: row['status'] as int));
+            status: row['status'] as int,
+            groupId: row['groupId'] as String));
   }
 
   @override
@@ -362,7 +381,8 @@ class _$MessageDao extends MessageDao {
             timestamp: row['timestamp'] as String,
             content: row['content'] as String,
             type: row['type'] as int,
-            status: row['status'] as int));
+            status: row['status'] as int,
+            groupId: row['groupId'] as String));
   }
 
   @override
@@ -379,7 +399,8 @@ class _$MessageDao extends MessageDao {
             timestamp: row['timestamp'] as String,
             content: row['content'] as String,
             type: row['type'] as int,
-            status: row['status'] as int));
+            status: row['status'] as int,
+            groupId: row['groupId'] as String));
   }
 
   @override

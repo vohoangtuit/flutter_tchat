@@ -119,7 +119,8 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                           ],
                         ),
                       ),
-                      background: user.cover.isEmpty
+                      // ignore: null_aware_in_condition
+                      background: user.cover==null
                           ? InkWell(
                               child: Image.asset(
                                 PATH_COVER_NOT_AVAILABLE,

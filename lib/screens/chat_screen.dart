@@ -149,6 +149,7 @@ class _ChatScreenState extends GenericAccountState {
     getProfile();
   }
   getProfile()async{
+    toUser.isOnlineChat=false;
     if(myAccount==null){
       await  getAccountFromSharedPre();
     }
@@ -272,7 +273,10 @@ class _ChatScreenState extends GenericAccountState {
          message.status =change.data()[MESSAGE_STATUS];
        });
        updateLastMessageByID(message);
-       ProviderController(context).setReloadLastMessage(true);
+       if(mounted){
+         ProviderController(context).setReloadLastMessage(true);
+       }
+
      });
    }
   void getMessage() {
@@ -624,6 +628,7 @@ class _ChatScreenState extends GenericAccountState {
       });
       //  print('message insert '+messages.toString());
       await floorDB.messageDao.insertMessage(messages);
+      print('toUser.isOnlineChat '+toUser.isOnlineChat.toString());
       if(!toUser.isOnlineChat){
         senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
       }
@@ -650,13 +655,14 @@ class _ChatScreenState extends GenericAccountState {
 
       socketIO.init();
 
-      socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
+      //socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
       // todo: listener events from server socket
       socketIO.subscribe(SOCKET_TYPING, userTyping);
       socketIO.subscribe(SOCKET_STOP_TYPING, stopTyping);
 
       socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
       socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
+      socketIO.subscribe(SOCKET_LIST_USERS, listUSerSocket);
 
       //     //Connect to the socket
     await socketIO.connect();
@@ -686,7 +692,7 @@ class _ChatScreenState extends GenericAccountState {
     });
   }
   void userJoined(dynamic data) {
-   // print("userJoined :::  "+data);
+    print("userJoined :::  "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
    // print("userJoined -------------------- ${map[SOCKET_USER_ID]}");
@@ -701,13 +707,30 @@ class _ChatScreenState extends GenericAccountState {
    // print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-    //print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
+    print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
     if(toUser.id.compareTo(map[SOCKET_USER_ID])==0){
       setState(() {
         toUser.isOnlineChat =false;
       });
  //     print("toUser :::  "+toUser.isOnlineChat.toString());
     }
+  }
+  void listUSerSocket(dynamic data) {
+     print('listUSerSocket '+data.toString());
+     List user = data;
+     if(user.length>0){
+       for(String id in user){
+         if(id.compareTo(toUser.id)==0){
+           if(mounted){
+             setState(() {
+               toUser.isOnlineChat =true;
+               print("toUser ::::::  "+toUser.isOnlineChat.toString());
+               return;
+             });
+           }
+         }
+       }
+     }
   }
   void receiveMessage(dynamic data) {
   //  print("receiveMessage " + data);
