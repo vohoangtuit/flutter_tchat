@@ -20,3 +20,5 @@ abstract class TChatAppDatabase extends FloorDatabase {
   MessageDao get messageDao;
   LastMessageDao get lastMessageDao;
 }
+// todo: fix if cannot run terminal build_runner on macbook : https://www.youtube.com/watch?v=kIcwX_w3Xw8
+// export PATH="/Volumes/DATA/Develop/AndroidStudio/FlutterSDK/flutter/bin:$PATH"
