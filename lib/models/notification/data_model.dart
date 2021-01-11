@@ -14,7 +14,7 @@ class DataModel{
   String content;
   String click_action;
   DataModel({this.uid,this.type,this.title, this.content,this.click_action});
-  factory DataModel.dataFromJson(Map<String, dynamic> message){
+  factory DataModel.dataFromAndroid(Map<String, dynamic> message){
     var data= json.decode(message['data']['data']);
     return DataModel(
         uid: data[MESSAGE_NOTIFY_UID],
@@ -33,15 +33,16 @@ class DataModel{
     data[MESSAGE_NOTIFY_CLICK_ACTION] = this.click_action;
     return data;
   }
-  factory DataModel.fromJsonIOS(Map<String,dynamic> json) =>DataModel(
-    // todo: working on ios
-      type:json['data']['type'],
-      content:json['data']['content'],
-      uid:json['data']['uid'],
-      title:json['data']['title'],
-    click_action:json['data']['click_action'],
-  );
-
+  factory DataModel.dataFromIOS(Map<String, dynamic> message){
+    var data= json.decode(message['data']);
+    return DataModel(
+      uid: data[MESSAGE_NOTIFY_UID],
+      type: data[MESSAGE_NOTIFY_TYPE],
+      title: data[MESSAGE_NOTIFY_TITLE],
+      content: data[MESSAGE_NOTIFY_CONTENT],
+      click_action: data[MESSAGE_NOTIFY_CLICK_ACTION],
+    );
+  }
   factory DataModel.fromJsonPayload(String payload) {
     var data = json.decode(payload) as Map;
     return DataModel(

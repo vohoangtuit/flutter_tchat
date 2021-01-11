@@ -224,9 +224,9 @@ class _MainScreenState extends GenericAccountState<MainScreen>
               message);
           DataModel data;
           if (Platform.isIOS) {
-            data = DataModel.fromJsonIOS(message);
+            data = DataModel.dataFromIOS(message);
           } else {
-            data = DataModel.dataFromJson(message);
+            data = DataModel.dataFromAndroid(message);
           }
 
           gotoDetailScreen(data);
@@ -241,25 +241,25 @@ class _MainScreenState extends GenericAccountState<MainScreen>
             message);
         DataModel data;
         if (Platform.isIOS) {
-          data = DataModel.fromJsonIOS(message);
+          data = DataModel.dataFromIOS(message);
         } else {
-          data = DataModel.dataFromJson(message);
+          data = DataModel.dataFromAndroid(message);
         }
         gotoDetailScreen(data);
       },
       onMessage: (Map<String,
           dynamic> message) async { // todo: new notify handle show banner
         setState(() {
-          print("onMessage : : " + message.toString());
+          print("onMessage " + message.toString());
           //NotificationModel pushNotification = NotificationModel.fromJson(message);
           NotificationResponse notification = NotificationResponse.fromJson(
               message);
           //  print("notification 1: "+notification.toString());
           DataModel dataModel;
           if (Platform.isIOS) {
-            dataModel = DataModel.fromJsonIOS(message);
+            dataModel = DataModel.dataFromIOS(message);
           } else {
-            dataModel = DataModel.dataFromJson(message);
+            dataModel = DataModel.dataFromAndroid(message);
           }
           NotificationModel notificationModel = NotificationModel(
               notification: notification, data: dataModel);
@@ -293,7 +293,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
 
   Future showBannerNotification(NotificationModel notification) async {
     /// todo: khi app opening thì sẽ vào đây
-    print("showBannerNotification :  " + notification.toString());
+  //  print("showBannerNotification :  " + notification.toString());
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your channel id', 'your channel name', 'your channel description',
         importance: Importance.Max, priority: Priority.High, autoCancel: true);
@@ -305,6 +305,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
         platformChannelSpecifics,
         payload: notification.data.toString());
     // print('data '+data.toString());
+
   }
 
   Future onSelectNotification(dynamic payload) async {
