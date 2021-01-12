@@ -18,6 +18,7 @@ import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/last_message_model.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/account_model.dart';
+import 'package:tchat_app/models/user_online_model.dart';
 import 'package:tchat_app/screens/friends/user_profile_screen.dart';
 import 'package:tchat_app/screens/video_call.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -159,8 +160,6 @@ class _ChatScreenState extends GenericAccountState {
         checkSocket();
       }
       initData();
-
-
     }
   }
   callVideo() async {
@@ -225,6 +224,8 @@ class _ChatScreenState extends GenericAccountState {
       }
     });
     listenerData();
+    checkUserOnline();
+    sendMeOnline(true);
   }
   @override
   void dispose() {
@@ -236,6 +237,7 @@ class _ChatScreenState extends GenericAccountState {
       );
       socketIO.disconnect();
     }
+    sendMeOnline(false);
 
   }
   void listenerData() async{
@@ -279,6 +281,37 @@ class _ChatScreenState extends GenericAccountState {
 
      });
    }
+  void checkUserOnline()async{
+    FirebaseFirestore.instance
+        .collection(FIREBASE_MESSAGES)
+        .doc(myAccount.id)
+        .collection(toUser.id).
+    doc(MESSAGE_CHECK_ONLINE).get().then((value) {
+      print('checkUserOnline '+value.toString());
+      if(value.data()==null){
+        createUserOnline(myAccount.id,toUser,false);
+      }else{
+        print('checkUserOnline '+value.data().toString());
+        print('checkUserOnline '+value.data().length.toString());
+      }
+    });
+   }
+   void sendMeOnline(bool online){
+     FirebaseFirestore.instance
+         .collection(FIREBASE_MESSAGES)
+         .doc(toUser.id)
+         .collection(myAccount.id).
+     doc(MESSAGE_CHECK_ONLINE).get().then((value) {
+       print('sendMeOnline '+value.toString());
+       if(value.data()==null){
+         createUserOnline(myAccount.id,toUser,online);
+       }else{
+         print('sendMeOnline '+value.data().toString());
+         print('sendMeOnline '+value.data().length.toString());
+       }
+     });
+   }
+
   void getMessage() {
     firebaseDataService
         .getMessageChat(myAccount.id, toUser.id)
@@ -662,7 +695,7 @@ class _ChatScreenState extends GenericAccountState {
 
       socketIO.subscribe(SOCKET_USER_JOINED, userJoined);
       socketIO.subscribe(SOCKET_USER_LEFT, userLeft);
-      socketIO.subscribe(SOCKET_LIST_USERS, listUSerSocket);
+     // socketIO.subscribe(SOCKET_LIST_USERS, listUSerSocket);
 
       //     //Connect to the socket
     await socketIO.connect();

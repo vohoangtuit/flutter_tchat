@@ -2,6 +2,7 @@
 import 'package:floor/floor.dart';
 
 final String MESSAGE_MESSAGE_MODEL ='MessageModel';
+final String MESSAGE_CHECK_ONLINE ='checkOnline';
 final String MESSAGE_ID ='id';
 
 final String MESSAGE_ID_SENDER ='idSender';

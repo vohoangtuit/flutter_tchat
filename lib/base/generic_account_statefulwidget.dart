@@ -12,11 +12,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
+import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/notification/data_model.dart';
 import 'package:tchat_app/models/notification/notification_model.dart';
 import 'package:tchat_app/models/notification/response/notification_response.dart';
 import 'package:tchat_app/models/notification/sent/notification_sent.dart';
 import 'package:tchat_app/models/account_model.dart';
+import 'package:tchat_app/models/user_online_model.dart';
 
 
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -111,6 +113,18 @@ abstract class GenericAccountState<T extends StatefulWidget>
     await SharedPre.clearData();
     await floorDB.getUserDao().deleteAllUsers();
     openMyAppAndRemoveAll();
+  }
+
+  createUserOnline(String myId,AccountModel accountModel, bool online){
+    print('createUserOnline');
+    UserOnLineModel userOnLineModel = UserOnLineModel(uid: accountModel.id,name: accountModel.fullName,lastAccess: '',isOnline: online);
+    fireBaseStore
+        .collection(FIREBASE_MESSAGES)
+        .doc(myId)
+        .collection(accountModel.id)
+        .doc(MESSAGE_CHECK_ONLINE).set(userOnLineModel.toJson()).then((value){
+
+    });
   }
   senNotificationNewMessage(String toUid, String nameRequest, String formId, String content) {
     DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_NEW_MESSAGE, title: '', content: content,click_action: 'FLUTTER_NOTIFICATION_CLICK');
