@@ -200,8 +200,6 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   }
 
   initNotification() {
-    // todo: bị loop khi để run ở initState() here
-
     var initializationSettingsAndroid =
     AndroidInitializationSettings('@drawable/ic_notification_system');
     var initializationSettingsIOS = IOSInitializationSettings();
@@ -295,7 +293,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     /// todo: khi app opening thì sẽ vào đây
   //  print("showBannerNotification :  " + notification.toString());
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'your channel id', 'your channel name', 'your channel description',
+        notification.data.uid, notification.data.title, notification.data.content,
         importance: Importance.Max, priority: Priority.High, autoCancel: true);
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
@@ -311,14 +309,15 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   Future onSelectNotification(dynamic payload) async {
     //todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
 
+    print('onSelectNotification... ');
     if (payload != null) {
-      print('payload... ' + payload.toString());
+ //     print('payload... ' + payload.toString());
       handlePayload(payload);
     }
   }
 
   handlePayload(String payload) async {
-    print('payload ' + payload);
+    print('handlePayload... ');
     var _json = json.decode(payload) as Map;
     DataModel data = DataModel(uid: _json['uid'].toString(),
         type: _json['type'] as int,
@@ -329,6 +328,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   }
 
   gotoDetailScreen(DataModel data) async {
+    print('gotoDetailScreen... ');
     if (data == null) {
       return;
     }

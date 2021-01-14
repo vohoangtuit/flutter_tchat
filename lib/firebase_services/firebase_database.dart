@@ -57,25 +57,6 @@ chatListenerData(String myID,String toID){
         .limit(1)
         .orderBy(MESSAGE_TIMESTAMP, descending: true);
 }
-  checkUserOnline(String myID,String toID)async{
-    return FirebaseFirestore.instance
-        .collection(FIREBASE_MESSAGES)
-        .doc(myID)
-        .collection(toID).
-       doc(MESSAGE_CHECK_ONLINE).get().then((value) {
-         print('checkUserOnline '+value.toString());
-         print('checkUserOnline '+value.data().toString());
-         print('checkUserOnline '+value.data().length.toString());
-    });
-  }
-  getLastMessage(String idSender, String idReceiver)async{
-    FirebaseFirestore.instance
-        .collection(FIREBASE_MESSAGES)
-        .doc(idSender)
-        .collection(idReceiver)
-        .limit(1)
-        .orderBy(MESSAGE_TIMESTAMP, descending: true).snapshots();
-  }
   Future<DocumentSnapshot> getInfoUserProfile(String id)async{
     DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance.collection(FIREBASE_USERS).doc(id).get();
     return documentSnapshot;

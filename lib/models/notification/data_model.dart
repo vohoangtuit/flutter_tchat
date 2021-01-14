@@ -16,6 +16,7 @@ class DataModel{
   DataModel({this.uid,this.type,this.title, this.content,this.click_action});
   factory DataModel.dataFromAndroid(Map<String, dynamic> message){
     var data= json.decode(message['data']['data']);
+    //var data= json.decode(message['data']);
     return DataModel(
         uid: data[MESSAGE_NOTIFY_UID],
         type: data[MESSAGE_NOTIFY_TYPE],

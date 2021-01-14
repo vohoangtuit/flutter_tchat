@@ -59,6 +59,7 @@ class _ChatScreenState extends GenericAccountState {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        centerTitle: false,
        titleSpacing:-8.0,
        // automaticallyImplyLeading: false,// todo hide icon back
        // title: Text(userProfile.fullName, style: textWhiteMedium()), // todo title default
@@ -223,8 +224,8 @@ class _ChatScreenState extends GenericAccountState {
         socketIO.sendMessage(SOCKET_STOP_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: myAccount.id}));
       }
     });
-    listenerData();
     checkUserOnline();
+    listenerData();
     sendMeOnline(true);
   }
   @override
@@ -251,9 +252,11 @@ class _ChatScreenState extends GenericAccountState {
           // print('groupChatId $groupChatId');
          if(groupChatId.length==0){
            if(change.data()[MESSAGE_GROUP_ID]!=null){
-             setState(() {
-               groupChatId =change.data()[MESSAGE_GROUP_ID];
-             });
+             if(mounted){
+               setState(() {
+                 groupChatId =change.data()[MESSAGE_GROUP_ID];
+               });
+             }
            }
            checkSocket();
          }
@@ -282,36 +285,26 @@ class _ChatScreenState extends GenericAccountState {
      });
    }
   void checkUserOnline()async{
-    FirebaseFirestore.instance
-        .collection(FIREBASE_MESSAGES)
-        .doc(myAccount.id)
-        .collection(toUser.id).
-    doc(MESSAGE_CHECK_ONLINE).get().then((value) {
-      print('checkUserOnline '+value.toString());
-      if(value.data()==null){
-        createUserOnline(myAccount.id,toUser,false);
+    var check = FirebaseFirestore.instance.collection(FIREBASE_MESSAGES).doc(myAccount.id).collection(toUser.id).doc(MESSAGE_CHECK_ONLINE);
+    check.snapshots().listen((data) {
+      if(data.data()!=null){
+        Map<String,dynamic> json =data.data();
+        UserOnLineModel userOnLineModel =UserOnLineModel.fromJson(json);
+       // print('userOnLineModel '+userOnLineModel.toString());
+        if(mounted){
+          setState(() {
+            toUser.isOnlineChat =userOnLineModel.isOnline;
+          });
+        }
+       // print('toUser.isOnlineChat '+toUser.isOnlineChat.toString());
       }else{
-        print('checkUserOnline '+value.data().toString());
-        print('checkUserOnline '+value.data().length.toString());
+        createUserOnline(myAccount.id,toUser,false);
       }
     });
    }
    void sendMeOnline(bool online){
-     FirebaseFirestore.instance
-         .collection(FIREBASE_MESSAGES)
-         .doc(toUser.id)
-         .collection(myAccount.id).
-     doc(MESSAGE_CHECK_ONLINE).get().then((value) {
-       print('sendMeOnline '+value.toString());
-       if(value.data()==null){
-         createUserOnline(myAccount.id,toUser,online);
-       }else{
-         print('sendMeOnline '+value.data().toString());
-         print('sendMeOnline '+value.data().length.toString());
-       }
-     });
+     createUserOnline(toUser.id,myAccount,online);
    }
-
   void getMessage() {
     firebaseDataService
         .getMessageChat(myAccount.id, toUser.id)
@@ -725,15 +718,15 @@ class _ChatScreenState extends GenericAccountState {
     });
   }
   void userJoined(dynamic data) {
-    print("userJoined :::  "+data);
+    //print("userJoined :::  "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
    // print("userJoined -------------------- ${map[SOCKET_USER_ID]}");
     if(toUser.id.compareTo(map[SOCKET_USER_ID])==0){
-      setState(() {
-        toUser.isOnlineChat =true;
-      });
-      print("toUser :::  "+toUser.isOnlineChat.toString());
+      // setState(() {
+      //   toUser.isOnlineChat =true;
+      // });
+      // print("toUser :::  "+toUser.isOnlineChat.toString());
     }
   }
   void userLeft(dynamic data) {
@@ -742,9 +735,9 @@ class _ChatScreenState extends GenericAccountState {
     map = json.decode(data);
     print("userLeft -------------------- ${map[SOCKET_USER_ID]}");
     if(toUser.id.compareTo(map[SOCKET_USER_ID])==0){
-      setState(() {
-        toUser.isOnlineChat =false;
-      });
+      // setState(() {
+      //   toUser.isOnlineChat =false;
+      // });
  //     print("toUser :::  "+toUser.isOnlineChat.toString());
     }
   }

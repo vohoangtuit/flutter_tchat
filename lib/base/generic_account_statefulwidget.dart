@@ -116,7 +116,6 @@ abstract class GenericAccountState<T extends StatefulWidget>
   }
 
   createUserOnline(String myId,AccountModel accountModel, bool online){
-    print('createUserOnline');
     UserOnLineModel userOnLineModel = UserOnLineModel(uid: accountModel.id,name: accountModel.fullName,lastAccess: '',isOnline: online);
     fireBaseStore
         .collection(FIREBASE_MESSAGES)

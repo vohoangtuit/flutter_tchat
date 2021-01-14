@@ -12,6 +12,7 @@ class NotificationModel{
    return NotificationModel(
      notification: json['notification'],
       data: json['data']['data'],
+     // data: json['data'],
     );
   }
   Map<String, dynamic> toJson() => {

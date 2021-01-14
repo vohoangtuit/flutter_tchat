@@ -20,11 +20,12 @@ class UserOnLineModel{
   factory UserOnLineModel.fromJson(Map<String, dynamic> json)=>UserOnLineModel(
       uid: json[USER_ONLINE_UID],
       name: json[USER_ONLINE_NAME],
-      lastAccess: json[USER_LAST_ACCESS]
+      lastAccess: json[USER_LAST_ACCESS],
+      isOnline: json[USER_IS_ONLINE]
   );
 
   @override
   String toString() {
-    return 'UserOnLineModel{uid: $uid, name: $name, lastAccess: $lastAccess}';
+    return 'UserOnLineModel{uid: $uid, name: $name, lastAccess: $lastAccess, isOnline: $isOnline}';
   }
 }

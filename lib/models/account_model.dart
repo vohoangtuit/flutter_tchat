@@ -49,7 +49,7 @@ class AccountModel {
   String lastUpdated = '';
   String pushToken = '';
   bool isLogin;
-  bool isOnlineChat;
+  bool isOnlineChat=false;
   int accountType = 0;
   bool allowSearch = true;
   double latitude = 0.0;
