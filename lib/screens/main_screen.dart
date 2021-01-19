@@ -215,7 +215,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     });
     firebaseMessaging.configure(
       onLaunch: (Map<String, dynamic> message) async {
-        setState(() {
+       // setState(() {
           print("Called onLaunch");
           print("onLaunch $message");
           NotificationResponse pushNotification = NotificationResponse.fromJson(
@@ -228,15 +228,12 @@ class _MainScreenState extends GenericAccountState<MainScreen>
           }
 
           gotoDetailScreen(data);
-        });
+       // });
       },
 
       onResume: (Map<String, dynamic> message) async {
         print("onResume $message");
-        NotificationResponse pushNotification = NotificationResponse.fromJson(
-            message);
-        NotificationResponse notification = NotificationResponse.fromJson(
-            message);
+        NotificationResponse pushNotification = NotificationResponse.fromJson(message);
         DataModel data;
         if (Platform.isIOS) {
           data = DataModel.dataFromIOS(message);
@@ -247,7 +244,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
       },
       onMessage: (Map<String,
           dynamic> message) async { // todo: new notify handle show banner
-        setState(() {
+       // setState(() {
           print("onMessage " + message.toString());
           //NotificationModel pushNotification = NotificationModel.fromJson(message);
           NotificationResponse notification = NotificationResponse.fromJson(
@@ -263,7 +260,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
               notification: notification, data: dataModel);
 
           showBannerNotification(notificationModel);
-        });
+     //   });
       },
     );
 
@@ -307,8 +304,6 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   }
 
   Future onSelectNotification(dynamic payload) async {
-    //todo: convert model to json rồi gửi qua screen khác, vì ko gửi model dc
-
     print('onSelectNotification... ');
     if (payload != null) {
  //     print('payload... ' + payload.toString());

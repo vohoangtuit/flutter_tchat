@@ -131,6 +131,7 @@ abstract class GenericAccountState<T extends StatefulWidget>
         toUId: toUid,
         title: nameRequest,
         body: 'you have got a new message',
+        click_action: 'FLUTTER_NOTIFICATION_CLICK',
         data: data.toJson());
     fireBaseStore
         .collection(FIREBASE_NOTIFICATIONS)
@@ -141,7 +142,7 @@ abstract class GenericAccountState<T extends StatefulWidget>
   }
   sentNotificationRequestAddFriend(String toUid, String nameRequest, String formId) {
     DataModel data = DataModel(uid: formId, type: NOTIFICATION_TYPE_SEND_ADD_FRIEND, title: '', content: '',click_action: 'FLUTTER_NOTIFICATION_CLICK');
-    NotificationSent sent = NotificationSent(toUId: toUid, title: nameRequest, body: 'Send you request add friend', data: data.toJson());
+    NotificationSent sent = NotificationSent(toUId: toUid, title: nameRequest, body: 'Send you request add friend',click_action: 'FLUTTER_NOTIFICATION_CLICK', data: data.toJson());
     fireBaseStore
         .collection(FIREBASE_NOTIFICATIONS)
         .doc(toUid)

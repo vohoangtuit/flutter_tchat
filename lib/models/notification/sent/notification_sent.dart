@@ -4,6 +4,7 @@ final String NOTIFICATION_ID='id';
 final String NOTIFICATION_TYPE='type';
 final String NOTIFICATION_TITLE='title';
 final String NOTIFICATION_BODY='body';
+final String NOTIFICATION_CLICK_ACTION='click_action';
 final String NOTIFICATION_UID='uid';// todo to userID
 final String NOTIFICATION_DATA='data';
 
@@ -17,14 +18,16 @@ class NotificationSent{
   String toUId;
   String title;
   String body;
+  String click_action;
   //DataNotification data;
   Map<String,dynamic> data;
-  NotificationSent({this.toUId,this.title,this.body,this.data});
+  NotificationSent({this.toUId,this.title,this.body,this.click_action,this.data});
 
   NotificationSent.fromJson(Map<String, dynamic> json){
     toUId = json[NOTIFICATION_UID];
     title = json[NOTIFICATION_TITLE];
     body = json[NOTIFICATION_BODY];
+    click_action = json[NOTIFICATION_CLICK_ACTION];
     data = json[NOTIFICATION_DATA];
   }
 
@@ -33,12 +36,13 @@ class NotificationSent{
     data[NOTIFICATION_UID] = this.toUId;
     data[NOTIFICATION_TITLE] = this.title;
     data[NOTIFICATION_BODY] = this.body;
+    data[NOTIFICATION_CLICK_ACTION] = this.click_action;
     data[NOTIFICATION_DATA] = this.data;
     return data;
   }
 
   @override
   String toString() {
-    return '{"uid": "$toUId", "title": "$title", "content": "$body", "data": "$data"}';
+    return '{"uid": "$toUId", "title": "$title", "content": "$body", "click_action": "$click_action", "data": "$data"}';
   }
 }
