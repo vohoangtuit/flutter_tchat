@@ -6,7 +6,6 @@ import 'package:tchat_app/widget/text_style.dart';
 
 import '../controller/my_router.dart';
 import 'account/login_screen.dart';
-import 'main_screen.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();

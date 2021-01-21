@@ -89,9 +89,9 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
         listMessage.clear();
         //print('listMessage '+value.toString());
         Future.delayed(Duration.zero, () async {
-          setState(() {
+          if(mounted){setState(() {
             listMessage.addAll(value);
-          });
+          });}
         });
       });
 

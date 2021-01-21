@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:tchat_app/base/generic_account_statefulwidget.dart';
 import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/main.dart';
-import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/screens/friends/suggest_friends_screen.dart';
 import 'package:tchat_app/utils/const.dart';
 import 'package:tchat_app/widget/custom_row_setting.dart';
@@ -14,7 +12,6 @@ import 'package:tchat_app/widget/text_style.dart';
 import 'package:tchat_app/widget/widget.dart';
 import '../../controller/my_router.dart';
 import '../account/my_profile_screen.dart';
-import '../account/update_account_screen.dart';
 
 class MoreScreen extends StatefulWidget {
   @override

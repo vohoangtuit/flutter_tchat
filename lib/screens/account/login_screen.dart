@@ -31,14 +31,21 @@ class LoginScreen extends StatefulWidget {
 }
 
 class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
-
-
   bool isLoggedIn = false;
   User currentUser;
+  bool handleBackground =false;
   @override
   void initState() {
     super.initState();
+    background();
     isSignedIn();
+  }
+  background(){
+    Future.delayed(Duration(microseconds: 300),()async{
+     setState(() {
+       handleBackground =true;
+     });
+    });
   }
 
   void isSignedIn() async {
@@ -55,11 +62,9 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
       isLoading = false;
     });
   }
-
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return !handleBackground?Container(color: Colors.blue,):Scaffold(
         appBar: appBarWithTitle(
         context,'Login Account'),
         body: Stack(

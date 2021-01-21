@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:tchat_app/controller/bloc/reload_contacts.dart';
+import 'package:tchat_app/screens/account/login_screen.dart';
 import 'package:tchat_app/screens/chat_screen.dart';
 import 'package:tchat_app/screens/home_screen.dart';
+import 'package:tchat_app/screens/main_screen.dart';
 
 import 'package:tchat_app/screens/splash_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
@@ -39,19 +41,32 @@ void main() async {
 initializeFloorDB()async{
    floorDB.init();
 }
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final String screens ='screens';
+  bool isLoginApp =false;
+  @override
+  void initState() {
+    checkLogin();
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
+
     Locale myLocale;
     //print('myLocale ${myLocale.countryCode} ${myLocale.languageCode}');
-    return MaterialApp(
+    return  MaterialApp(
       title: 'TChat',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
         onGenerateRoute: MyRouter.generateRoute,
-      home: SplashScreen(),
+     // home: SplashScreen(),
+      home: isLoginApp != null ?  isLoginApp ? MainScreen(false):LoginScreen():LoginScreen(),
       debugShowCheckedModeBanner: false,
         // ignore: missing_return
         localeResolutionCallback: (deviceLocale, supportedLocales) {
@@ -62,5 +77,32 @@ class MyApp extends StatelessWidget {
           SharedPre.saveString(SharedPre.sharedPreCountryCode, myLocale.countryCode);
         }
     );
+  }
+
+ checkLogin()async{
+    await SharedPre.getBoolKey(SharedPre.sharedPreIsLogin).then((value){
+      if(value!=null){
+        setState(() {
+          isLoginApp =value;
+        });
+      }else{
+        setState(() {
+          isLoginApp =false;
+        });
+      }
+    });
+    // await floorDB.getUserDao().getSingleUser().then((value){
+    //   if(value!=null){
+    //     setState(() {
+    //       isLoginApp =true;
+    //     });
+    //    return true;
+    //   }else{
+    //     setState(() {
+    //       isLoginApp =false;
+    //     });
+    //
+    //   }
+    // });
   }
 }
