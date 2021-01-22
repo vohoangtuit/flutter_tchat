@@ -14,8 +14,6 @@ import 'package:tchat_app/controller/providers/providers.dart';
 import 'package:tchat_app/firebase_services/firebase_database.dart';
 import 'package:tchat_app/models/message._model.dart';
 import 'package:tchat_app/models/notification/data_model.dart';
-import 'package:tchat_app/models/notification/notification_model.dart';
-import 'package:tchat_app/models/notification/response/notification_response.dart';
 import 'package:tchat_app/models/notification/sent/notification_sent.dart';
 import 'package:tchat_app/models/account_model.dart';
 import 'package:tchat_app/models/user_online_model.dart';
@@ -28,16 +26,17 @@ import 'bases_statefulwidget.dart';
 
 abstract class GenericAccountState<T extends StatefulWidget>
     extends BaseStatefulWidget {
-
   final GoogleSignIn googleSignIn = GoogleSignIn();
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   final facebookLogin = FacebookLogin();
   FirebaseDataFunc firebaseDataService = new FirebaseDataFunc(null);
   var reload;
-  AccountModel myAccount;
+  AccountModel account;
+
   @override
   void initState() {
     super.initState();
+
   }
   Future<AccountModel>getAccountFromSharedPre() async{
     Map<String, dynamic> userShared;
@@ -46,40 +45,40 @@ abstract class GenericAccountState<T extends StatefulWidget>
       userShared = jsonDecode(userStr) as Map<String, dynamic>;
     }
     if (userShared != null) {
-      myAccount =AccountModel.fromJson(userShared);
+      account =AccountModel.fromJson(userShared);
       if(mounted){
         setState(() {
-          myAccount =AccountModel.fromJson(userShared);
+          account =AccountModel.fromJson(userShared);
         });
       }
     }
-    return myAccount;
+    return account;
   }
   Future<AccountModel>getAccountFromFloorDB()async{
     await floorDB.getUserDao().getSingleUser().then((value) {
       if(value!=null){
-        myAccount =value;
+        account =value;
         if(mounted){
           setState(() {
-            myAccount =value;
+            account =value;
           });
         }
       }
     });
 
-    return myAccount;
+    return account;
   }
   updateUserDatabase(AccountModel user){
     floorDB.getUserDao().updateUser(user);
     setState(() {
-      myAccount =user;
+      account =user;
     });
   }
   checkAccountForLogout() async {
     // print('Logout ${userModel.accountType}');
-    if (myAccount.accountType == USER_ACCOUNT_FACEBOOK) {
+    if (account.accountType == USER_ACCOUNT_FACEBOOK) {
       logOutFacebook();
-    } else if (myAccount.accountType == USER_ACCOUNT_GMAIL) {
+    } else if (account.accountType == USER_ACCOUNT_GMAIL) {
       logoutGoogle();
     } else {
       print('unknow type');
@@ -97,7 +96,7 @@ abstract class GenericAccountState<T extends StatefulWidget>
     await floorDB.getUserDao().deleteAllUsers();
     this.setState(() {
       isLoading = false;
-      myAccount = null;
+      account = null;
     });
     openMyAppAndRemoveAll();
   }

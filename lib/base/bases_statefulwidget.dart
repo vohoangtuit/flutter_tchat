@@ -45,10 +45,6 @@ abstract class BaseStatefulWidget<T extends StatefulWidget> extends State<T> {
     initConfig();
     super.initState();
   }
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   void updateRouteOpening(int route){
     if(mounted){

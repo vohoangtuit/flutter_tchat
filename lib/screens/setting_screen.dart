@@ -32,7 +32,7 @@ Widget initUI(){
           CustomRowSetting(
             onPressed: (){
              // openScreenWithName(UpdateAccountScreen(myAccount));
-              Navigator.pushNamed(context, TAG_UPDATE_ACCOUNT,arguments: myAccount);
+              Navigator.pushNamed(context, TAG_UPDATE_ACCOUNT,arguments: account);
             },
             title: 'Update Account', icon: 'images/icons/ic_edit_blue.png',
           ),

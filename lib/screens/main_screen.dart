@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -18,12 +17,10 @@ import 'package:tchat_app/screens/tabs/last_message_screen.dart';
 import 'package:tchat_app/screens/tabs/more_screen.dart';
 import 'package:tchat_app/screens/tabs/time_line_screen.dart';
 import 'package:tchat_app/utils/const.dart';
-import 'package:tchat_app/base/bases_statefulwidget.dart';
 import 'package:tchat_app/widget/loading.dart';
 import 'package:tchat_app/widget/toolbar_main.dart';
 import '../controller/my_router.dart';
 import 'dialogs/dialog_controller.dart';
-import 'friends/user_profile_screen.dart';
 
 class MainScreen extends StatefulWidget {
   bool synData;
@@ -44,7 +41,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   FlutterLocalNotificationsPlugin();
-
+  final GlobalKey<State> _loadingKey = GlobalKey<State>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -119,17 +116,24 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   @override
   void initState() {
     super.initState();
-    //  print('main screen initState()');
     tabController = TabController(length: 5, vsync: this);
     tabController.addListener(handleTabSelection);
-
     initNotification();
+
+
+  }
+@override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    super.didChangeDependencies();
   }
 
   void handleTabSelection() {
-    setState(() {
-      positionTab = tabController.index;
-    });
+    if(mounted){
+      setState(() {
+        positionTab = tabController.index;
+      });
+    }
   }
 
   handleClick(int click) {
@@ -148,10 +152,10 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     }
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  // }
 
   void handleSyncData() {
   }
@@ -268,16 +272,16 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   }
 
   Future<String> registerFBToken() async {
-    myAccount = await getAccountFromSharedPre();
-    if (myAccount != null) {
+    account = await getAccountFromSharedPre();
+    if (account != null) {
       // if(myAccount.pushToken.isEmpty){
       firebaseMessaging.getToken().then((token) {
         print('token: $token');
-        myAccount.pushToken = token;
-        updateUserDatabase(myAccount);
+        account.pushToken = token;
+        updateUserDatabase(account);
         fireBaseStore
             .collection(FIREBASE_USERS)
-            .doc(myAccount.id)
+            .doc(account.id)
             .update({USER_PUST_TOKEN: token});
       }).catchError((err) {
         print('Error Token');
@@ -291,12 +295,17 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   //  print("showBannerNotification :  " + notification.toString());
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         notification.data.uid, notification.data.title, notification.data.content,
-        importance: Importance.Max, priority: Priority.High, autoCancel: true);
+        importance: Importance.Max, priority: Priority.High, autoCancel: true,ticker: 'ticker',
+       sound: RawResourceAndroidNotificationSound('sound_notification'),
+        playSound: true,
+        groupKey: notification.data.uid
+    );//,sound: RawResourceAndroidNotificationSound('sound_notification')
+
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
-        5, notification.notification.title, notification.notification.body,
+        0, notification.notification.title, notification.notification.body,
         platformChannelSpecifics,
         payload: notification.data.toString());
     // print('data '+data.toString());
@@ -312,13 +321,13 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   }
 
   handlePayload(String payload) async {
-    print('handlePayload... ');
+   // print('handlePayload... ');
     var _json = json.decode(payload) as Map;
     DataModel data = DataModel(uid: _json['uid'].toString(),
         type: _json['type'] as int,
         title: _json['title'].toString(),
         content: _json['content'].toString(),
-        click_action: _json['content']);
+        click_action: _json['click_action']);
     gotoDetailScreen(data);
   }
 
@@ -327,28 +336,28 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     if (data == null) {
       return;
     }
-    String current = ModalRoute
-        .of(context)
-        .settings
-        .name;
-    print('current screen $current');
-    switch (data.type) {
-      case 1:
-        getUserInfoAndOpenScreen(data.uid, TAG_CHAT_SCREEN);
-        break;
-      case 2:
-        print('case 2');
-        getUserInfoAndOpenScreen(data.uid, TAG_USER_PROFILE_SCREEN);
-        break;
-      default:
-        break;
-    }
+      String current = ModalRoute.of(context).settings.name;
+      print('current screen $current');
+      switch (data.type) {
+        case 1:
+          getUserInfoAndOpenScreen(data.uid, TAG_CHAT_SCREEN);
+          break;
+        case 2:
+          getUserInfoAndOpenScreen(data.uid, TAG_USER_PROFILE_SCREEN);
+          break;
+        default:
+          break;
+      }
+
+
   }
 
   getUserInfoAndOpenScreen(String userID, String screen) async {
-    setState(() {
-      isLoading = true;
-    });
+    if(mounted){
+      setState(() {
+        isLoading = true;
+      });
+    }
     await firebaseDataService.getInfoUserProfile(userID).then((value) {
       if (value.data() != null) {
         Map<String, dynamic> json = value.data();
@@ -359,17 +368,21 @@ class _MainScreenState extends GenericAccountState<MainScreen>
           );
         }
         if(screen.compareTo(TAG_USER_PROFILE_SCREEN)==0){
-          Navigator.pushNamed(context, screen,arguments:{'myProfile':myAccount,'userProfile':userModel});
+          Navigator.pushNamed(context, screen,arguments:{'myProfile':account,'userProfile':userModel});
         }else{
           Navigator.pushNamed(context, screen,arguments:userModel);
         }
-        setState(() {
-          isLoading = false;
-        });
+        if(mounted){
+          setState(() {
+            isLoading = false;
+          });
+        }
       } else {
-        setState(() {
-          isLoading = false;
-        });
+        if(mounted){
+          setState(() {
+            isLoading = false;
+          });
+        }
       }
     });
   }

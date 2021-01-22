@@ -47,7 +47,7 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccou
         CameraLibraryOpening(callBackCamera).cameraOpen(type);
       }else if(choose ==CHOOSE_PICTURE_VIEW_PICTURE){
         await  Future.delayed(Duration.zero, () async {
-          DialogController(context).ShowDialogViewSingleImage(dialog, myAccount.photoURL);
+          DialogController(context).ShowDialogViewSingleImage(dialog, account.photoURL);
         });
       }
       else{
@@ -59,7 +59,7 @@ abstract class BaseAccountUpdate <T extends StatefulWidget> extends GenericAccou
         CameraLibraryOpening(callBackCamera).cameraOpen(type);
       }else if(choose ==CHOOSE_PICTURE_VIEW_PICTURE){
         Future.delayed(Duration.zero, () async {
-          DialogController(context).ShowDialogViewSingleImage(dialog, myAccount.cover);
+          DialogController(context).ShowDialogViewSingleImage(dialog, account.cover);
         });
       }
       else{

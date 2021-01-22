@@ -76,7 +76,7 @@ class _ChatScreenState extends GenericAccountState {
               ],
             ),
             onTap: (){
-              openScreenWithName(toUser!=null?UserProfileScreen(myProfile: myAccount,user: toUser,):(){
+              openScreenWithName(toUser!=null?UserProfileScreen(myProfile: account,user: toUser,):(){
 
               });
             },
@@ -152,16 +152,17 @@ class _ChatScreenState extends GenericAccountState {
   }
   getProfile()async{
     toUser.isOnlineChat=false;
-    if(myAccount==null){
+    if(account==null){
       await  getAccountFromSharedPre();
     }
-    if(myAccount!=null&&toUser!=null){
+    if(account!=null&&toUser!=null){
       if(groupChatId.length>0){
       // print('groupChatId:::::::::::::::::: $groupChatId');
         checkSocket();
       }
       initData();
     }
+    getProfileUser();
   }
   callVideo() async {
     print('call video');
@@ -215,13 +216,13 @@ class _ChatScreenState extends GenericAccountState {
           return;
         if (typing) return;
         typing = true;
-        socketIO.sendMessage(SOCKET_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: myAccount.id}));
+        socketIO.sendMessage(SOCKET_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: account.id}));
       } else {
         if(socketIO==null)
           return;
         if (!typing) return;
         typing = false;
-        socketIO.sendMessage(SOCKET_STOP_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: myAccount.id}));
+        socketIO.sendMessage(SOCKET_STOP_TYPING, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_SENDER_CHAT_ID: account.id}));
       }
     });
     checkUserOnline();
@@ -234,7 +235,7 @@ class _ChatScreenState extends GenericAccountState {
     if(socketIO!=null){
       socketIO.sendMessage(// todo send message to server socket
         SOCKET_UNSUBSCRIBE,
-        json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),
+        json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:account.id}),
       );
       socketIO.disconnect();
     }
@@ -242,12 +243,12 @@ class _ChatScreenState extends GenericAccountState {
 
   }
   void listenerData() async{
-     var userQuery=  firebaseDataService.chatListenerData(myAccount.id, toUser.id);
+     var userQuery=  firebaseDataService.chatListenerData(account.id, toUser.id);
      userQuery.snapshots().listen((data) {
        // print("data size: "+data.size.toString());
        //print("data document: "+data.docs.toString());
        LastMessageModel message = LastMessageModel();
-       message.uid =myAccount.id;
+       message.uid =account.id;
        data.docs.forEach((change) {
           // print('groupChatId $groupChatId');
          if(groupChatId.length==0){
@@ -261,7 +262,7 @@ class _ChatScreenState extends GenericAccountState {
            checkSocket();
          }
           // print('groupChatId: $groupChatId');
-         if(myAccount.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
+         if(account.id.contains(change.data()[MESSAGE_ID_SENDER])){// todo: is me
            //  print('message is me');
            message.idReceiver =change.data()[MESSAGE_ID_RECEIVER];
            message.nameReceiver =change.data()[MESSAGE_NAME_RECEIVER];
@@ -285,7 +286,7 @@ class _ChatScreenState extends GenericAccountState {
      });
    }
   void checkUserOnline()async{
-    var check = FirebaseFirestore.instance.collection(FIREBASE_MESSAGES).doc(myAccount.id).collection(toUser.id).doc(MESSAGE_CHECK_ONLINE);
+    var check = FirebaseFirestore.instance.collection(FIREBASE_MESSAGES).doc(account.id).collection(toUser.id).doc(MESSAGE_CHECK_ONLINE);
     check.snapshots().listen((data) {
       if(data.data()!=null){
         Map<String,dynamic> json =data.data();
@@ -298,22 +299,35 @@ class _ChatScreenState extends GenericAccountState {
         }
        // print('toUser.isOnlineChat '+toUser.isOnlineChat.toString());
       }else{
-        createUserOnline(myAccount.id,toUser,false);
+        createUserOnline(account.id,toUser,false);
       }
     });
    }
    void sendMeOnline(bool online){
-     createUserOnline(toUser.id,myAccount,online);
+     createUserOnline(toUser.id,account,online);
    }
   void getMessage() {
     firebaseDataService
-        .getMessageChat(myAccount.id, toUser.id)
+        .getMessageChat(account.id, toUser.id)
         .then((data) {
           if(this.mounted){
             setState(() {
               chatStream =data;
             });
           }
+    });
+  }
+  getProfileUser()async{
+    await firebaseDataService.getInfoUserProfile(toUser.id).then((value) {
+      if (value.data() != null) {
+        Map<String, dynamic> json = value.data();
+        AccountModel userModel = AccountModel.fromJson(json);
+      if(userModel!=null) {
+        setState(() {
+          toUser = userModel;
+        });
+      }
+      }
     });
   }
   void onFocusChange() {
@@ -569,7 +583,7 @@ class _ChatScreenState extends GenericAccountState {
               padding: EdgeInsets.all(10.0),
               itemBuilder: (context, index) => ItemChatMessage(
                   context,
-                  myAccount.id,
+                  account.id,
                   index,
                   snapshot.data.documents[index],
                   listMessage,
@@ -617,14 +631,14 @@ class _ChatScreenState extends GenericAccountState {
       textEditingController.clear();
       if(groupChatId.length==0){
         setState(() {
-          groupChatId =myAccount.id+'-'+DateTime.now().millisecondsSinceEpoch.toString();
+          groupChatId =account.id+'-'+DateTime.now().millisecondsSinceEpoch.toString();
         });
         checkSocket();
       }
       MessageModel messages = MessageModel(
-          idSender: myAccount.id,
-          nameSender: myAccount.fullName,
-          photoSender: myAccount.photoURL,
+          idSender: account.id,
+          nameSender: account.fullName,
+          photoSender: account.photoURL,
           idReceiver:toUser.id,
           nameReceiver:toUser.fullName,
           photoReceiver: toUser.photoURL,
@@ -635,13 +649,13 @@ class _ChatScreenState extends GenericAccountState {
           groupId: groupChatId);
       var from = fireBaseStore
           .collection(FIREBASE_MESSAGES)
-          .doc(myAccount.id)
+          .doc(account.id)
           .collection(toUser.id)
           .doc(); // end doc can use timestamp
       var to = fireBaseStore
           .collection(FIREBASE_MESSAGES)
           .doc(toUser.id)
-          .collection(myAccount.id)
+          .collection(account.id)
           .doc(); // end doc can use timestamp
       WriteBatch writeBatch = fireBaseStore.batch();
       writeBatch.set(from, messages.toJson());
@@ -656,7 +670,7 @@ class _ChatScreenState extends GenericAccountState {
       await floorDB.messageDao.insertMessage(messages);
       print('toUser.isOnlineChat '+toUser.isOnlineChat.toString());
       if(!toUser.isOnlineChat){
-        senNotificationNewMessage(toUser.id,myAccount.fullName,myAccount.id,content);
+        senNotificationNewMessage(toUser.id,account.fullName,account.id,content);
       }
       listScrollController.animateTo(0.0,
           duration: Duration(milliseconds: 300), curve: Curves.easeOut);
@@ -697,25 +711,33 @@ class _ChatScreenState extends GenericAccountState {
   }
   _socketStatus(dynamic data) {
     print("Socket status: " + data);
-    socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:myAccount.id}),);
+    socketIO.sendMessage(SOCKET_SUBSCRIBE, json.encode({SOCKET_GROUP_CHAT_ID: groupChatId,SOCKET_USER_ID:account.id}),);
   }
   void userTyping(dynamic data) {
-   // print("userTyping "+data);
+ //   print("userTyping "+data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
-  //  print("typing -------------------- ${map[SOCKET_USER_ID]}");
-    setState(() {
-      typing = true;
-    });
+
+    String id =map[SOCKET_SENDER_CHAT_ID];
+     print("typing --id-------------- $id");
+    if(id.compareTo(account.id)!=0){
+      if(mounted){
+        setState(() {
+          typing = true;
+        });
+      }
+    }
   }
   void stopTyping(dynamic data) {
     print(data);
     Map<String, dynamic> map = new Map<String, dynamic>();
     map = json.decode(data);
   //  print("stopTyping -------------------- $map");
-    setState(() {
-      typing = false;
-    });
+    if(mounted){
+      setState(() {
+        typing = false;
+      });
+    }
   }
   void userJoined(dynamic data) {
     //print("userJoined :::  "+data);

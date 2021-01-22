@@ -120,7 +120,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
                         ),
                       ),
                       // ignore: null_aware_in_condition
-                      background: user.cover==null
+                      background: user.cover.isEmpty
                           ? InkWell(
                               child: Image.asset(
                                 PATH_COVER_NOT_AVAILABLE,
@@ -456,15 +456,15 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
   }
 
   undoRequest() async {
-    print('undoRequest()');
-
-    await firebaseDataService.removeFriend(myAccount.id, user.id).then((value){
-      setState(() {
-        print('ok:222222222:');
-        isLoading =false;
-        statusRequest = FRIEND_NOT_REQUEST;
-        ProviderController(context).setReloadContacts(true);
-      });
+    await firebaseDataService.removeFriend(myProfile.id, user.id).then((value){
+      if(mounted){
+        setState(() {
+          print('ok:222222222:');
+          isLoading =false;
+          statusRequest = FRIEND_NOT_REQUEST;
+          ProviderController(context).setReloadContacts(true);
+        });
+      }
     });
   }
 
@@ -473,7 +473,7 @@ class _UserProfileScreenState extends GenericAccountState<UserProfileScreen> {
     setState(() {
       isLoading = true;
     });
-    await firebaseDataService.acceptFriend(myAccount.id, user.id).then((value){
+    await firebaseDataService.acceptFriend(myProfile.id, user.id).then((value){
       setState(() {
         print('ok:::::::::::::');
         isLoading =false;

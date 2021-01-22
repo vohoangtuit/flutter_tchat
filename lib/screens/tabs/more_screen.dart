@@ -32,7 +32,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen>
           SingleChildScrollView(
             child: Column(
               children: [
-                myAccount == null ? Container() : myProFileUI(),
+                account == null ? Container() : myProFileUI(),
                 SizedBox(
                   height: 20,
                 ),
@@ -51,10 +51,10 @@ class _MoreScreenState extends GenericAccountState<MoreScreen>
     initData();
   }
   initData() async {
-    myAccount = await getAccountFromFloorDB();
+    account = await getAccountFromFloorDB();
     if(mounted){
       setState(() {
-        this.myAccount =myAccount;
+        this.account =account;
       });
     }
   }
@@ -74,8 +74,8 @@ class _MoreScreenState extends GenericAccountState<MoreScreen>
           child: Row(
             children: [
               Container(
-                child: myAccount.photoURL.isEmpty?CircleAvatar(radius: 30.0,backgroundImage:AssetImage(PATH_AVATAR_NOT_AVAILABLE)):Material(
-                 child: cachedImage(myAccount.photoURL,45.0,45.0),
+                child: account.photoURL.isEmpty?CircleAvatar(radius: 30.0,backgroundImage:AssetImage(PATH_AVATAR_NOT_AVAILABLE)):Material(
+                 child: cachedImage(account.photoURL,45.0,45.0),
                  borderRadius: BorderRadius.all(
                      Radius.circular(45.0)),
                  clipBehavior: Clip.hardEdge,
@@ -92,7 +92,7 @@ class _MoreScreenState extends GenericAccountState<MoreScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        myAccount.fullName,
+                        account.fullName,
                         style: textBlackMedium(),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -124,14 +124,14 @@ class _MoreScreenState extends GenericAccountState<MoreScreen>
         CustomRowSetting(
           onPressed: () {
             Navigator.pushNamed(context, TAG_UPDATE_ACCOUNT,
-                arguments: myAccount);
+                arguments: account);
           },
           title: 'Update Account',
           icon: 'images/icons/ic_edit_blue.png',
         ),
         CustomRowSetting(
           onPressed: () {
-            openScreenWithName(SuggestFriendsScreen(myAccount));
+            openScreenWithName(SuggestFriendsScreen(account));
           },
           title: 'Suggest Friends',
           icon: 'images/icons/ic_friends_light_blue.png',

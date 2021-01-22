@@ -33,20 +33,12 @@ class LoginScreen extends StatefulWidget {
 class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
   bool isLoggedIn = false;
   User currentUser;
-  bool handleBackground =false;
   @override
   void initState() {
     super.initState();
-    background();
     isSignedIn();
   }
-  background(){
-    Future.delayed(Duration(microseconds: 300),()async{
-     setState(() {
-       handleBackground =true;
-     });
-    });
-  }
+
 
   void isSignedIn() async {
     this.setState(() {
@@ -64,7 +56,7 @@ class LoginScreenState extends BaseAccountUpdate<LoginScreen> {
   }
   @override
   Widget build(BuildContext context) {
-    return !handleBackground?Container(color: Colors.blue,):Scaffold(
+    return Scaffold(
         appBar: appBarWithTitle(
         context,'Login Account'),
         body: Stack(

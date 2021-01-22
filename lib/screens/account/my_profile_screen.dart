@@ -33,7 +33,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
     if (ProviderController(context).getUserUpdated()) {
       reload = getAccountFromSharedPre(); // todo call back when user update info from other screen
     }
-    if (myAccount == null) {
+    if (account == null) {
       return Container();
     } else {
       return Scaffold(
@@ -69,7 +69,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             icon: Icon(Icons.more_horiz,
                                 color: isShrink ? Colors.black : Colors.white),
                             onPressed: () {
-                              openScreenWithName(UpdateAccountScreen(myAccount));
+                              openScreenWithName(UpdateAccountScreen(account));
                             })
                       ],
                       flexibleSpace: FlexibleSpaceBar(
@@ -89,7 +89,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                   height: 36.0,
                                   child: CircleAvatar(
                                     radius: 30.0,
-                                    backgroundImage:  myAccount.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(myAccount.photoURL),
+                                    backgroundImage:  account.photoURL.isEmpty ? AssetImage(PATH_AVATAR_NOT_AVAILABLE):NetworkImage(account.photoURL),
                                     backgroundColor: Colors.transparent,
                                   ),
                                 ),
@@ -101,7 +101,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                                 width: 10,
                               ),
                               Text(
-                                myAccount.fullName,
+                                account.fullName,
                                 textAlign: TextAlign.center,
                                 style: isShrink
                                     ? textBlackMedium()
@@ -110,7 +110,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             ],
                           ),
                         ),
-                        background: myAccount.cover.isEmpty
+                        background: account.cover.isEmpty
                             ? InkWell(
                                 child: Image.asset(
                                   PATH_COVER_NOT_AVAILABLE,
@@ -123,7 +123,7 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
                             : InkWell(
                                 child:
                                 //CachedNetworkImageProvider(userModel.cover),
-                                Image.network(myAccount.cover, fit: BoxFit.cover,),
+                                Image.network(account.cover, fit: BoxFit.cover,),
                                 onTap: () {
                                   DialogController(context).showDialogRequestUpdatePicture(dialog, PICTURE_TYPE_COVER, viewDialogPicture);
                                 }),
@@ -198,10 +198,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
     super.initState();
   }
   initData() async {
-    myAccount = await getAccountFromFloorDB();
+    account = await getAccountFromFloorDB();
     if(mounted){
       setState(() {
-        this.myAccount =myAccount;
+        this.account =account;
       });
     }
   }
@@ -238,10 +238,10 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
       });
       if(type ==PICTURE_TYPE_AVATAR){
         FirebaseUpload(updateProfile)
-            .uploadFileAvatar(myAccount, file);
+            .uploadFileAvatar(account, file);
       }else{
         FirebaseUpload(updateProfile)
-            .uploadFileCover(myAccount, file);
+            .uploadFileCover(account, file);
       }
     }
   }
@@ -256,9 +256,9 @@ class _MyProfileScreenState extends BaseAccountUpdate<MyProfileScreen> {
         isLoading =true;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(updateProfile).uploadFileAvatar(myAccount, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(account, file);
       }else{
-        FirebaseUpload(updateProfile).uploadFileCover(myAccount, file);
+        FirebaseUpload(updateProfile).uploadFileCover(account, file);
       }
     }
   }

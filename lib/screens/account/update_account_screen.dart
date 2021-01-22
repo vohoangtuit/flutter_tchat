@@ -44,7 +44,7 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
     if (ProviderController(context).getUserUpdated()) {
       reload = getAccountFromFloorDB(); // todo call back when user update info from other screen
     }
-    return myAccount==null?Container(color: Colors.white,):Scaffold(
+    return account==null?Container(color: Colors.white,):Scaffold(
         appBar: appBarWithTitleCenter(context, 'Profile Information'),
         //  body: UpdateScreen(),
         body: Stack(
@@ -207,10 +207,10 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
     readLocal();
   }
   initData() async {
-    myAccount = await getAccountFromFloorDB();
+    account = await getAccountFromFloorDB();
     if(mounted){
       setState(() {
-        this.myAccount =myAccount;
+        this.account =account;
       });
     }
   }
@@ -299,10 +299,10 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
       });
       if(type ==PICTURE_TYPE_AVATAR){
         FirebaseUpload(updateProfile)
-            .uploadFileAvatar(myAccount, file);
+            .uploadFileAvatar(account, file);
       }else{
         FirebaseUpload(updateProfile)
-            .uploadFileCover(myAccount, file);
+            .uploadFileCover(account, file);
       }
     }
   }
@@ -318,9 +318,9 @@ class _UpdateAccountScreenState extends BaseAccountUpdate<UpdateAccountScreen> {
         avatarImageFile =file;
       });
       if(type ==PICTURE_TYPE_AVATAR){
-        FirebaseUpload(updateProfile).uploadFileAvatar(myAccount, file);
+        FirebaseUpload(updateProfile).uploadFileAvatar(account, file);
       }else{
-        FirebaseUpload(updateProfile).uploadFileCover(myAccount, file);
+        FirebaseUpload(updateProfile).uploadFileCover(account, file);
       }
     }
   }

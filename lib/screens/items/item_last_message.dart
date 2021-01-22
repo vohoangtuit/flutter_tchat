@@ -61,6 +61,7 @@ Widget buildItemLastMessage(BuildContext context,AccountModel userModel, LastMes
         toUser.id =message.idReceiver;
         toUser.fullName =message.nameReceiver;
         toUser.photoURL =message.photoReceiver;
+        toUser.cover ="";
         Navigator.push(
             context,
             MaterialPageRoute(

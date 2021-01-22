@@ -50,15 +50,15 @@ class UsersScreenState extends GenericAccountState<UsersScreen> {
       });
       hideLoading();
     });
-    if (myAccount == null) {
-      myAccount = await getAccountFromSharedPre();
+    if (account == null) {
+      account = await getAccountFromSharedPre();
     }
 
-    if (myAccount != null) {
+    if (account != null) {
      setState(() {
        isLoading =true;
      });
-   await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(myAccount.id).collection(myAccount.id).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get().then((value) {
+   await FirebaseFirestore.instance.collection(FIREBASE_FRIENDS).doc(account.id).collection(account.id).where(FRIEND_STATUS_REQUEST,isEqualTo: FRIEND_SUCEESS).get().then((value) {
        if(value.size>0){
          List<FriendModel> data =List();
              for(int i=0;i<value.size;i++ ){
@@ -116,7 +116,7 @@ class UsersScreenState extends GenericAccountState<UsersScreen> {
                 itemCount: snapshot.data.documents.length,
                 // snapshot.data.documents.length
                 itemBuilder: (context, index) => ItemUser(
-                    context, snapshot.data.documents[index], myAccount, false),
+                    context, snapshot.data.documents[index], account, false),
               )
             : Container();
       },

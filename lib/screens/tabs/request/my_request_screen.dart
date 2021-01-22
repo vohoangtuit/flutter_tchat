@@ -34,7 +34,7 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
       padding: EdgeInsets.all(0.0),
       itemCount: listFriend.length,
       itemBuilder: (context, index) => ItemMyFriendRequest(
-          context, listFriend[index], myAccount,languageCode, (friend) {
+          context, listFriend[index], account,languageCode, (friend) {
             handleActionCick(friend);
       }),
       separatorBuilder: (context, index) => Divider(
@@ -46,14 +46,14 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
   }
 
   getData() async {
-    if (myAccount == null) {
-      myAccount = await getAccountFromSharedPre();
+    if (account == null) {
+      account = await getAccountFromSharedPre();
     }
     setState(() {
       isLoading = true;
     });
     await firebaseDataService
-        .getFriendsWithType(myAccount.id, FRIEND_SEND_REQUEST)
+        .getFriendsWithType(account.id, FRIEND_SEND_REQUEST)
         .then((value) {
       if (value.size > 0) {
         List<FriendModel> data = List();
@@ -92,7 +92,7 @@ class _MyRequestScreenState extends GenericAccountState<MyRequestScreen>
     if (friend.actionConfirm != null) {
       if (friend.actionConfirm == FRIEND_ACCTION_CLICK_DENNY) {
         await firebaseDataService
-            .acceptFriend(myAccount.id, friend.id)
+            .removeFriend(account.id, friend.id)
             .then((value) {
           setState(() {
             isLoading = false;
