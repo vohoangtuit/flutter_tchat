@@ -207,8 +207,12 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     var initializationSettingsAndroid =
     AndroidInitializationSettings('@drawable/ic_notification_system');
     var initializationSettingsIOS = IOSInitializationSettings();
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
+    const MacOSInitializationSettings initializationSettingsMacOS =
+    MacOSInitializationSettings(
+        requestAlertPermission: false,
+        requestBadgePermission: false,
+        requestSoundPermission: false);
+    var initializationSettings = InitializationSettings(android:initializationSettingsAndroid, iOS:initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings,
         onSelectNotification: onSelectNotification);
     firebaseMessaging.requestNotificationPermissions(
@@ -295,15 +299,15 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   //  print("showBannerNotification :  " + notification.toString());
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         notification.data.uid, notification.data.title, notification.data.content,
-        importance: Importance.Max, priority: Priority.High, autoCancel: true,ticker: 'ticker',
+        importance: Importance.max, priority: Priority.high, autoCancel: true,ticker: 'ticker',
        sound: RawResourceAndroidNotificationSound('sound_notification'),
         playSound: true,
-        groupKey: notification.data.uid
-    );//,sound: RawResourceAndroidNotificationSound('sound_notification')
-
+        showWhen: true,
+      //  groupKey: notification.data.uid
+    );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    const MacOSNotificationDetails macOSPlatformChannelSpecifics = MacOSNotificationDetails(sound: 'slow_spring_board.aiff');
+    var platformChannelSpecifics = NotificationDetails(android:androidPlatformChannelSpecifics, iOS:iOSPlatformChannelSpecifics,macOS:macOSPlatformChannelSpecifics);
     await flutterLocalNotificationsPlugin.show(
         0, notification.notification.title, notification.notification.body,
         platformChannelSpecifics,
