@@ -4,6 +4,7 @@ import 'package:tchat_app/controller/my_router.dart';
 import 'package:tchat_app/screens/account/login_screen.dart';
 import 'package:tchat_app/screens/splash_screen.dart';
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
+import 'package:tchat_app/widget/basewidget.dart';
 
 class CheckLoginScreen extends StatefulWidget {
   @override
@@ -12,8 +13,21 @@ class CheckLoginScreen extends StatefulWidget {
 class _CheckLoginScreenState extends State<CheckLoginScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.blue,
+    return Scaffold(
+     // color: Colors.blue,
+      appBar: appBarWithTitle(context,''),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 50,
+              color: Colors.white,
+              child:  Container(height: 1.0, color: Colors.grey[200]),
+            ),
+          )
+        ],
+      ),
     );
   }
   @override
@@ -30,18 +44,5 @@ class _CheckLoginScreenState extends State<CheckLoginScreen> {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>LoginScreen()));
       }
     });
-    // await floorDB.getUserDao().getSingleUser().then((value){
-    //   if(value!=null){
-    //     setState(() {
-    //       isLoginApp =true;
-    //     });
-    //    return true;
-    //   }else{
-    //     setState(() {
-    //       isLoginApp =false;
-    //     });
-    //
-    //   }
-    // });
   }
 }

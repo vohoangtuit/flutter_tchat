@@ -94,10 +94,7 @@ class _LastMessageScreenState extends GenericAccountState<LastMessageScreen> wit
           });}
         });
       });
-
     }
-
-
   }
   @override
   void dispose(){

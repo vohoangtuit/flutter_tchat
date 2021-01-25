@@ -11,7 +11,7 @@ class FloorInitialize {
   LastMessageDao lastMessageDao;
    init()async{
     database = await $FloorTChatAppDatabase.databaseBuilder('TChatApp.db').build();
-    userDao =await database.userDao;
+    userDao = database.userDao;
     messageDao =database.messageDao;
     lastMessageDao =database.lastMessageDao;
   }

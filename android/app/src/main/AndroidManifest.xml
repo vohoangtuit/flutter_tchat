@@ -1,4 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="vht.com.tchat_app">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
@@ -29,7 +30,9 @@
             android:networkSecurityConfig="@xml/network_security_config"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize"
+            tools:targetApi="o_mr1"
+            tools:ignore="RtlEnabled">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -59,7 +62,10 @@
         </activity>
        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
            <intent-filter>
-               <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+               <action android:name="android.intent.action.BOOT_COMPLETED"/>
+               <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+               <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+               <action android:name="com.htc.intent.action.QUICKBOOT_POWERON"/>
            </intent-filter>
        </receiver>
 
@@ -70,7 +76,7 @@
             android:value="2" />
        <meta-data
            android:name="com.google.firebase.messaging.default_notification_icon"
-           android:resource="@drawable/ic_notification_system" />
+           android:resource="@drawable/ic_notification" />
        <meta-data
            android:name="com.google.firebase.messaging.default_notification_color"
            android:resource="@color/blue" />

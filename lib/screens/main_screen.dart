@@ -205,7 +205,8 @@ class _MainScreenState extends GenericAccountState<MainScreen>
 
   initNotification() {
     var initializationSettingsAndroid =
-    AndroidInitializationSettings('@drawable/ic_notification_system');
+    //AndroidInitializationSettings('@drawable/ic_notification_system');
+    AndroidInitializationSettings('@drawable/ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings();
     const MacOSInitializationSettings initializationSettingsMacOS =
     MacOSInitializationSettings(
@@ -250,6 +251,8 @@ class _MainScreenState extends GenericAccountState<MainScreen>
         }
         gotoDetailScreen(data);
       },
+     // onBackgroundMessage: Platform.isIOS ? null : onBackgroundMessageHandler,
+     // onBackgroundMessage: onBackgroundMessageHandler,
       onMessage: (Map<String,
           dynamic> message) async { // todo: new notify handle show banner
        // setState(() {
@@ -300,9 +303,10 @@ class _MainScreenState extends GenericAccountState<MainScreen>
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
         notification.data.uid, notification.data.title, notification.data.content,
         importance: Importance.max, priority: Priority.high, autoCancel: true,ticker: 'ticker',
-       sound: RawResourceAndroidNotificationSound('sound_notification'),
+      // sound: RawResourceAndroidNotificationSound('sound_notification'),
         playSound: true,
         showWhen: true,
+        enableVibration: true
       //  groupKey: notification.data.uid
     );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
@@ -312,7 +316,6 @@ class _MainScreenState extends GenericAccountState<MainScreen>
         0, notification.notification.title, notification.notification.body,
         platformChannelSpecifics,
         payload: notification.data.toString());
-    // print('data '+data.toString());
 
   }
 
