@@ -32,7 +32,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends GenericAccountState<MainScreen>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin ,WidgetsBindingObserver {
   TabController tabController;
 
   int positionTab = 0;
@@ -116,6 +116,7 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     tabController = TabController(length: 5, vsync: this);
     tabController.addListener(handleTabSelection);
     initNotification();
@@ -163,10 +164,14 @@ class _MainScreenState extends GenericAccountState<MainScreen>
   @override
   void dispose() {
     // Dispose of the Tab Controller
+    WidgetsBinding.instance.removeObserver(this);
     tabController.dispose();
     super.dispose();
   }
-
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    print('state ${state.toString()}');
+  }
   List<Tab> listTab() {
     return <Tab>[
       // todo: custom view tabs

@@ -1,6 +1,5 @@
 
 import 'package:tchat_app/shared_preferences/shared_preference.dart';
-import 'package:tchat_app/shared_preferences/shared_preference.dart';
 import 'package:timeago/timeago.dart' as timeago;
 class TimeAgo {
   var locale ='vi';// es
